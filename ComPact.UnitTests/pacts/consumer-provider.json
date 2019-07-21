@@ -1,0 +1,33 @@
+{
+  "consumer": {
+    "name": "consumer"
+  },
+  "provider": {
+    "name": "provider"
+  },
+  "interactions": [
+    {
+      "description": "TestInteraction",
+      "request": {
+        "method": 2,
+        "path": "/",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "query": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": {},
+        "body": {
+          "id": "85f6634d-2958-4af6-9dbe-afd3ff6e01e9"
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "3.0.0"
+    }
+  }
+}

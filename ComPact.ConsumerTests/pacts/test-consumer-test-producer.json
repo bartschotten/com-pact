@@ -1,0 +1,33 @@
+{
+  "consumer": {
+    "name": "test-consumer"
+  },
+  "provider": {
+    "name": "test-producer"
+  },
+  "interactions": [
+    {
+      "description": "a request",
+      "request": {
+        "method": 2,
+        "path": "/testpath",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "query": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {}
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "2.0.0"
+    }
+  }
+}
