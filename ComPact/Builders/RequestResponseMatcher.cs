@@ -8,12 +8,12 @@ namespace ComPact.Builders
 {
     public class RequestResponseMatcher: IRequestResponseMatcher
     {
-        private readonly List<InteractionV2> _interactions;
+        private readonly List<MatchableInteraction> _matchableInteractions;
         private readonly ILogger _logger;
 
-        public RequestResponseMatcher(List<InteractionV2> interactions, ILogger logger)
+        public RequestResponseMatcher(List<MatchableInteraction> interactions, ILogger logger)
         {
-            _interactions = interactions;
+            _matchableInteractions = interactions;
             _logger = logger;
         }
 
@@ -24,7 +24,7 @@ namespace ComPact.Builders
                 throw new ArgumentNullException(nameof(actualRequest));
             }
 
-            var matches = _interactions.Where(p => p.Request.Match(actualRequest));
+            var matches = _matchableInteractions.Where(m => m.Interaction.Request.Match(actualRequest));
 
             if (!matches.Any())
             {
@@ -36,8 +36,14 @@ namespace ComPact.Builders
             }
             else
             {
-                return matches.First().Response;
+                matches.First().HasBeenMatched = true;
+                return matches.First().Interaction.Response;
             }
+        }
+
+        public bool AllHaveBeenMatched()
+        {
+            return _matchableInteractions.All(m => m.HasBeenMatched);
         }
     }
 }

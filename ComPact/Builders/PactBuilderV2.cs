@@ -3,7 +3,6 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -14,10 +13,11 @@ namespace ComPact.Builders
     {
         private readonly CancellationTokenSource _cts;
         private readonly ILogger _logger;
+        private readonly IRequestResponseMatcher _matcher;
 
         public string Consumer { get; private set; }
         public string Provider { get; private set; }
-        public List<InteractionV2> Interactions { get; private set; }
+        public List<MatchableInteraction> MatchableInteractions { get; private set; }
 
         public PactBuilderV2(string consumer, string provider, string mockProviderServiceBaseUri, ILogger logger)
         {
@@ -26,14 +26,16 @@ namespace ComPact.Builders
 
             Consumer = consumer;
             Provider = provider;
-            Interactions = new List<InteractionV2>();
+            MatchableInteractions = new List<MatchableInteraction>();
+
+            _matcher = new RequestResponseMatcher(MatchableInteractions, _logger);
 
             var host = WebHost.CreateDefaultBuilder()
                 .UseKestrel()
                 .UseUrls(mockProviderServiceBaseUri)
                 .ConfigureServices(serviceCollection =>
                 {
-                    serviceCollection.AddSingleton<IRequestResponseMatcher>(new RequestResponseMatcher(Interactions, _logger));
+                    serviceCollection.AddSingleton(_matcher);
                 })
                 .UseStartup<MockProviderServiceStartup>()
                 .Build();
@@ -43,23 +45,33 @@ namespace ComPact.Builders
 
         public void SetupInteraction(InteractionV2 interaction)
         {
-            Interactions.Add(interaction);
+            MatchableInteractions.Add(new MatchableInteraction(interaction));
         }
 
         public void ClearInteractions()
         {
-            Interactions = new List<InteractionV2>();
+            MatchableInteractions = new List<MatchableInteraction>();
         }
 
         public void Build()
         {
             _cts.Cancel();
 
+            if (!MatchableInteractions.Any())
+            {
+                throw new PactException("Cannot build pact. No interactions.");
+            }
+
+            if (!_matcher.AllHaveBeenMatched())
+            {
+                throw new PactException("Cannot build pact. Not all mocked interactions have been called.");
+            }
+
             var pact = new PactV2
             {
                 Consumer = new Pacticipant { Name = Consumer },
                 Provider = new Pacticipant { Name = Provider },
-                Interactions = Interactions
+                Interactions = MatchableInteractions.Select(m => m.Interaction).ToList()
             };
 
             PactWriter.Write(pact, new PactConfig());

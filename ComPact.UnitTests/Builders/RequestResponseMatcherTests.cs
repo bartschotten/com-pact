@@ -29,7 +29,7 @@ namespace ComPact.UnitTests.Builders
                 Body = "OK!"
             };
 
-            var interactions = new List<InteractionV2> { new InteractionV2 { Request = expectedRequest, Response = expectedResponse } };
+            var interactions = new List<MatchableInteraction> { new MatchableInteraction(new InteractionV2 { Request = expectedRequest, Response = expectedResponse }) };
 
             var matcher = new RequestResponseMatcher(interactions, NullLogger.Instance);
 
@@ -39,13 +39,15 @@ namespace ComPact.UnitTests.Builders
             Assert.AreEqual(200, actualResponse.Status);
             Assert.AreEqual("application/json", actualResponse.Headers["Content-Type"]);
             Assert.AreEqual("OK!", actualResponse.Body);
+
+            Assert.IsTrue(matcher.AllHaveBeenMatched());
         }
 
         [TestMethod]
         [ExpectedException(typeof(PactException))]
         public void ShouldThrowPactExceptionIfNoMatchIsFound()
         {
-            var matcher = new RequestResponseMatcher(new List<InteractionV2>(), NullLogger.Instance);
+            var matcher = new RequestResponseMatcher(new List<MatchableInteraction>(), NullLogger.Instance);
 
             try
             {
@@ -94,10 +96,10 @@ namespace ComPact.UnitTests.Builders
                 Body = "Not OK!"
             };
 
-            var interactions = new List<InteractionV2>
+            var interactions = new List<MatchableInteraction>
             {
-                new InteractionV2 { Request = request1, Response = response1 },
-                new InteractionV2 { Request = request2, Response = response2 }
+                new MatchableInteraction(new InteractionV2 { Request = request1, Response = response1 }),
+                new MatchableInteraction(new InteractionV2 { Request = request2, Response = response2 })
             };
 
             var matcher = new RequestResponseMatcher(interactions, NullLogger.Instance);
@@ -109,6 +111,7 @@ namespace ComPact.UnitTests.Builders
             catch (PactException e)
             {
                 Assert.AreEqual("More than one matching response found for this request.", e.Message);
+                Assert.IsFalse(matcher.AllHaveBeenMatched());
                 throw;
             }
         }
@@ -117,7 +120,7 @@ namespace ComPact.UnitTests.Builders
         [ExpectedException(typeof(ArgumentNullException))]
         public void ShouldThrowWhenNull()
         {
-            var matcher = new RequestResponseMatcher(new List<InteractionV2>(), NullLogger.Instance);
+            var matcher = new RequestResponseMatcher(new List<MatchableInteraction>(), NullLogger.Instance);
 
             matcher.FindMatch(null);
         }
