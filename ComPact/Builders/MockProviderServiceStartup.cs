@@ -7,7 +7,7 @@ using System.Text;
 
 namespace ComPact
 {
-    public class MockProviderServiceStartup
+    internal class MockProviderServiceStartup
     {
         private readonly IRequestResponseMatcher _matcher;
 

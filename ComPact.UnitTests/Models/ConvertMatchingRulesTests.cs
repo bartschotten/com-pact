@@ -120,5 +120,25 @@ namespace ComPact.UnitTests.Models
             Assert.AreEqual(2, convertedResponse.MatchingRules.Children().Count());
             Assert.AreEqual("$.body.nestedObject", ((JProperty)convertedResponse.MatchingRules.First).Name);
         }
+
+        [TestMethod]
+        public void RegexMatcherOnSingleProperty()
+        {
+            var response = new Response
+            {
+                Status = 200,
+                Headers = new Headers(),
+                Body = new
+                {
+                    name = Match.Regex("text", "^text$")
+                }
+            };
+
+            var convertedResponse = response.ConvertMatchingRules();
+
+            Assert.AreEqual(1, convertedResponse.MatchingRules.Children().Count());
+            Assert.AreEqual("$.body.name", ((JProperty)convertedResponse.MatchingRules.First).Name);
+            Assert.AreEqual("text", ((JObject)convertedResponse.Body)["name"].Value<string>());
+        }
     }
 }

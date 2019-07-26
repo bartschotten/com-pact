@@ -8,7 +8,7 @@ namespace ComPact.Models
     {
         public Headers() { }
 
-        public Headers(IHeaderDictionary headers)
+        internal Headers(IHeaderDictionary headers)
         {
             if (headers == null)
             {
@@ -21,7 +21,7 @@ namespace ComPact.Models
             }
         }
 
-        public bool Match(Headers actualHeaders)
+        internal bool Match(Headers actualHeaders)
         {
             if (actualHeaders == null)
             {

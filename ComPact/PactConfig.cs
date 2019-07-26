@@ -4,7 +4,7 @@ using System.IO;
 
 namespace ComPact
 {
-    public class PactConfig
+    internal class PactConfig
     {
         private string _pactDir;
         public string PactDir

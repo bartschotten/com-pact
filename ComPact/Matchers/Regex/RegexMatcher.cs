@@ -1,14 +1,19 @@
 ﻿namespace ComPact.Matchers.Regex
 {
-    public class RegexMatcher : IMatcher
+    internal class RegexMatcher : IMatcher
     {
         public string Match { get; set; }
         public dynamic Example { get; set; }
         public string Regex { get; set; }
 
-        internal RegexMatcher(string example, string regex)
+        public RegexMatcher(string example, string regex)
         {
-            Match = "Pact::Term";
+            if (!System.Text.RegularExpressions.Regex.IsMatch(example, regex))
+            {
+                throw new PactException($"The provided example {example} does not match the regular expression {regex}.");
+            }
+
+            Match = "Pact.Term";
             Example = example;
             Regex = regex;
         }

@@ -6,7 +6,7 @@ using ComPact.Models;
 
 namespace ComPact.Builders
 {
-    public class RequestResponseMatcher: IRequestResponseMatcher
+    internal class RequestResponseMatcher: IRequestResponseMatcher
     {
         private readonly List<MatchableInteraction> _matchableInteractions;
         private readonly ILogger _logger;

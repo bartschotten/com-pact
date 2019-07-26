@@ -2,7 +2,7 @@
 
 namespace ComPact.Builders
 {
-    public class MatchableInteraction
+    internal class MatchableInteraction
     {
         public InteractionV2 Interaction { get; set; }
         public bool HasBeenMatched { get; set; }

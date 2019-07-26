@@ -48,11 +48,20 @@ namespace ComPact.Models
             }
             if (token.Type == JTokenType.String)
             {
-                if (token.Value<string>() == "Pact::SomethingLike")
+                if (token.Value<string>().StartsWith("Pact."))
                 {
                     var path = $"$.{token.Parent.Parent.Path}";
-                    token.Root["matchingRules"][path] = JObject.Parse("{\"match\":\"type\"}");
-                    token.Parent.Parent.Replace(token.Parent.Parent.Last.First);
+                    var inlineMatchingRule = ((JObject)token.Parent.Parent);
+                    if (token.Value<string>() == "Pact.SomethingLike")
+                    {
+                        token.Root["matchingRules"][path] = JObject.FromObject(new { match = "type" });
+                    }
+                    else if (token.Value<string>() == "Pact.Term")
+                    {
+                        var regexValue = inlineMatchingRule["Regex"].Value<string>();
+                        token.Root["matchingRules"][path] = JObject.FromObject(new { match = "regex", regex = regexValue });
+                    }
+                    token.Parent.Parent.Replace(inlineMatchingRule["Example"]);
                     _matcherFound = true;
                 }
             }

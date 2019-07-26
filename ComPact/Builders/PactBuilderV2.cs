@@ -11,24 +11,23 @@ namespace ComPact.Builders
 {
     public class PactBuilderV2
     {
+        private readonly string _consumer;
+        private readonly string _provider;
         private readonly CancellationTokenSource _cts;
         private readonly ILogger _logger;
         private readonly IRequestResponseMatcher _matcher;
-
-        public string Consumer { get; private set; }
-        public string Provider { get; private set; }
-        public List<MatchableInteraction> MatchableInteractions { get; private set; }
+        private List<MatchableInteraction> _matchableInteractions;
 
         public PactBuilderV2(string consumer, string provider, string mockProviderServiceBaseUri, ILogger logger)
         {
             _cts = new CancellationTokenSource();
             _logger = logger;
 
-            Consumer = consumer;
-            Provider = provider;
-            MatchableInteractions = new List<MatchableInteraction>();
+            _consumer = consumer;
+            _provider = provider;
+            _matchableInteractions = new List<MatchableInteraction>();
 
-            _matcher = new RequestResponseMatcher(MatchableInteractions, _logger);
+            _matcher = new RequestResponseMatcher(_matchableInteractions, _logger);
 
             var host = WebHost.CreateDefaultBuilder()
                 .UseKestrel()
@@ -43,21 +42,21 @@ namespace ComPact.Builders
             host.RunAsync(_cts.Token);
         }
 
-        public void SetupInteraction(InteractionV2 interaction)
+        public void SetupInteraction(InteractionV2Builder interactionBuilder)
         {
-            MatchableInteractions.Add(new MatchableInteraction(interaction));
+            _matchableInteractions.Add(new MatchableInteraction(interactionBuilder.Build()));
         }
 
         public void ClearInteractions()
         {
-            MatchableInteractions = new List<MatchableInteraction>();
+            _matchableInteractions = new List<MatchableInteraction>();
         }
 
         public void Build()
         {
             _cts.Cancel();
 
-            if (!MatchableInteractions.Any())
+            if (!_matchableInteractions.Any())
             {
                 throw new PactException("Cannot build pact. No interactions.");
             }
@@ -69,10 +68,12 @@ namespace ComPact.Builders
 
             var pact = new PactV2
             {
-                Consumer = new Pacticipant { Name = Consumer },
-                Provider = new Pacticipant { Name = Provider },
-                Interactions = MatchableInteractions.Select(m => m.Interaction).ToList()
+                Consumer = new Pacticipant { Name = _consumer },
+                Provider = new Pacticipant { Name = _provider },
+                Interactions = _matchableInteractions.Select(m => m.Interaction).ToList()
             };
+
+            pact.Interactions.ForEach(i => i.Response = i.Response.ConvertMatchingRules());
 
             PactWriter.Write(pact, new PactConfig());
         }

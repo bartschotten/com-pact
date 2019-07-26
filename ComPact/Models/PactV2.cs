@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ComPact.Models
 {
-    public class PactV2
+    internal class PactV2
     {
         [JsonProperty("consumer")]
         public Pacticipant Consumer { get; set; }

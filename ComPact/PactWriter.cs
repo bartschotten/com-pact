@@ -7,7 +7,7 @@ using System.Text;
 
 namespace ComPact
 {
-    public static class PactWriter
+    internal static class PactWriter
     {
         public static void Write(PactV2 pact, PactConfig config)
         {
@@ -18,15 +18,8 @@ namespace ComPact
             };
             var serializedPact = JsonConvert.SerializeObject(pact, settings);
 
-            try
-            {
-                Directory.CreateDirectory(config.PactDir);
-                File.WriteAllText($"{config.PactDir}{pact.Consumer.Name}-{pact.Provider.Name}.json", serializedPact);
-            }
-            catch (Exception e)
-            {
-                var x = e;
-            }
+            Directory.CreateDirectory(config.PactDir);
+            File.WriteAllText($"{config.PactDir}{pact.Consumer.Name}-{pact.Provider.Name}.json", serializedPact);
         }
     }
 }

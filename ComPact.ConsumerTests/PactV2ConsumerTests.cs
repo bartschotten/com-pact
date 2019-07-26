@@ -1,4 +1,5 @@
 using ComPact.Builders;
+using ComPact.Matchers;
 using ComPact.Models;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -19,7 +20,7 @@ namespace ComPact.ConsumerTests
 
             var builder = new PactBuilderV2("test-consumer", "test-producer", url, NullLogger.Instance);
 
-            var interaction = new InteractionV2Builder()
+            builder.SetupInteraction(new InteractionV2Builder()
                 .UponReceiving("a request")
                 .With(new Request
                 {
@@ -31,11 +32,12 @@ namespace ComPact.ConsumerTests
                 {
                     Status = 200,
                     Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } },
-                    Body = new object { }
-                })
-                .Build();
-
-            builder.SetupInteraction(interaction);
+                    Body = new
+                    {
+                        number = Match.Type(42),
+                        text = Match.Regex("Hello World!", "^Hello.*$")
+                    }
+                }));
 
             var client = new HttpClient
             {
@@ -57,7 +59,7 @@ namespace ComPact.ConsumerTests
 
             var builder = new PactBuilderV2("test-consumer", "test-producer", url, NullLogger.Instance);
 
-            var interaction = new InteractionV2Builder()
+            builder.SetupInteraction(new InteractionV2Builder()
                 .UponReceiving("a request")
                 .With(new Request
                 {
@@ -70,10 +72,7 @@ namespace ComPact.ConsumerTests
                     Status = 200,
                     Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } },
                     Body = new object { }
-                })
-                .Build();
-
-            builder.SetupInteraction(interaction);
+                }));
 
             try
             {

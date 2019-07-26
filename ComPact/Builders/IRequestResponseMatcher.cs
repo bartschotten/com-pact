@@ -2,7 +2,7 @@
 
 namespace ComPact.Builders
 {
-    public interface IRequestResponseMatcher
+    internal interface IRequestResponseMatcher
     {
         Response FindMatch(Request actualRequest);
         bool AllHaveBeenMatched();

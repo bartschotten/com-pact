@@ -21,8 +21,19 @@
         "headers": {
           "Content-Type": "application/json"
         },
-        "body": {},
-        "matchingRules": {}
+        "body": {
+          "number": 42,
+          "text": "Hello World!"
+        },
+        "matchingRules": {
+          "$.body.number": {
+            "match": "type"
+          },
+          "$.body.text": {
+            "match": "regex",
+            "regex": "^Hello.*$"
+          }
+        }
       }
     }
   ],

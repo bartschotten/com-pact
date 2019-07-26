@@ -36,7 +36,7 @@ namespace ComPact.Builders
             return this;
         }
 
-        public InteractionV2 Build()
+        internal InteractionV2 Build()
         {
             return _interaction;
         }

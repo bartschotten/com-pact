@@ -2,7 +2,7 @@
 
 namespace ComPact.Models
 {
-    public class InteractionV2
+    internal class InteractionV2
     {
         [JsonProperty("description")]
         public string Description { get; set; } = string.Empty;

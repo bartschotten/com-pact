@@ -17,7 +17,7 @@ namespace ComPact.Matchers
 
         public static IMatcher MinType(dynamic example, int min)
         {
-            return new MinTypeMatcher(example, min);
+            return new ArrayMatcher(example, min);
         }
     }
 }

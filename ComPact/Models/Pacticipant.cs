@@ -2,7 +2,7 @@
 
 namespace ComPact.Models
 {
-    public class Pacticipant
+    internal class Pacticipant
     {
         [JsonProperty("name")]
         public string Name { get; set; }
