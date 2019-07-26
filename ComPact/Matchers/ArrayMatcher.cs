@@ -2,7 +2,7 @@
 using System;
 using System.Collections;
 
-namespace ComPact.Matchers.Type
+namespace ComPact.Matchers
 {
     internal class ArrayMatcher : IMatcher
     {

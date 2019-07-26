@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Linq;
 using System.Text;
 
 namespace ComPact.Models
@@ -56,6 +57,12 @@ namespace ComPact.Models
                     {
                         token.Root["matchingRules"][path] = JObject.FromObject(new { match = "type" });
                     }
+                    else if (token.Value<string>() == "Pact.ArrayLike")
+                    {
+                        path += "[*]";
+                        var minValue = inlineMatchingRule["Min"].Value<string>();
+                        token.Root["matchingRules"][path] = JObject.FromObject(new { match = "type", min = minValue });
+                    }
                     else if (token.Value<string>() == "Pact.Term")
                     {
                         var regexValue = inlineMatchingRule["Regex"].Value<string>();
@@ -67,9 +74,16 @@ namespace ComPact.Models
             }
             else
             {
-                foreach (var child in token.Children())
+                if (token.Children().Count() == 1)
                 {
-                    ParseToken(child);
+                    ParseToken(token.Children().First());
+                }
+                else
+                {
+                    foreach (var child in token.Children())
+                    {
+                        ParseToken(child);
+                    }
                 }
             }
         }

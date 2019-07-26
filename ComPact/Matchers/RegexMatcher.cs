@@ -1,4 +1,4 @@
-﻿namespace ComPact.Matchers.Regex
+﻿namespace ComPact.Matchers
 {
     internal class RegexMatcher : IMatcher
     {

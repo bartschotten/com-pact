@@ -1,4 +1,4 @@
-﻿using ComPact.Matchers.Regex;
+﻿using ComPact.Matchers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ComPact.UnitTests.Matchers

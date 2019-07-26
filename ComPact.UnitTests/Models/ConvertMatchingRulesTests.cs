@@ -32,6 +32,25 @@ namespace ComPact.UnitTests.Models
         }
 
         [TestMethod]
+        public void TypeMatcherInArray()
+        {
+            var response = new Response
+            {
+                Status = 200,
+                Headers = new Headers(),
+                Body = new []
+                {
+                    Match.Type("text")
+                }
+            };
+
+            var convertedResponse = response.ConvertMatchingRules();
+
+            Assert.AreEqual(1, convertedResponse.MatchingRules.Children().Count());
+            Assert.AreEqual("$.body[0]", ((JProperty)convertedResponse.MatchingRules.First).Name);
+        }
+
+        [TestMethod]
         public void TypeMatcherDirectlyOnBody()
         {
             var response = new Response
@@ -119,6 +138,52 @@ namespace ComPact.UnitTests.Models
 
             Assert.AreEqual(2, convertedResponse.MatchingRules.Children().Count());
             Assert.AreEqual("$.body.nestedObject", ((JProperty)convertedResponse.MatchingRules.First).Name);
+            Assert.AreEqual("$.body.nestedObject.number", ((JProperty)convertedResponse.MatchingRules.Last).Name);
+        }
+
+        [TestMethod]
+        public void MatchingRuleOnArray()
+        {
+            var response = new Response
+            {
+                Status = 200,
+                Headers = new Headers(),
+                Body = new
+                {
+                    array = Match.MinType(new[]
+                    {
+                        5
+                    }, 1)
+                }
+            };
+
+            var convertedResponse = response.ConvertMatchingRules();
+
+            Assert.AreEqual(1, convertedResponse.MatchingRules.Children().Count());
+            Assert.AreEqual("$.body.array[*]", ((JProperty)convertedResponse.MatchingRules.First).Name);
+        }
+
+        [TestMethod]
+        public void NestedMatchingRuleOnArray()
+        {
+            var response = new Response
+            {
+                Status = 200,
+                Headers = new Headers(),
+                Body = new
+                {
+                    array = Match.MinType(new []
+                    {
+                        Match.Type(5),
+                    }, 2)
+                }
+            };
+
+            var convertedResponse = response.ConvertMatchingRules();
+
+            Assert.AreEqual(2, convertedResponse.MatchingRules.Children().Count());
+            Assert.AreEqual("$.body.array[*]", ((JProperty)convertedResponse.MatchingRules.First).Name);
+            Assert.AreEqual("$.body.array[0]", ((JProperty)convertedResponse.MatchingRules.Last).Name);
         }
 
         [TestMethod]

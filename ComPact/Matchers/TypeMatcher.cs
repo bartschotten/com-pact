@@ -1,4 +1,4 @@
-﻿namespace ComPact.Matchers.Type
+﻿namespace ComPact.Matchers
 {
     internal class TypeMatcher : IMatcher
     {

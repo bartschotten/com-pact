@@ -1,7 +1,4 @@
-﻿using ComPact.Matchers.Regex;
-using ComPact.Matchers.Type;
-
-namespace ComPact.Matchers
+﻿namespace ComPact.Matchers
 {
     public static class Match
     {
