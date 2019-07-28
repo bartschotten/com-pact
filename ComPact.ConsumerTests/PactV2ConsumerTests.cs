@@ -20,13 +20,16 @@ namespace ComPact.ConsumerTests
 
             var builder = new PactBuilderV2("test-consumer", "test-producer", url, NullLogger.Instance);
 
+            var recipeId = Guid.Parse("2860dedb-a193-425f-b73e-ef02db0aa8cf");
+
             builder.SetupInteraction(new InteractionV2Builder()
+                .Given($"There is a recipe with id `{recipeId}`")
                 .UponReceiving("a request")
                 .With(new Request
                 {
                     Headers = new Headers { { "Accept", "application/json" } },
                     Method = Method.GET,
-                    Path = "/testpath"
+                    Path = $"/api/recipes/{recipeId}"
                 })
                 .WillRespondWith(new Response
                 {
@@ -34,8 +37,18 @@ namespace ComPact.ConsumerTests
                     Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } },
                     Body = new
                     {
-                        number = Match.Type(42),
-                        text = Match.Regex("Hello World!", "^Hello.*$")
+                        name = Match.Type("A Recipe"),
+                        instructions = Match.Type("Mix it up"),
+                        ingredients = Match.MinType(new []
+                        {
+                            new
+                            {
+                                name = "Salt",
+                                amount = 5.5,
+                                unit = "gram"
+                            }
+                        }, 
+                        1)
                     }
                 }));
 
@@ -44,7 +57,7 @@ namespace ComPact.ConsumerTests
                 BaseAddress = new Uri(url)
             };
             client.DefaultRequestHeaders.Add("Accept", "application/json");
-            var response = await client.GetAsync("testpath");
+            var response = await client.GetAsync($"api/recipes/{recipeId}");
 
             Assert.IsTrue(response.IsSuccessStatusCode);
 

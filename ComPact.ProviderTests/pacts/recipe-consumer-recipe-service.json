@@ -1,9 +1,9 @@
 {
   "consumer": {
-    "name": "test-consumer"
+    "name": "recipe-consumer"
   },
   "provider": {
-    "name": "test-producer"
+    "name": "recipe-service"
   },
   "interactions": [
     {

@@ -1,5 +1,7 @@
 ﻿﻿using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using RestSharp;
 using System;
 using System.IO;
 using System.Text;
@@ -9,6 +11,7 @@ namespace ComPact.Models
     public class Request
     {
         [JsonProperty("method")]
+        [JsonConverter(typeof(StringEnumConverter))]
         public Method Method { get; set; }
         [JsonProperty("path")]
         public string Path { get; set; } = "/";
@@ -43,6 +46,24 @@ namespace ComPact.Models
             var streamReader = new StreamReader(request.Body, Encoding.UTF8);
             var serializedBody = streamReader.ReadToEnd();
             Body = JsonConvert.DeserializeObject<dynamic>(serializedBody);
+        }
+
+        public RestRequest ToRestRequest()
+        {
+            var method = (RestSharp.Method)Enum.Parse(typeof(RestSharp.Method), Method.ToString());
+            var path = Path;
+            if (!string.IsNullOrWhiteSpace(Query))
+            {
+                path += ("?" + Query);
+            }
+            var request = new RestRequest(path, method);
+            foreach (var header in Headers)
+            {
+                request.AddHeader(header.Key, header.Value);
+            }
+            request.AddJsonBody(Body);
+
+            return request;
         }
 
         public bool Match(Request actualRequest)

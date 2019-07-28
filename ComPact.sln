@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.352
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComPact", "ComPact\ComPact.csproj", "{9A622242-5199-4EC0-9953-4E543759153F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComPact", "ComPact\ComPact.csproj", "{9A622242-5199-4EC0-9953-4E543759153F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComPact.UnitTests", "ComPact.UnitTests\ComPact.UnitTests.csproj", "{0191CA45-2A47-4262-8065-BC18263EA67D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComPact.UnitTests", "ComPact.UnitTests\ComPact.UnitTests.csproj", "{0191CA45-2A47-4262-8065-BC18263EA67D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComPact.ConsumerTests", "ComPact.ConsumerTests\ComPact.ConsumerTests.csproj", "{BDF3F200-B8DB-47EA-BD13-5BE7C609B467}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComPact.ConsumerTests", "ComPact.ConsumerTests\ComPact.ConsumerTests.csproj", "{BDF3F200-B8DB-47EA-BD13-5BE7C609B467}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComPact.ProviderTests", "ComPact.ProviderTests\ComPact.ProviderTests.csproj", "{3A46C75D-A045-41B0-A4BE-523F9DC0CDAA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{BDF3F200-B8DB-47EA-BD13-5BE7C609B467}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BDF3F200-B8DB-47EA-BD13-5BE7C609B467}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BDF3F200-B8DB-47EA-BD13-5BE7C609B467}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A46C75D-A045-41B0-A4BE-523F9DC0CDAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A46C75D-A045-41B0-A4BE-523F9DC0CDAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A46C75D-A045-41B0-A4BE-523F9DC0CDAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A46C75D-A045-41B0-A4BE-523F9DC0CDAA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

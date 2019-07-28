@@ -9,7 +9,7 @@
     {
       "description": "TestInteraction",
       "request": {
-        "method": 2,
+        "method": "GET",
         "path": "/",
         "headers": {
           "Accept": "application/json"
@@ -20,7 +20,7 @@
         "status": 200,
         "headers": {},
         "body": {
-          "id": "8621e14f-d9e7-497c-ad51-75fff368115e"
+          "id": "74a9551f-11e2-4165-86b6-77d5a73e38bf"
         },
         "matchingRules": {}
       }
