@@ -34,7 +34,7 @@ namespace ComPact.ConsumerTests
                 .WillRespondWith(new Response
                 {
                     Status = 200,
-                    Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } },
+                    Headers = new Headers { { "Content-Type", "application/json" } },
                     Body = new
                     {
                         name = Match.Type("A Recipe"),
@@ -83,7 +83,7 @@ namespace ComPact.ConsumerTests
                 .WillRespondWith(new Response
                 {
                     Status = 200,
-                    Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } },
+                    Headers = new Headers { { "Content-Type", "application/json" } },
                     Body = new object { }
                 }));
 

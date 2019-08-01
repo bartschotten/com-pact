@@ -2,7 +2,6 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Text;
 
@@ -15,7 +14,7 @@ namespace ComPact.Models
         [JsonProperty("status")]
         public int Status { get; set; }
         [JsonProperty("headers")]
-        public Dictionary<string, string> Headers { get; set; }
+        public Headers Headers { get; set; }
         [JsonProperty("body")]
         public dynamic Body { get; set; }
         [JsonProperty("matchingRules")]

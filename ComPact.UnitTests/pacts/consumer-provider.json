@@ -18,9 +18,11 @@
       },
       "response": {
         "status": 200,
-        "headers": {},
+        "headers": {
+          "Content-Type": "application/json"
+        },
         "body": {
-          "id": "74a9551f-11e2-4165-86b6-77d5a73e38bf"
+          "id": "4bd082df-b695-4ab5-8580-e41f0802da31"
         },
         "matchingRules": {}
       }

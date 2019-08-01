@@ -11,8 +11,6 @@ namespace ComPact.UnitTests
         [TestMethod]
         public void ShouldWritePactFile()
         {
-            var requestHeaders = new Headers { { "Accept", "application/json" } };
-
             var pact = new PactV2
             {
                 Consumer = new Pacticipant { Name = "consumer" },
@@ -26,12 +24,12 @@ namespace ComPact.UnitTests
                         {
                             Method = Method.GET,
                             Path = "/",
-                            Headers = requestHeaders
+                            Headers = new Headers { { "Accept", "application/json" } }
                         },
                         Response = new Response
                         {
                             Status = 200,
-                            Headers = new Dictionary<string, string>(),
+                            Headers = new Headers { { "Content-Type", "application/json" } },
                             Body = new
                             {
                                 id = Guid.NewGuid()
