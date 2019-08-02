@@ -90,6 +90,7 @@ namespace ComPact.Models
         internal List<string> Match(Response actualResponse)
         {
             var expectedJObj = JObject.Parse(JsonConvert.SerializeObject(this));
+            expectedJObj.Remove("matchingRules");
             var actualJObj = JObject.Parse(JsonConvert.SerializeObject(actualResponse));
 
             var differences = new List<string>();
@@ -110,8 +111,16 @@ namespace ComPact.Models
                 }
                 else
                 {
+                    var matchingRule = GetMatchingRuleForToken(token);
                     var actualValue = actualToken.Value<string>();
-                    if (actualValue != expectedValue)
+                    if (matchingRule?.First.First.Value<string>() == "type")
+                    {
+                        if (actualToken.Type != token.Type)
+                        {
+                            differences.Add($"Expected value of type {token.Type} (like \"{expectedValue}\") at {token.Path}, but was {actualValue} ({actualToken.Type})");
+                        }
+                    }
+                    else if (actualValue != expectedValue)
                     {
                         differences.Add($"Expected {expectedValue} at {token.Path}, but was {actualValue}");
                     }
@@ -129,6 +138,20 @@ namespace ComPact.Models
                     CompareExpectedTokenWithActual(child, actualJObject, differences);
                 }
             }
+        }
+
+        private JToken GetMatchingRuleForToken(JToken token)
+        {
+            var currentToken = token;
+            while (currentToken.Root != currentToken)
+            {
+                if (MatchingRules.TryGetValue("$." + currentToken.Path, out var matchingRuleToken))
+                {
+                    return matchingRuleToken;
+                }
+                currentToken = currentToken.Parent;
+            }
+            return null;
         }
     }
 }
