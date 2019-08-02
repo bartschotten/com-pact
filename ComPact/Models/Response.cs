@@ -18,16 +18,16 @@ namespace ComPact.Models
         [JsonProperty("body")]
         public dynamic Body { get; set; }
         [JsonProperty("matchingRules")]
-        public JObject MatchingRules { get; set; } = new JObject();
+        internal JObject MatchingRules { get; set; } = new JObject();
 
-        public Response ConvertMatchingRules()
+        internal Response ConvertMatchingRules()
         {
             var jobj = JObject.Parse(JsonConvert.SerializeObject(this));
 
             do
             {
                 _matcherFound = false;
-                ParseToken(jobj.Root);
+                FindAndConvertFirstUnconvertedMatchingRule(jobj.Root);
             }
             while (_matcherFound);
 
@@ -40,7 +40,7 @@ namespace ComPact.Models
         /// but immediately returns when the first one is found, because the tree is rearranged as it is being searched.
         /// </summary>
         /// <param name="token"></param>
-        private void ParseToken(JToken token)
+        private void FindAndConvertFirstUnconvertedMatchingRule(JToken token)
         {
             if (_matcherFound)
             {
@@ -75,14 +75,58 @@ namespace ComPact.Models
             {
                 if (token.Children().Count() == 1)
                 {
-                    ParseToken(token.Children().First());
+                    FindAndConvertFirstUnconvertedMatchingRule(token.Children().First());
                 }
                 else
                 {
                     foreach (var child in token.Children())
                     {
-                        ParseToken(child);
+                        FindAndConvertFirstUnconvertedMatchingRule(child);
                     }
+                }
+            }
+        }
+
+        internal List<string> Match(Response actualResponse)
+        {
+            var expectedJObj = JObject.Parse(JsonConvert.SerializeObject(this));
+            var actualJObj = JObject.Parse(JsonConvert.SerializeObject(actualResponse));
+
+            var differences = new List<string>();
+            CompareExpectedTokenWithActual(expectedJObj.Root, actualJObj, differences);
+
+            return differences;
+        }
+
+        private void CompareExpectedTokenWithActual(JToken token, JObject actualJObject, List<string> differences)
+        {
+            if (token.Type == JTokenType.String)
+            {
+                var expectedValue = token.Value<string>();
+                var actualToken = actualJObject.SelectToken(token.Path);
+                if (actualToken == null)
+                {
+                    differences.Add($"Property {token.Path} was not present in the actual response");
+                }
+                else
+                {
+                    var actualValue = actualToken.Value<string>();
+                    if (actualValue != expectedValue)
+                    {
+                        differences.Add($"Expected {expectedValue} at {token.Path}, but was {actualValue}");
+                    }
+                }
+            }
+
+            if (token.Children().Count() == 1)
+            {
+                CompareExpectedTokenWithActual(token.Children().First(), actualJObject, differences);
+            }
+            else
+            {
+                foreach (var child in token.Children())
+                {
+                    CompareExpectedTokenWithActual(child, actualJObject, differences);
                 }
             }
         }
