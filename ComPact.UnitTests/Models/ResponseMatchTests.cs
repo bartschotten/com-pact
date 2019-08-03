@@ -21,13 +21,13 @@ namespace ComPact.UnitTests.Models
         [TestMethod]
         public void ValuesDoNotMatch()
         {
-            CompareExpectedAndActualBody(new { name = "Hello world!" }, new { name = "Hello Pact!" }, "Expected Hello world! at body.name, but was Hello Pact!");
+            CompareExpectedAndActualBody(new { name = "Hello world!" }, new { name = "Hello Pact!" }, "Expected Hello world! at body.name, but was Hello Pact!.");
         }
 
         [TestMethod]
         public void PropertyCannotBeFound()
         {
-            CompareExpectedAndActualBody(new { name = "Hello world!" }, new { text = "Hello world!" }, "Property body.name was not present in the actual response");
+            CompareExpectedAndActualBody(new { name = "Hello world!" }, new { text = "Hello world!" }, "Property body.name was not present in the actual response.");
         }
 
         [TestMethod]
@@ -39,7 +39,7 @@ namespace ComPact.UnitTests.Models
         [TestMethod]
         public void TypeMismatchForString()
         {
-            CompareExpectedAndActualBody(new { name = Match.Type("Hello world!") }, new { name = 1 }, "Expected value of type String (like: Hello world!) at body.name, but was value of type Integer");
+            CompareExpectedAndActualBody(new { name = Match.Type("Hello world!") }, new { name = 1 }, "Expected value of type String (like: Hello world!) at body.name, but was value of type Integer.");
         }
 
         [TestMethod]
@@ -51,38 +51,44 @@ namespace ComPact.UnitTests.Models
         [TestMethod]
         public void TypeMismatchForInteger()
         {
-            CompareExpectedAndActualBody(new { number = Match.Type(1) }, new { number = 1.1 }, "Expected value of type Integer (like: 1) at body.number, but was value of type Float");
+            CompareExpectedAndActualBody(new { number = Match.Type(1) }, new { number = 1.1 }, "Expected value of type Integer (like: 1) at body.number, but was value of type Float.");
         }
 
         [TestMethod]
         public void TypeMismatchForFloat()
         {
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
-            CompareExpectedAndActualBody(new { number = Match.Type(1.1) }, new { number = 1 }, "Expected value of type Float (like: 1.1) at body.number, but was value of type Integer");
+            CompareExpectedAndActualBody(new { number = Match.Type(1.1) }, new { number = 1 }, "Expected value of type Float (like: 1.1) at body.number, but was value of type Integer.");
         }
 
         [TestMethod]
         public void TypeMismatchForBoolean()
         {
-            CompareExpectedAndActualBody(new { status = Match.Type(true) }, new { status = 1 }, "Expected value of type Boolean (like: True) at body.status, but was value of type Integer");
+            CompareExpectedAndActualBody(new { status = Match.Type(true) }, new { status = 1 }, "Expected value of type Boolean (like: True) at body.status, but was value of type Integer.");
         }
 
         [TestMethod]
         public void TypeMismatchWithRuleOnParentObject()
         {
-            CompareExpectedAndActualBody(Match.Type(new { name = "Hello world!" }), new { name = 1 }, "Expected value of type String (like: Hello world!) at body.name, but was value of type Integer");
+            CompareExpectedAndActualBody(Match.Type(new { name = "Hello world!" }), new { name = 1 }, "Expected value of type String (like: Hello world!) at body.name, but was value of type Integer.");
         }
 
         [TestMethod]
         public void TypeMismatchWithRuleWithinArray()
         {
-            CompareExpectedAndActualBody(new [] { Match.Type("Hello world!") }, new [] { 1 }, "Expected value of type String (like: Hello world!) at body[0], but was value of type Integer");
+            CompareExpectedAndActualBody(new [] { Match.Type("Hello world!") }, new [] { 1 }, "Expected value of type String (like: Hello world!) at body[0], but was value of type Integer.");
         }
 
         [TestMethod]
         public void TypeMismatchWithRuleOnParentArray()
         {
-            CompareExpectedAndActualBody(Match.Type(new[] { "Hello world!" }), new[] { 1 }, "Expected value of type String (like: Hello world!) at body[0], but was value of type Integer");
+            CompareExpectedAndActualBody(Match.Type(new[] { "Hello world!" }), new[] { 1 }, "Expected value of type String (like: Hello world!) at body[0], but was value of type Integer.");
+        }
+
+        [TestMethod]
+        public void NotEnoughItemsInArray()
+        {
+            CompareExpectedAndActualBody(Match.MinType(new[] { 1 }, 2), new[] { 1 }, "Expected an array with 2 item(s) at body, but was 1 items(s).");
         }
 
         private void CompareExpectedAndActualBody(dynamic expected, dynamic actual, string expectedDifference)

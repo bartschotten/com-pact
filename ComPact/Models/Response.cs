@@ -116,6 +116,9 @@ namespace ComPact.Models
                 case JTokenType.Boolean:
                     difference = CompareExpectedTokenWithActual<bool>(token, actualJObject);
                     break;
+                case JTokenType.Array:
+                    difference = CompareExpectedArrayWithActual(token, actualJObject);
+                    break;
             }
             if (difference != null)
             {
@@ -141,7 +144,7 @@ namespace ComPact.Models
             var actualToken = actualJObject.SelectToken(expectedToken.Path);
             if (actualToken == null)
             {
-                return $"Property {expectedToken.Path} was not present in the actual response";
+                return $"Property {expectedToken.Path} was not present in the actual response.";
             }
             else
             {
@@ -151,13 +154,31 @@ namespace ComPact.Models
                 {
                     if (actualToken.Type != expectedToken.Type)
                     {
-                        return $"Expected value of type {expectedToken.Type} (like: {expectedValue}) at {expectedToken.Path}, but was value of type {actualToken.Type}";
+                        return $"Expected value of type {expectedToken.Type} (like: {expectedValue}) at {expectedToken.Path}, but was value of type {actualToken.Type}.";
                     }
                 }
                 else if (!actualValue.Equals(expectedValue))
                 {
-                    return $"Expected {expectedValue} at {expectedToken.Path}, but was {actualValue}";
+                    return $"Expected {expectedValue} at {expectedToken.Path}, but was {actualValue}.";
                 }
+            }
+
+            return null;
+        }
+
+        private string CompareExpectedArrayWithActual(JToken expectedToken, JObject actualJObject)
+        {
+            var actualToken = actualJObject.SelectToken(expectedToken.Path);
+            if (actualToken == null)
+            {
+                return $"Array {expectedToken.Path} was not present in the actual response.";
+            }
+            var matchingRule = GetMatchingRuleForToken(expectedToken);
+            var expectedMinItems = matchingRule?["min"]?.Value<int>();
+            var actualItemsCount = actualToken.Children().Count();
+            if (expectedMinItems.HasValue && actualItemsCount < expectedMinItems)
+            {
+                return $"Expected an array with {expectedMinItems} item(s) at {expectedToken.Path}, but was {actualItemsCount} items(s).";
             }
 
             return null;
@@ -169,6 +190,10 @@ namespace ComPact.Models
             while (currentToken.Root != currentToken)
             {
                 if (MatchingRules.TryGetValue("$." + currentToken.Path, out var matchingRuleToken))
+                {
+                    return matchingRuleToken;
+                }
+                if (MatchingRules.TryGetValue("$." + currentToken.Path + "[*]", out matchingRuleToken))
                 {
                     return matchingRuleToken;
                 }
