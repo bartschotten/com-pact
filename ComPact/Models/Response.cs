@@ -94,50 +94,73 @@ namespace ComPact.Models
             var actualJObj = JObject.Parse(JsonConvert.SerializeObject(actualResponse));
 
             var differences = new List<string>();
-            CompareExpectedTokenWithActual(expectedJObj.Root, actualJObj, differences);
+            CompareTokenAndItsChildren(expectedJObj.Root, actualJObj, differences);
 
             return differences;
         }
 
-        private void CompareExpectedTokenWithActual(JToken token, JObject actualJObject, List<string> differences)
+        private void CompareTokenAndItsChildren(JToken token, JObject actualJObject, List<string> differences)
         {
-            if (token.Type == JTokenType.String)
+            string difference = null;
+            switch(token.Type)
             {
-                var expectedValue = token.Value<string>();
-                var actualToken = actualJObject.SelectToken(token.Path);
-                if (actualToken == null)
-                {
-                    differences.Add($"Property {token.Path} was not present in the actual response");
-                }
-                else
-                {
-                    var matchingRule = GetMatchingRuleForToken(token);
-                    var actualValue = actualToken.Value<string>();
-                    if (matchingRule?.First.First.Value<string>() == "type")
-                    {
-                        if (actualToken.Type != token.Type)
-                        {
-                            differences.Add($"Expected value of type {token.Type} (like \"{expectedValue}\") at {token.Path}, but was {actualValue} ({actualToken.Type})");
-                        }
-                    }
-                    else if (actualValue != expectedValue)
-                    {
-                        differences.Add($"Expected {expectedValue} at {token.Path}, but was {actualValue}");
-                    }
-                }
+                case JTokenType.String:
+                    difference = CompareExpectedTokenWithActual<string>(token, actualJObject);
+                    break;
+                case JTokenType.Integer:
+                    difference = CompareExpectedTokenWithActual<int>(token, actualJObject);
+                    break;
+                case JTokenType.Float:
+                    difference = CompareExpectedTokenWithActual<double>(token, actualJObject);
+                    break;
+                case JTokenType.Boolean:
+                    difference = CompareExpectedTokenWithActual<bool>(token, actualJObject);
+                    break;
+            }
+            if (difference != null)
+            {
+                differences.Add(difference);
             }
 
             if (token.Children().Count() == 1)
             {
-                CompareExpectedTokenWithActual(token.Children().First(), actualJObject, differences);
+                CompareTokenAndItsChildren(token.Children().First(), actualJObject, differences);
             }
             else
             {
                 foreach (var child in token.Children())
                 {
-                    CompareExpectedTokenWithActual(child, actualJObject, differences);
+                    CompareTokenAndItsChildren(child, actualJObject, differences);
                 }
             }
+        }
+
+        private string CompareExpectedTokenWithActual<T>(JToken expectedToken, JObject actualJObject) where T: IEquatable<T>
+        {
+            var expectedValue = expectedToken.Value<T>();
+            var actualToken = actualJObject.SelectToken(expectedToken.Path);
+            if (actualToken == null)
+            {
+                return $"Property {expectedToken.Path} was not present in the actual response";
+            }
+            else
+            {
+                var matchingRule = GetMatchingRuleForToken(expectedToken);
+                var actualValue = actualToken.Value<T>();
+                if (matchingRule?.First.First.Value<string>() == "type")
+                {
+                    if (actualToken.Type != expectedToken.Type)
+                    {
+                        return $"Expected value of type {expectedToken.Type} (like: {expectedValue}) at {expectedToken.Path}, but was value of type {actualToken.Type}";
+                    }
+                }
+                else if (!actualValue.Equals(expectedValue))
+                {
+                    return $"Expected {expectedValue} at {expectedToken.Path}, but was {actualValue}";
+                }
+            }
+
+            return null;
         }
 
         private JToken GetMatchingRuleForToken(JToken token)
