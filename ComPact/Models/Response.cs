@@ -59,7 +59,7 @@ namespace ComPact.Models
                     else if (token.Value<string>() == "Pact.ArrayLike")
                     {
                         path += "[*]";
-                        var minValue = inlineMatchingRule["Min"].Value<string>();
+                        var minValue = inlineMatchingRule["Min"].Value<int>();
                         token.Root["matchingRules"][path] = JObject.FromObject(new { match = "type", min = minValue });
                     }
                     else if (token.Value<string>() == "Pact.Term")
@@ -149,12 +149,20 @@ namespace ComPact.Models
             else
             {
                 var matchingRule = GetMatchingRuleForToken(expectedToken);
+                var regexValue = matchingRule?["regex"]?.Value<string>();
                 var actualValue = actualToken.Value<T>();
-                if (matchingRule?.First.First.Value<string>() == "type")
+                if (matchingRule?["match"]?.Value<string>() == "type")
                 {
                     if (actualToken.Type != expectedToken.Type)
                     {
                         return $"Expected value of type {expectedToken.Type} (like: {expectedValue}) at {expectedToken.Path}, but was value of type {actualToken.Type}.";
+                    }
+                }
+                else if (regexValue != null)
+                {
+                    if (!System.Text.RegularExpressions.Regex.IsMatch(actualToken.Value<string>(), regexValue))
+                    {
+                        return $"Expected value matching {regexValue} (like: {expectedValue}) at {expectedToken.Path}, but was {actualValue}.";
                     }
                 }
                 else if (!actualValue.Equals(expectedValue))

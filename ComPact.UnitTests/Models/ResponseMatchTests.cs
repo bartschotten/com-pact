@@ -91,6 +91,18 @@ namespace ComPact.UnitTests.Models
             CompareExpectedAndActualBody(Match.MinType(new[] { 1 }, 2), new[] { 1 }, "Expected an array with 2 item(s) at body, but was 1 items(s).");
         }
 
+        [TestMethod]
+        public void RegexMatchForString()
+        {
+            CompareExpectedAndActualBody(new { name = Match.Regex("Hello world!", "^Hello.*$") }, new { name = "Hello Pact!" }, null);
+        }
+
+        [TestMethod]
+        public void RegexMismatchForString()
+        {
+            CompareExpectedAndActualBody(new { name = Match.Regex("Hello world!", "^.*world!$") }, new { name = "Hello Pact!" }, "Expected value matching ^.*world!$ (like: Hello world!) at body.name, but was Hello Pact!.");
+        }
+
         private void CompareExpectedAndActualBody(dynamic expected, dynamic actual, string expectedDifference)
         {
             var expectedResponse = new Response
