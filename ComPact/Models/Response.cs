@@ -3,7 +3,6 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace ComPact.Models
 {
@@ -14,7 +13,7 @@ namespace ComPact.Models
         [JsonProperty("status")]
         public int Status { get; set; }
         [JsonProperty("headers")]
-        public Headers Headers { get; set; }
+        public Headers Headers { get; set; } = new Headers();
         [JsonProperty("body")]
         public dynamic Body { get; set; }
         [JsonProperty("matchingRules")]

@@ -5,12 +5,7 @@ namespace ComPact.Builders
 {
     public class InteractionV2Builder
     {
-        private readonly InteractionV2 _interaction;
-
-        public InteractionV2Builder()
-        {
-            _interaction = new InteractionV2();
-        }
+        private readonly InteractionV2 _interaction = new InteractionV2();
 
         public InteractionV2Builder Given(string providerState)
         {
@@ -24,15 +19,35 @@ namespace ComPact.Builders
             return this;
         }
 
-        public InteractionV2Builder With(Request request)
+        /// <summary>
+        /// Type Pact.Request...
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public InteractionV2Builder With(RequestBuilder request)
         {
-            _interaction.Request = request ?? throw new ArgumentNullException(nameof(request));
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            _interaction.Request = request.Build();
             return this;
         }
 
-        public InteractionV2Builder WillRespondWith(Response response)
+        /// <summary>
+        /// Type Pact.Response...
+        /// </summary>
+        /// <param name="response"></param>
+        /// <returns></returns>
+        public InteractionV2Builder WillRespondWith(ResponseBuilder response)
         {
-            _interaction.Response = response ?? throw new ArgumentNullException(nameof(response));
+            if (response == null)
+            {
+                throw new ArgumentNullException(nameof(response));
+            }
+
+            _interaction.Response = response.Build();
             return this;
         }
 

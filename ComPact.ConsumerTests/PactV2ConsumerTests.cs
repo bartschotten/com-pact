@@ -22,35 +22,26 @@ namespace ComPact.ConsumerTests
 
             var recipeId = Guid.Parse("2860dedb-a193-425f-b73e-ef02db0aa8cf");
 
+            var ingredient = Some.Object.With(
+                                Some.Element.Named("name").Like("Salt"),
+                                Some.Element.Named("amount").Like(5.5),
+                                Some.Element.Named("unit").Like("gram"));
+
             builder.SetupInteraction(new InteractionV2Builder()
                 .Given($"There is a recipe with id `{recipeId}`")
                 .UponReceiving("a request")
-                .With(new Request
-                {
-                    Headers = new Headers { { "Accept", "application/json" } },
-                    Method = Method.GET,
-                    Path = $"/api/recipes/{recipeId}"
-                })
-                .WillRespondWith(new Response
-                {
-                    Status = 200,
-                    Headers = new Headers { { "Content-Type", "application/json" } },
-                    Body = new
-                    {
-                        name = Match.Type("A Recipe"),
-                        instructions = Match.Type("Mix it up"),
-                        ingredients = Match.MinType(new []
-                        {
-                            new
-                            {
-                                name = "Salt",
-                                amount = 5.5,
-                                unit = "gram"
-                            }
-                        }, 
-                        1)
-                    }
-                }));
+                .With(Pact.Request
+                    .WithHeader("Accept", "application/json")
+                    .WithMethod(Method.GET)
+                    .ToPath($"/api/recipes/{recipeId}"))
+                .WillRespondWith(Pact.Response
+                    .WithStatus(200)
+                    .WithHeader("Content-Type", "application/json")
+                    .WithBody(Pact.ResponseBody.With(
+                        Some.Element.Named("name").Like("A Recipe"),
+                        Some.Element.Named("instructions").Like("Mix it up"),
+                        Some.Array.Named("ingredients").Of(ingredient)
+                    ))));
 
             var client = new HttpClient
             {
@@ -74,18 +65,14 @@ namespace ComPact.ConsumerTests
 
             builder.SetupInteraction(new InteractionV2Builder()
                 .UponReceiving("a request")
-                .With(new Request
-                {
-                    Headers = new Headers { { "Accept", "application/json" } },
-                    Method = Method.GET,
-                    Path = "/testpath"
-                })
-                .WillRespondWith(new Response
-                {
-                    Status = 200,
-                    Headers = new Headers { { "Content-Type", "application/json" } },
-                    Body = new object { }
-                }));
+                .With(Pact.Request
+                    .WithHeader("Accept", "application/json")
+                    .WithMethod(Method.GET)
+                    .ToPath("/testpath"))
+                .WillRespondWith(Pact.Response
+                    .WithStatus(200)
+                    .WithHeader("Content-Type", "application/json")
+                    .WithBody(Pact.ResponseBody.Empty())));
 
             try
             {

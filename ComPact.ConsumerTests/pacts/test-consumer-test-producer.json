@@ -34,15 +34,30 @@
           ]
         },
         "matchingRules": {
-          "$.body.name": {
-            "match": "type"
+          "$.name": {
+            "Match": "type",
+            "Min": null,
+            "Regex": null
           },
-          "$.body.instructions": {
-            "match": "type"
+          "$.instructions": {
+            "Match": "type",
+            "Min": null,
+            "Regex": null
           },
-          "$.body.ingredients[*]": {
-            "match": "type",
-            "min": "1"
+          "$.ingredients[0].name": {
+            "Match": "type",
+            "Min": null,
+            "Regex": null
+          },
+          "$.ingredients[0].amount": {
+            "Match": "type",
+            "Min": null,
+            "Regex": null
+          },
+          "$.ingredients[0].unit": {
+            "Match": "type",
+            "Min": null,
+            "Regex": null
           }
         }
       }
