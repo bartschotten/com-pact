@@ -112,6 +112,56 @@ namespace ComPact.UnitTests.Models
             CompareExpectedAndActualBody(new { name = "Hello world!" }, matchingRules, new { name = "Hello Pact!" }, "Expected value matching ^.*world!$ (like: Hello world!) at body.name, but was Hello Pact!.");
         }
 
+        [TestMethod]
+        public void MultipleMatchingRules()
+        {
+            var matchingRules = new Dictionary<string, MatchingRule>
+            {
+                { "$.body[0].name", new MatchingRule { Match = "type" } },
+                { "$.body", new MatchingRule { Match = "type" } },
+                { "$.body[*].name", new MatchingRule { Match = "type" } },
+            };
+            CompareExpectedAndActualBody(new[] { new { name = "Hello world!" } }, matchingRules, new[] { new { name = 1 } }, "Expected value of type String (like: Hello world!) at body[0].name, but was value of type Integer.");
+        }
+
+        [DataTestMethod]
+        [DataRow("$.body.anObject.anArray[0].name")]
+        [DataRow("$.body.anObject.anArray[*].name")]
+        [DataRow("$.body.*.anArray[*].name")]
+        public void ComplexStarNotation(string path)
+        {
+            var matchingRules = new Dictionary<string, MatchingRule> { { path, new MatchingRule { Match = "type" } } };
+            var expectedBody = new
+            {
+                anObject = new
+                {
+                    anArray = new[] 
+                    {
+                        new
+                        {
+                            name = "Hello world!"
+                        }
+                    }
+                }
+            };
+
+            var actualBody = new
+            {
+                anObject = new
+                {
+                    anArray = new[]
+                    {
+                        new
+                        {
+                            name = "Hello pact!"
+                        }
+                    }
+                }
+            };
+
+            CompareExpectedAndActualBody(expectedBody, matchingRules, actualBody, null);
+        }
+
         private void CompareExpectedAndActualBody(object expected, Dictionary<string, MatchingRule> matchingRules, object actual, string expectedDifference)
         {
             var expectedResponse = new Response

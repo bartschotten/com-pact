@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace ComPact.UnitTests.Builders
 {
     [TestClass]
-    public class PactContentBuilderTests
+    public class ResponseBodyBuilderTests
     {
         [TestMethod]
         public void SimpleValue()

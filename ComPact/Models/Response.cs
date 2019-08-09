@@ -23,31 +23,49 @@ namespace ComPact.Models
             expectedJObj.Remove("matchingRules");
             var actualJObj = JObject.Parse(JsonConvert.SerializeObject(actualResponse));
 
+            var applicableMatchingRules = LinkMatchingRulesToTokens(expectedJObj.Root);
             var differences = new List<string>();
-            CompareTokenAndItsChildren(expectedJObj.Root, actualJObj, differences);
+            CompareTokenAndItsChildren(expectedJObj.Root, applicableMatchingRules, actualJObj, differences);
 
             return differences;
         }
 
-        private void CompareTokenAndItsChildren(JToken token, JObject actualJObject, List<string> differences)
+        private Dictionary<JToken, MatchingRule> LinkMatchingRulesToTokens(JToken rootToken)
+        {
+            var orderedPaths = MatchingRules.Select(m => m.Key).OrderBy(m => m, new MatchingRulePathComparer()).ToList();
+
+            var applicableMatchingRules = new Dictionary<JToken, MatchingRule>();
+            foreach (var path in orderedPaths)
+            {
+                var tokens = rootToken.SelectTokens(path).ToList();
+                foreach (var token in tokens)
+                {
+                    applicableMatchingRules[token] = MatchingRules[path];
+                }
+            }
+
+            return applicableMatchingRules;
+        }
+
+        private void CompareTokenAndItsChildren(JToken token, Dictionary<JToken, MatchingRule> applicableMatchingRules, JObject actualJObject, List<string> differences)
         {
             string difference = null;
             switch(token.Type)
             {
                 case JTokenType.String:
-                    difference = CompareExpectedTokenWithActual<string>(token, actualJObject);
+                    difference = CompareExpectedTokenWithActual<string>(token, applicableMatchingRules, actualJObject);
                     break;
                 case JTokenType.Integer:
-                    difference = CompareExpectedTokenWithActual<int>(token, actualJObject);
+                    difference = CompareExpectedTokenWithActual<int>(token, applicableMatchingRules, actualJObject);
                     break;
                 case JTokenType.Float:
-                    difference = CompareExpectedTokenWithActual<double>(token, actualJObject);
+                    difference = CompareExpectedTokenWithActual<double>(token, applicableMatchingRules, actualJObject);
                     break;
                 case JTokenType.Boolean:
-                    difference = CompareExpectedTokenWithActual<bool>(token, actualJObject);
+                    difference = CompareExpectedTokenWithActual<bool>(token, applicableMatchingRules, actualJObject);
                     break;
                 case JTokenType.Array:
-                    difference = CompareExpectedArrayWithActual(token, actualJObject);
+                    difference = CompareExpectedArrayWithActual(token, applicableMatchingRules, actualJObject);
                     break;
             }
             if (difference != null)
@@ -57,18 +75,18 @@ namespace ComPact.Models
 
             if (token.Children().Count() == 1)
             {
-                CompareTokenAndItsChildren(token.Children().First(), actualJObject, differences);
+                CompareTokenAndItsChildren(token.Children().First(), applicableMatchingRules, actualJObject, differences);
             }
             else
             {
                 foreach (var child in token.Children())
                 {
-                    CompareTokenAndItsChildren(child, actualJObject, differences);
+                    CompareTokenAndItsChildren(child, applicableMatchingRules, actualJObject, differences);
                 }
             }
         }
 
-        private string CompareExpectedTokenWithActual<T>(JToken expectedToken, JObject actualJObject) where T: IEquatable<T>
+        private string CompareExpectedTokenWithActual<T>(JToken expectedToken, Dictionary<JToken, MatchingRule> applicableMatchingRules, JObject actualJObject) where T: IEquatable<T>
         {
             var expectedValue = expectedToken.Value<T>();
             var actualToken = actualJObject.SelectToken(expectedToken.Path);
@@ -78,7 +96,7 @@ namespace ComPact.Models
             }
             else
             {
-                var matchingRule = GetMatchingRuleForToken(expectedToken);
+                var matchingRule = GetMatchingRuleForToken(expectedToken, applicableMatchingRules);
                 var regexValue = matchingRule?.Regex;
                 var actualValue = actualToken.Value<T>();
                 if (matchingRule?.Match == "type")
@@ -104,14 +122,14 @@ namespace ComPact.Models
             return null;
         }
 
-        private string CompareExpectedArrayWithActual(JToken expectedToken, JObject actualJObject)
+        private string CompareExpectedArrayWithActual(JToken expectedToken, Dictionary<JToken, MatchingRule> applicableMatchingRules, JObject actualJObject)
         {
             var actualToken = actualJObject.SelectToken(expectedToken.Path);
             if (actualToken == null)
             {
                 return $"Array {expectedToken.Path} was not present in the actual response.";
             }
-            var matchingRule = GetMatchingRuleForToken(expectedToken);
+            var matchingRule = GetMatchingRuleForToken(expectedToken, applicableMatchingRules);
             var expectedMinItems = matchingRule?.Min;
             var actualItemsCount = actualToken.Children().Count();
             if (expectedMinItems.HasValue && actualItemsCount < expectedMinItems)
@@ -122,22 +140,34 @@ namespace ComPact.Models
             return null;
         }
 
-        private MatchingRule GetMatchingRuleForToken(JToken token)
+        private MatchingRule GetMatchingRuleForToken(JToken token, Dictionary<JToken, MatchingRule> applicableMatchingRules)
         {
             var currentToken = token;
             while (currentToken.Root != currentToken)
             {
-                if (MatchingRules.TryGetValue("$." + currentToken.Path, out var rule))
-                {
-                    return rule;
-                }
-                if (MatchingRules.TryGetValue("$." + currentToken.Path + "[*]", out rule))
+                if (applicableMatchingRules.TryGetValue(currentToken, out var rule))
                 {
                     return rule;
                 }
                 currentToken = currentToken.Parent;
             }
             return null;
+        }
+
+        private class MatchingRulePathComparer : IComparer<string>
+        {
+            public int Compare(string x, string y)
+            {
+                var lengthComparison = x.Length.CompareTo(y.Length);
+                if (lengthComparison == 0)
+                {
+                    return y.Count(c => c == '*').CompareTo(x.Count(c => c == '*'));
+                }
+                else
+                {
+                    return lengthComparison;
+                }
+            }
         }
     }
 }
