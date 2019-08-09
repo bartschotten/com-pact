@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using ComPact.Models;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -255,12 +256,5 @@ namespace ComPact.Builders
         Exact,
         Type,
         Regex
-    }
-
-    internal class MatchingRule
-    {
-        public string Match { get; set; }
-        public uint? Min { get; set; }
-        public string Regex { get; set; }
     }
 }

@@ -1,10 +1,8 @@
 using ComPact.Builders;
-using ComPact.Matchers;
 using ComPact.Models;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 

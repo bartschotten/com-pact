@@ -73,8 +73,6 @@ namespace ComPact.Builders
                 Interactions = _matchableInteractions.Select(m => m.Interaction).ToList()
             };
 
-            pact.Interactions.ForEach(i => i.Response = i.Response.ConvertMatchingRules());
-
             PactWriter.Write(pact, new PactConfig());
         }
     }

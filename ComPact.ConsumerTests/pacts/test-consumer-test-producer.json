@@ -35,29 +35,19 @@
         },
         "matchingRules": {
           "$.name": {
-            "Match": "type",
-            "Min": null,
-            "Regex": null
+            "Match": "type"
           },
           "$.instructions": {
-            "Match": "type",
-            "Min": null,
-            "Regex": null
+            "Match": "type"
           },
           "$.ingredients[0].name": {
-            "Match": "type",
-            "Min": null,
-            "Regex": null
+            "Match": "type"
           },
           "$.ingredients[0].amount": {
-            "Match": "type",
-            "Min": null,
-            "Regex": null
+            "Match": "type"
           },
           "$.ingredients[0].unit": {
-            "Match": "type",
-            "Min": null,
-            "Regex": null
+            "Match": "type"
           }
         }
       }

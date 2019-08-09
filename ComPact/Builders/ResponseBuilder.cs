@@ -43,7 +43,7 @@ namespace ComPact.Builders
         public ResponseBuilder WithBody(ResponseBody responseBody)
         {
             _response.Body = responseBody.ToJToken();
-            _response.MatchingRules = JObject.FromObject(responseBody.CreateMatchingRules());
+            _response.MatchingRules = responseBody.CreateMatchingRules();
             return this;
         }
 
