@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,22 @@ namespace ComPact.Models
         public dynamic Body { get; set; }
         [JsonProperty("matchingRules")]
         internal Dictionary<string, MatchingRule> MatchingRules { get; set; } = new Dictionary<string, MatchingRule>();
+
+        internal Response()
+        {
+        }
+
+        internal Response(IRestResponse restResponse)
+        {
+            if (restResponse == null)
+            {
+                throw new ArgumentNullException(nameof(restResponse));
+            }
+
+            Status = (int)restResponse?.StatusCode;
+            Headers = new Headers(restResponse.Headers);
+            Body = JsonConvert.DeserializeObject(restResponse.Content);
+        }
 
         internal List<string> Match(Response actualResponse)
         {

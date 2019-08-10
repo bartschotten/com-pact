@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using RestSharp;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,6 +19,22 @@ namespace ComPact.Models
             foreach (var header in headers)
             {
                 Add(header.Key, string.Join(",", header.Value));
+            }
+        }
+
+        internal Headers(IList<Parameter> headers)
+        {
+            if (headers == null)
+            {
+                throw new System.ArgumentNullException(nameof(headers));
+            }
+
+            foreach (var header in headers)
+            {
+                if (header.Value is string stringValue)
+                {
+                    Add(header.Name, stringValue);
+                }
             }
         }
 

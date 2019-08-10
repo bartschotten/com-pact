@@ -52,7 +52,7 @@ namespace ComPact.UnitTests.Models
         [ExpectedException(typeof(ArgumentNullException))]
         public void ShouldThrowWhenNull()
         {
-            new Headers(null);
+            new Headers(null as IHeaderDictionary);
         }
     }
 }
