@@ -4,11 +4,11 @@ namespace ComPact.Builders
 {
     public class RequestBuilder
     {
-        private readonly Request _request;
+        private readonly RequestV2 _request;
 
         internal RequestBuilder()
         {
-            _request = new Request();
+            _request = new RequestV2();
         }
 
         public RequestBuilder ToPath(string path)
@@ -51,7 +51,7 @@ namespace ComPact.Builders
             return this;
         }
 
-        internal Request Build()
+        internal RequestV2 Build()
         {
             return _request;
         }

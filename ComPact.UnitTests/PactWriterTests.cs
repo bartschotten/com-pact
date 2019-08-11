@@ -20,13 +20,13 @@ namespace ComPact.UnitTests
                     new InteractionV2
                     {
                         Description = "TestInteraction",
-                        Request = new Request
+                        Request = new RequestV2
                         {
                             Method = Method.GET,
                             Path = "/",
                             Headers = new Headers { { "Accept", "application/json" } }
                         },
-                        Response = new Response
+                        Response = new ResponseV2
                         {
                             Status = 200,
                             Headers = new Headers { { "Content-Type", "application/json" } },

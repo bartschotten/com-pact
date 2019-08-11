@@ -6,8 +6,8 @@ namespace ComPact.Models
     internal class ProviderState
     {
         [JsonProperty("name")]
-        public string Name { get; set; }
+        internal string Name { get; set; }
         [JsonProperty("params")]
-        public Dictionary<string, string> Params { get; set; }
+        internal Dictionary<string, string> Params { get; set; }
     }
 }

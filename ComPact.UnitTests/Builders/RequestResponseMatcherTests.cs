@@ -13,7 +13,7 @@ namespace ComPact.UnitTests.Builders
         [TestMethod]
         public void ShouldMatchSingleRequestToRespons()
         {
-            var expectedRequest = new Request
+            var expectedRequest = new RequestV2
             {
                 Method = Method.GET,
                 Path = "/test",
@@ -22,7 +22,7 @@ namespace ComPact.UnitTests.Builders
                 Body = "test"
             };
 
-            var expectedResponse = new Response
+            var expectedResponse = new ResponseV2
             {
                 Status = 200,
                 Headers = new Headers { { "Content-Type", "application/json"} },
@@ -51,7 +51,7 @@ namespace ComPact.UnitTests.Builders
 
             try
             {
-                var actualResponse = matcher.FindMatch(new Request());
+                var actualResponse = matcher.FindMatch(new RequestV2());
             }
             catch (PactException e)
             {
@@ -64,7 +64,7 @@ namespace ComPact.UnitTests.Builders
         [ExpectedException(typeof(PactException))]
         public void ShouldThrowWhenMoreThanOneRequestMatches()
         {
-            var request1 = new Request
+            var request1 = new RequestV2
             {
                 Method = Method.GET,
                 Path = "/test",
@@ -73,7 +73,7 @@ namespace ComPact.UnitTests.Builders
                 Body = "test"
             };
 
-            var request2 = new Request
+            var request2 = new RequestV2
             {
                 Method = Method.GET,
                 Path = "/test",
@@ -82,14 +82,14 @@ namespace ComPact.UnitTests.Builders
                 Body = "test"
             };
 
-            var response1 = new Response
+            var response1 = new ResponseV2
             {
                 Status = 200,
                 Headers = new Headers { { "Content-Type", "application/json" } },
                 Body = "OK!"
             };
 
-            var response2 = new Response
+            var response2 = new ResponseV2
             {
                 Status = 404,
                 Headers = new Headers(),

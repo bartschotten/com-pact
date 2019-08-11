@@ -1,17 +1,19 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace ComPact.Models
 {
-    internal class PactV2
+    internal class MessagePact
     {
         [JsonProperty("consumer")]
         internal Pacticipant Consumer { get; set; }
         [JsonProperty("provider")]
         internal Pacticipant Provider { get; set; }
-        [JsonProperty("interactions")]
-        internal List<InteractionV2> Interactions { get; set; }
+        [JsonProperty("messages")]
+        internal List<Message> Messages { get; set; }
         [JsonProperty("metadata")]
-        internal Metadata Metadata { get; set; } = new Metadata { PactSpecification = new PactSpecification { Version = "2.0.0" } };
+        internal Metadata Metadata { get; set; } = new Metadata { PactSpecification = new PactSpecification { Version = "3.0.0" } };
     }
 }

@@ -11,7 +11,7 @@ namespace ComPact.UnitTests.Models
         [TestMethod]
         public void ShouldCreateRestRequestFromRequest()
         {
-            var request = new Request
+            var request = new RequestV2
             {
                 Method = Method.POST,
                 Path = "/test",

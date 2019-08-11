@@ -17,7 +17,7 @@ namespace ComPact.Builders
             _logger = logger;
         }
 
-        public Response FindMatch(Request actualRequest)
+        public ResponseV2 FindMatch(RequestV2 actualRequest)
         {
             if (actualRequest == null)
             {

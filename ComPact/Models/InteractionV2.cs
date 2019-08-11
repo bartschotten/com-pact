@@ -9,9 +9,9 @@ namespace ComPact.Models
         [JsonProperty("providerState")]
         public string ProviderState { get; set; }
         [JsonProperty("request")]
-        public Request Request { get; set; } = new Request();
+        public RequestV2 Request { get; set; } = new RequestV2();
         [JsonProperty("response")]
-        public Response Response { get; set; } = new Response();
+        public ResponseV2 Response { get; set; } = new ResponseV2();
 
     }
 }

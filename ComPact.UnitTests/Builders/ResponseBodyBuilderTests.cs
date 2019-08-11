@@ -68,7 +68,7 @@ namespace ComPact.UnitTests.Builders
         {
             var pactJsonElement = Some.Element.Like("Hello world");
 
-            var matchingRules = new Dictionary<string, MatchingRule>();
+            var matchingRules = new Dictionary<string, Matcher>();
             pactJsonElement.AddMatchingRules(matchingRules, "$");
         }
     }

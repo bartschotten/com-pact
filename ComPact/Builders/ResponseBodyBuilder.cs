@@ -32,9 +32,9 @@ namespace ComPact.Builders
             return _rootElement.ToJToken();
         }
 
-        internal Dictionary<string, MatchingRule> CreateMatchingRules()
+        internal Dictionary<string, Matcher> CreateMatchingRules()
         {
-            var matchingRules = new Dictionary<string, MatchingRule>();
+            var matchingRules = new Dictionary<string, Matcher>();
             _rootElement.AddMatchingRules(matchingRules, "$");
             return matchingRules;
         }
@@ -57,7 +57,7 @@ namespace ComPact.Builders
 
         internal abstract JToken ToJToken();
 
-        internal abstract void AddMatchingRules(Dictionary<string, MatchingRule> matchingRules, string path);
+        internal abstract void AddMatchingRules(Dictionary<string, Matcher> matchingRules, string path);
     }
 
     public class UnknownSimpleValue
@@ -133,7 +133,7 @@ namespace ComPact.Builders
             Element = element;
         }
 
-        internal void AddMatchingRules(Dictionary<string, MatchingRule> matchingRules, string path)
+        internal void AddMatchingRules(Dictionary<string, Matcher> matchingRules, string path)
         {
             var extendedPath = path + "." + Name;
             Element.AddMatchingRules(matchingRules, extendedPath);
@@ -156,9 +156,9 @@ namespace ComPact.Builders
             return JToken.FromObject(Example);
         }
 
-        internal override void AddMatchingRules(Dictionary<string, MatchingRule> matchingRules, string path)
+        internal override void AddMatchingRules(Dictionary<string, Matcher> matchingRules, string path)
         {
-            matchingRules[path] = new MatchingRule { Match = "type" };
+            matchingRules[path] = new Matcher { Match = "type" };
         }
     }
 
@@ -185,9 +185,9 @@ namespace ComPact.Builders
             return JToken.FromObject(Example);
         }
 
-        internal override void AddMatchingRules(Dictionary<string, MatchingRule> matchingRules, string path)
+        internal override void AddMatchingRules(Dictionary<string, Matcher> matchingRules, string path)
         {
-            matchingRules[path] = new MatchingRule { Match = "regex", Regex = Regex };
+            matchingRules[path] = new Matcher { Match = "regex", Regex = Regex };
         }
     }
 
@@ -207,7 +207,7 @@ namespace ComPact.Builders
             return JToken.FromObject(membersDictionary);
         }
 
-        internal override void AddMatchingRules(Dictionary<string, MatchingRule> matchingRules, string path)
+        internal override void AddMatchingRules(Dictionary<string, Matcher> matchingRules, string path)
         {
             Members.ForEach(m => m.AddMatchingRules(matchingRules, path));
         }
@@ -237,11 +237,11 @@ namespace ComPact.Builders
             return JToken.FromObject(Elements.Select(e => e.ToJToken()));
         }
 
-        internal override void AddMatchingRules(Dictionary<string, MatchingRule> matchingRules, string path)
+        internal override void AddMatchingRules(Dictionary<string, Matcher> matchingRules, string path)
         {
             if (Match == MatchType.Type)
             {
-                matchingRules[path] = new MatchingRule { Match = "type", Min = Min };
+                matchingRules[path] = new Matcher { Match = "type", Min = Min };
             }
 
             for (var i = 0; i < Elements.Length; i++)

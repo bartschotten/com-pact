@@ -28,7 +28,7 @@ namespace ComPact.MockConsumer
                 _client.Execute(providerStatesRequest);
                 var restRequest = interaction.Request.ToRestRequest();
                 var actualResponse = _client.Execute(restRequest);
-                var differences = interaction.Response.Match(new Response(actualResponse));
+                var differences = interaction.Response.Match(new ResponseV2(actualResponse));
                 if (differences.Any())
                 {
                     throw new PactException(string.Join(Environment.NewLine, differences));

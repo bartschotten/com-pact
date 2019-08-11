@@ -6,11 +6,11 @@ namespace ComPact.Builders
 {
     public class ResponseBuilder
     {
-        private readonly Response _response;
+        private readonly ResponseV2 _response;
 
         internal ResponseBuilder()
         {
-            _response = new Response();
+            _response = new ResponseV2();
         }
 
         public ResponseBuilder WithStatus(int status)
@@ -47,7 +47,7 @@ namespace ComPact.Builders
             return this;
         }
 
-        internal Response Build()
+        internal ResponseV2 Build()
         {
             return _response;
         }

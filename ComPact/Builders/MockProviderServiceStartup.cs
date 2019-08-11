@@ -20,7 +20,7 @@ namespace ComPact
         {
             app.Run(async context =>
             {
-                var request = new Request(context.Request);
+                var request = new RequestV2(context.Request);
                 var response = _matcher.FindMatch(request);
 
                 context.Response.StatusCode = response.Status;
