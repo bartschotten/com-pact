@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System;
-using Microsoft.Extensions.Logging;
 using ComPact.Models;
 
 namespace ComPact.Builders
@@ -9,12 +8,10 @@ namespace ComPact.Builders
     internal class RequestResponseMatcher: IRequestResponseMatcher
     {
         private readonly List<MatchableInteraction> _matchableInteractions;
-        private readonly ILogger _logger;
 
-        public RequestResponseMatcher(List<MatchableInteraction> interactions, ILogger logger)
+        public RequestResponseMatcher(List<MatchableInteraction> interactions)
         {
             _matchableInteractions = interactions;
-            _logger = logger;
         }
 
         public ResponseV2 FindMatch(RequestV2 actualRequest)

@@ -37,12 +37,10 @@ namespace ComPact.UnitTests
                         }
                     }
                 },
-                Metadata = new Metadata { PactSpecification = new PactSpecification { Version = "3.0.0" } }
+                Metadata = new Metadata { PactSpecification = new PactSpecification { Version = "2.0.0" } }
             };
 
-            var config = new PactConfig();
-
-            PactWriter.Write(pact, config);
+            PactWriter.Write(pact);
         }
     }
 }

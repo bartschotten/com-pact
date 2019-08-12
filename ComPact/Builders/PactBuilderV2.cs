@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -14,20 +13,18 @@ namespace ComPact.Builders
         private readonly string _consumer;
         private readonly string _provider;
         private readonly CancellationTokenSource _cts;
-        private readonly ILogger _logger;
         private readonly IRequestResponseMatcher _matcher;
         private List<MatchableInteraction> _matchableInteractions;
 
-        public PactBuilderV2(string consumer, string provider, string mockProviderServiceBaseUri, ILogger logger)
+        public PactBuilderV2(string consumer, string provider, string mockProviderServiceBaseUri)
         {
             _cts = new CancellationTokenSource();
-            _logger = logger;
 
             _consumer = consumer;
             _provider = provider;
             _matchableInteractions = new List<MatchableInteraction>();
 
-            _matcher = new RequestResponseMatcher(_matchableInteractions, _logger);
+            _matcher = new RequestResponseMatcher(_matchableInteractions);
 
             var host = WebHost.CreateDefaultBuilder()
                 .UseKestrel()
@@ -73,7 +70,7 @@ namespace ComPact.Builders
                 Interactions = _matchableInteractions.Select(m => m.Interaction).ToList()
             };
 
-            PactWriter.Write(pact, new PactConfig());
+            PactWriter.Write(pact);
         }
     }
 }

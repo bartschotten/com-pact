@@ -31,7 +31,7 @@ namespace ComPact.UnitTests.Builders
 
             var interactions = new List<MatchableInteraction> { new MatchableInteraction(new InteractionV2 { Request = expectedRequest, Response = expectedResponse }) };
 
-            var matcher = new RequestResponseMatcher(interactions, NullLogger.Instance);
+            var matcher = new RequestResponseMatcher(interactions);
 
             var actualResponse = matcher.FindMatch(expectedRequest);
 
@@ -47,7 +47,7 @@ namespace ComPact.UnitTests.Builders
         [ExpectedException(typeof(PactException))]
         public void ShouldThrowPactExceptionIfNoMatchIsFound()
         {
-            var matcher = new RequestResponseMatcher(new List<MatchableInteraction>(), NullLogger.Instance);
+            var matcher = new RequestResponseMatcher(new List<MatchableInteraction>());
 
             try
             {
@@ -102,7 +102,7 @@ namespace ComPact.UnitTests.Builders
                 new MatchableInteraction(new InteractionV2 { Request = request2, Response = response2 })
             };
 
-            var matcher = new RequestResponseMatcher(interactions, NullLogger.Instance);
+            var matcher = new RequestResponseMatcher(interactions);
 
             try
             {
@@ -120,7 +120,7 @@ namespace ComPact.UnitTests.Builders
         [ExpectedException(typeof(ArgumentNullException))]
         public void ShouldThrowWhenNull()
         {
-            var matcher = new RequestResponseMatcher(new List<MatchableInteraction>(), NullLogger.Instance);
+            var matcher = new RequestResponseMatcher(new List<MatchableInteraction>());
 
             matcher.FindMatch(null);
         }

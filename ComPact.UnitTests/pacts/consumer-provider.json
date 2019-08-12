@@ -22,7 +22,7 @@
           "Content-Type": "application/json"
         },
         "body": {
-          "id": "669f9e40-bbce-4224-9750-5d010a3cfcbf"
+          "id": "0d32802f-59c3-40c6-a0af-77ca7a743384"
         },
         "matchingRules": {}
       }
@@ -30,7 +30,7 @@
   ],
   "metadata": {
     "pactSpecification": {
-      "version": "3.0.0"
+      "version": "2.0.0"
     }
   }
 }

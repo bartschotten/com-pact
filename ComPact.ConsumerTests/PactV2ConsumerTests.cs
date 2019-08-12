@@ -16,7 +16,7 @@ namespace ComPact.ConsumerTests
         {
             var url = "http://localhost:9393";
 
-            var builder = new PactBuilderV2("test-consumer", "test-producer", url, NullLogger.Instance);
+            var builder = new PactBuilderV2("test-consumer", "test-producer", url);
 
             var recipeId = Guid.Parse("2860dedb-a193-425f-b73e-ef02db0aa8cf");
 
@@ -59,7 +59,7 @@ namespace ComPact.ConsumerTests
         {
             var url = "http://localhost:9393";
 
-            var builder = new PactBuilderV2("test-consumer", "test-producer", url, NullLogger.Instance);
+            var builder = new PactBuilderV2("test-consumer", "test-producer", url);
 
             builder.SetupInteraction(new InteractionV2Builder()
                 .UponReceiving("a request")
@@ -89,7 +89,7 @@ namespace ComPact.ConsumerTests
         {
             var url = "http://localhost:9393";
 
-            var builder = new PactBuilderV2("test-consumer", "test-producer", url, NullLogger.Instance);
+            var builder = new PactBuilderV2("test-consumer", "test-producer", url);
 
             try
             {
