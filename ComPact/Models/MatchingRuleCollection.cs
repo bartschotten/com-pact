@@ -42,20 +42,25 @@ namespace ComPact.Models
         [JsonProperty("matchers")]
         internal List<Matcher> Matchers { get; set; }
 
-        internal List<string> Match<T>(JToken expectedToken, JToken actualToken)
+        internal List<string> Match(JToken expectedToken, JToken actualToken)
         {
             var differences = new List<string>();
 
+            var anySuccessfulMatchers = false;
             foreach (var matcher in Matchers)
             {
-                var difference = matcher.Match<T>(expectedToken, actualToken);
-                if (difference != null)
+                var matcherDifferences = matcher.Match(expectedToken, actualToken);
+                if (matcherDifferences.Any())
                 {
-                    differences.Add(difference);
+                    differences.AddRange(matcherDifferences);
+                }
+                else
+                {
+                    anySuccessfulMatchers = true;
                 }
             }
 
-            if ((Combine == "AND" && differences.Any()) || (differences.Count == Matchers.Count))
+            if ((Combine == "AND" && differences.Any()) || !anySuccessfulMatchers)
             {
                 return differences;
             }
