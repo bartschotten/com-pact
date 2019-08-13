@@ -56,17 +56,21 @@ namespace ComPact.Models
             }
 
             var differences = new List<string>();
-            foreach(var expectedHeader in this)
+            foreach(var expectedHeader in KeysToLowerCase(this))
             {
-                if (actualHeaders.TryGetValue(expectedHeader.Key, out var actualHeader))
+                if (KeysToLowerCase(actualHeaders).TryGetValue(expectedHeader.Key, out var actualHeaderValue))
                 {
-                    var expectedParts = expectedHeader.Value.ToLower().Split(";").Select(p => p.Trim()).ToList();
-                    var actualParts = actualHeader.ToLower().Split(";").Select(p => p.Trim()).ToList();
-                    if (!expectedParts.All(e => actualParts.Any(a => a.Equals(a == e))))
-                    {
-                        differences.Add($"Expected {expectedHeader.Value} for {expectedHeader.Key}, but was {actualHeader}");
-                    }
+                    var expectedParts = SplitValueIntoParts(expectedHeader.Value);
+                    var actualParts = SplitValueIntoParts(actualHeaderValue);
 
+                    if (matchingRules?.Header != null && KeysToLowerCase(matchingRules.Header).TryGetValue(expectedHeader.Key, out var matchers))
+                    {
+                        differences.AddRange(matchers.Match<string>(expectedHeader.Value, actualHeaderValue));
+                    }
+                    else if (!expectedParts.All(e => actualParts.Any(a => RemoveWhiteSpaceAfterCommas(a) == RemoveWhiteSpaceAfterCommas(e))))
+                    {
+                        differences.Add($"Expected {expectedHeader.Value} for {expectedHeader.Key}, but was {actualHeaderValue}");
+                    }
                 }
                 else
                 {
@@ -75,6 +79,21 @@ namespace ComPact.Models
             }
 
             return differences;
+        }
+
+        private Dictionary<string, T> KeysToLowerCase<T>(Dictionary<string, T> headers)
+        {
+            return headers.ToDictionary(h => h.Key.ToLowerInvariant(), h => h.Value);
+        }
+
+        private List<string> SplitValueIntoParts(string value)
+        {
+            return value.Split(";").Select(p => p.Trim()).ToList();
+        }
+
+        private string RemoveWhiteSpaceAfterCommas(string value)
+        {
+            return string.Join(',', value.Split(',').Select(x => x.Trim()));
         }
     }
 }

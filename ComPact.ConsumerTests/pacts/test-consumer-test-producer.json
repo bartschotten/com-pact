@@ -35,19 +35,19 @@
         },
         "matchingRules": {
           "$.name": {
-            "Match": "type"
+            "match": "type"
           },
           "$.instructions": {
-            "Match": "type"
+            "match": "type"
           },
           "$.ingredients[0].name": {
-            "Match": "type"
+            "match": "type"
           },
           "$.ingredients[0].amount": {
-            "Match": "type"
+            "match": "type"
           },
           "$.ingredients[0].unit": {
-            "Match": "type"
+            "match": "type"
           }
         }
       }

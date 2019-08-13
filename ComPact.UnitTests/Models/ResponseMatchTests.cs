@@ -30,28 +30,28 @@ namespace ComPact.UnitTests.Models
         [TestMethod]
         public void TypeMatchForString()
         {
-            var matchingRules = new Dictionary<string, Matcher> { { "$.body.name", new Matcher { Match = "type" } } };
+            var matchingRules = new Dictionary<string, Matcher> { { "$.body.name", new Matcher { MatcherType = "type" } } };
             CompareExpectedAndActualBody(new { name = "Hello world!" }, matchingRules, new { name = "Hello Pact!" }, null);
         }
 
         [TestMethod]
         public void TypeMismatchForString()
         {
-            var matchingRules = new Dictionary<string, Matcher> { { "$.body.name", new Matcher { Match = "type" } } };
+            var matchingRules = new Dictionary<string, Matcher> { { "$.body.name", new Matcher { MatcherType = "type" } } };
             CompareExpectedAndActualBody(new { name = "Hello world!" }, matchingRules, new { name = 1 }, "Expected value of type String (like: Hello world!) at body.name, but was value of type Integer.");
         }
 
         [TestMethod]
         public void TypeMatchForInteger()
         {
-            var matchingRules = new Dictionary<string, Matcher> { { "$.body.number", new Matcher { Match = "type" } } };
+            var matchingRules = new Dictionary<string, Matcher> { { "$.body.number", new Matcher { MatcherType = "type" } } };
             CompareExpectedAndActualBody(new { number = 1 }, matchingRules, new { number = 2 }, null);
         }
 
         [TestMethod]
         public void TypeMismatchForInteger()
         {
-            var matchingRules = new Dictionary<string, Matcher> { { "$.body.number", new Matcher { Match = "type" } } };
+            var matchingRules = new Dictionary<string, Matcher> { { "$.body.number", new Matcher { MatcherType = "type" } } };
             CompareExpectedAndActualBody(new { number = 1 }, matchingRules, new { number = 1.1 }, "Expected value of type Integer (like: 1) at body.number, but was value of type Float.");
         }
 
@@ -59,56 +59,56 @@ namespace ComPact.UnitTests.Models
         public void TypeMismatchForFloat()
         {
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
-            var matchingRules = new Dictionary<string, Matcher> { { "$.body.number", new Matcher { Match = "type" } } };
+            var matchingRules = new Dictionary<string, Matcher> { { "$.body.number", new Matcher { MatcherType = "type" } } };
             CompareExpectedAndActualBody(new { number = 1.1 }, matchingRules, new { number = 1 }, "Expected value of type Float (like: 1.1) at body.number, but was value of type Integer.");
         }
 
         [TestMethod]
         public void TypeMismatchForBoolean()
         {
-            var matchingRules = new Dictionary<string, Matcher> { { "$.body.status", new Matcher { Match = "type" } } };
+            var matchingRules = new Dictionary<string, Matcher> { { "$.body.status", new Matcher { MatcherType = "type" } } };
             CompareExpectedAndActualBody(new { status = true }, matchingRules, new { status = 1 }, "Expected value of type Boolean (like: True) at body.status, but was value of type Integer.");
         }
 
         [TestMethod]
         public void TypeMismatchWithRuleOnParentObject()
         {
-            var matchingRules = new Dictionary<string, Matcher> { { "$.body", new Matcher { Match = "type" } } };
+            var matchingRules = new Dictionary<string, Matcher> { { "$.body", new Matcher { MatcherType = "type" } } };
             CompareExpectedAndActualBody(new { name = "Hello world!" }, matchingRules, new { name = 1 }, "Expected value of type String (like: Hello world!) at body.name, but was value of type Integer.");
         }
 
         [TestMethod]
         public void TypeMismatchWithRuleWithinArray()
         {
-            var matchingRules = new Dictionary<string, Matcher> { { "$.body[0]", new Matcher { Match = "type" } } };
+            var matchingRules = new Dictionary<string, Matcher> { { "$.body[0]", new Matcher { MatcherType = "type" } } };
             CompareExpectedAndActualBody(new [] { "Hello world!" }, matchingRules, new [] { 1 }, "Expected value of type String (like: Hello world!) at body[0], but was value of type Integer.");
         }
 
         [TestMethod]
         public void TypeMismatchWithRuleOnParentArray()
         {
-            var matchingRules = new Dictionary<string, Matcher> { { "$.body[0]", new Matcher { Match = "type" } } };
+            var matchingRules = new Dictionary<string, Matcher> { { "$.body[0]", new Matcher { MatcherType = "type" } } };
             CompareExpectedAndActualBody(new[] { "Hello world!" }, matchingRules, new[] { 1 }, "Expected value of type String (like: Hello world!) at body[0], but was value of type Integer.");
         }
 
         [TestMethod]
         public void NotEnoughItemsInArray()
         {
-            var matchingRules = new Dictionary<string, Matcher> { { "$.body", new Matcher { Match = "type", Min = 2 } } };
+            var matchingRules = new Dictionary<string, Matcher> { { "$.body", new Matcher { MatcherType = "type", Min = 2 } } };
             CompareExpectedAndActualBody(new[] { 1 }, matchingRules, new[] { 1 }, "Expected an array with 2 item(s) at body, but was 1 items(s).");
         }
 
         [TestMethod]
         public void RegexMatchForString()
         {
-            var matchingRules = new Dictionary<string, Matcher> { { "$.body.name", new Matcher { Match = "regex", Regex = "^Hello.*$" } } };
+            var matchingRules = new Dictionary<string, Matcher> { { "$.body.name", new Matcher { MatcherType = "regex", Regex = "^Hello.*$" } } };
             CompareExpectedAndActualBody(new { name = "Hello world!" }, matchingRules, new { name = "Hello Pact!" }, null);
         }
 
         [TestMethod]
         public void RegexMismatchForString()
         {
-            var matchingRules = new Dictionary<string, Matcher> { { "$.body.name", new Matcher { Match = "regex", Regex = "^.*world!$" } } };
+            var matchingRules = new Dictionary<string, Matcher> { { "$.body.name", new Matcher { MatcherType = "regex", Regex = "^.*world!$" } } };
             CompareExpectedAndActualBody(new { name = "Hello world!" }, matchingRules, new { name = "Hello Pact!" }, "Expected value matching ^.*world!$ (like: Hello world!) at body.name, but was Hello Pact!.");
         }
 
@@ -117,9 +117,9 @@ namespace ComPact.UnitTests.Models
         {
             var matchingRules = new Dictionary<string, Matcher>
             {
-                { "$.body[0].name", new Matcher { Match = "type" } },
-                { "$.body", new Matcher { Match = "type" } },
-                { "$.body[*].name", new Matcher { Match = "type" } },
+                { "$.body[0].name", new Matcher { MatcherType = "type" } },
+                { "$.body", new Matcher { MatcherType = "type" } },
+                { "$.body[*].name", new Matcher { MatcherType = "type" } },
             };
             CompareExpectedAndActualBody(new[] { new { name = "Hello world!" } }, matchingRules, new[] { new { name = 1 } }, "Expected value of type String (like: Hello world!) at body[0].name, but was value of type Integer.");
         }
@@ -130,7 +130,7 @@ namespace ComPact.UnitTests.Models
         [DataRow("$.body.*.anArray[*].name")]
         public void ComplexStarNotation(string path)
         {
-            var matchingRules = new Dictionary<string, Matcher> { { path, new Matcher { Match = "type" } } };
+            var matchingRules = new Dictionary<string, Matcher> { { path, new Matcher { MatcherType = "type" } } };
             var expectedBody = new
             {
                 anObject = new

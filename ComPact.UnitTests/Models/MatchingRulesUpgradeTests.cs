@@ -13,9 +13,9 @@ namespace ComPact.UnitTests.Models
         {
             var oldMatchingRules = new Dictionary<string, Matcher>()
             {
-                { "$.body.name", new Matcher { Match = "regex", Regex = "\\w+" } },
-                { "$.body.number", new Matcher { Match = "type"} },
-                { "$.headers.content-type", new Matcher { Match = "type"} }
+                { "$.body.name", new Matcher { MatcherType = "regex", Regex = "\\w+" } },
+                { "$.body.number", new Matcher { MatcherType = "type"} },
+                { "$.headers.content-type", new Matcher { MatcherType = "type"} }
             };
 
             var newMatchingRules = new MatchingRuleCollection(oldMatchingRules);
@@ -25,7 +25,7 @@ namespace ComPact.UnitTests.Models
             Assert.AreEqual("name", newMatchingRules.Body.First().Key);
             Assert.AreEqual("AND", newMatchingRules.Body.First().Value.Combine);
             Assert.AreEqual(1, newMatchingRules.Body.First().Value.Matchers.Count);
-            Assert.AreEqual("regex", newMatchingRules.Body.First().Value.Matchers.First().Match);
+            Assert.AreEqual("regex", newMatchingRules.Body.First().Value.Matchers.First().MatcherType);
         }
     }
 }

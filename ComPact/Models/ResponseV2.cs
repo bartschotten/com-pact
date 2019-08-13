@@ -116,7 +116,7 @@ namespace ComPact.Models
                 var matchingRule = GetMatchingRuleForToken(expectedToken, applicableMatchingRules);
                 var regexValue = matchingRule?.Regex;
                 var actualValue = actualToken.Value<T>();
-                if (matchingRule?.Match == "type")
+                if (matchingRule?.MatcherType == "type")
                 {
                     if (actualToken.Type != expectedToken.Type)
                     {

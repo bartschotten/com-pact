@@ -158,7 +158,7 @@ namespace ComPact.Builders
 
         internal override void AddMatchingRules(Dictionary<string, Matcher> matchingRules, string path)
         {
-            matchingRules[path] = new Matcher { Match = "type" };
+            matchingRules[path] = new Matcher { MatcherType = "type" };
         }
     }
 
@@ -187,7 +187,7 @@ namespace ComPact.Builders
 
         internal override void AddMatchingRules(Dictionary<string, Matcher> matchingRules, string path)
         {
-            matchingRules[path] = new Matcher { Match = "regex", Regex = Regex };
+            matchingRules[path] = new Matcher { MatcherType = "regex", Regex = Regex };
         }
     }
 
@@ -241,7 +241,7 @@ namespace ComPact.Builders
         {
             if (Match == MatchType.Type)
             {
-                matchingRules[path] = new Matcher { Match = "type", Min = Min };
+                matchingRules[path] = new Matcher { MatcherType = "type", Min = Min };
             }
 
             for (var i = 0; i < Elements.Length; i++)

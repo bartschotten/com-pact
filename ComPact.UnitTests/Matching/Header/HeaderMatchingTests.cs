@@ -31,7 +31,7 @@ namespace ComPact.UnitTests.Matching.Header
                 }
             }
 
-            Assert.AreEqual(0, failedCases.Count, "Failed cases: " + string.Join(Environment.NewLine, failedCases));
+            Assert.AreEqual(0, failedCases.Count, "Failed cases: " + Environment.NewLine  + string.Join(Environment.NewLine, failedCases));
         }
 
         private class TestCase

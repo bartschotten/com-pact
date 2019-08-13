@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -40,5 +41,30 @@ namespace ComPact.Models
         internal string Combine { get; set; } = "AND";
         [JsonProperty("matchers")]
         internal List<Matcher> Matchers { get; set; }
+
+        internal List<string> Match<T>(JToken expectedToken, JToken actualToken)
+        {
+            var differences = new List<string>();
+
+            foreach (var matcher in Matchers)
+            {
+                var difference = matcher.Match<T>(expectedToken, actualToken);
+                if (difference != null)
+                {
+                    differences.Add(difference);
+                }
+            }
+
+            if ((Combine == "AND" && differences.Any()) || (differences.Count == Matchers.Count))
+            {
+                return differences;
+            }
+            return new List<string>();
+        }
+
+        internal List<string> Match<T>(object expectedValue, object actualValue)
+        {
+            return Match<T>(JToken.FromObject(expectedValue), JToken.FromObject(actualValue));
+        }
     }
 }
