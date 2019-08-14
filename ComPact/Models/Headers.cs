@@ -65,7 +65,7 @@ namespace ComPact.Models
 
                     if (matchingRules?.Header != null && KeysToLowerCase(matchingRules.Header).TryGetValue(expectedHeader.Key, out var matchers))
                     {
-                        differences.AddRange(matchers.Match<string>(expectedHeader.Value, actualHeaderValue));
+                        differences.AddRange(matchers.Match(expectedHeader.Value, actualHeaderValue));
                     }
                     else if (!expectedParts.All(e => actualParts.Any(a => RemoveWhiteSpaceAfterCommas(a) == RemoveWhiteSpaceAfterCommas(e))))
                     {

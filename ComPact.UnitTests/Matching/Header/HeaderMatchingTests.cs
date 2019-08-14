@@ -17,11 +17,11 @@ namespace ComPact.UnitTests.Matching.Header
             var testcasesDir = Path.GetFullPath($"{AppContext.BaseDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}.." +
                 $"{Path.DirectorySeparatorChar}Matching{Path.DirectorySeparatorChar}Header{Path.DirectorySeparatorChar}Testcases{Path.DirectorySeparatorChar}");
 
-            var testcasesFile = Directory.GetFiles(testcasesDir);
+            var testcaseFiles = Directory.GetFiles(testcasesDir);
 
             var failedCases = new List<string>();
 
-            foreach(var file in testcasesFile)
+            foreach(var file in testcaseFiles)
             {
                 var testcase = JsonConvert.DeserializeObject<TestCase>(File.ReadAllText(file));
                 var differences = testcase.Expected.Headers.Match(testcase.Actual.Headers, testcase.Expected.MatchingRules);
