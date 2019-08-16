@@ -24,7 +24,7 @@ namespace ComPact.Models
             {
                 differences.Add($"Expected value of type {expectedToken.Type} (like: {expectedToken.ToString()}) at {expectedToken.Path}, but was value of type {actualToken.Type}.");
             }
-            if (Regex != null && !System.Text.RegularExpressions.Regex.IsMatch(actualToken.Value<string>(), Regex))
+            if (Regex != null && System.Text.RegularExpressions.Regex.Match(actualToken.Value<string>(), Regex).Value != actualToken.Value<string>())
             {
                 differences.Add($"Expected value matching {Regex} (like: {expectedToken.Value<string>()}) at {expectedToken.Path}, but was {actualToken.Value<string>()}.");
             }

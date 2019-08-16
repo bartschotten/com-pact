@@ -33,43 +33,44 @@ namespace ComPact.Models
                 Header.Add(rule.Key.Substring(10), new MatcherList { Matchers = new List<Matcher> { rule.Value } });
             }
         }
-    }
 
-    internal class MatcherList
-    {
-        [JsonProperty("combine")]
-        internal string Combine { get; set; } = "AND";
-        [JsonProperty("matchers")]
-        internal List<Matcher> Matchers { get; set; }
-
-        internal List<string> Match(JToken expectedToken, JToken actualToken)
+        internal bool TryGetApplicableMatcherListForToken(JToken token, out MatcherList matcherList)
         {
-            var differences = new List<string>();
-
-            var anySuccessfulMatchers = false;
-            foreach (var matcher in Matchers)
+            var matchingPaths = new List<string>();
+            foreach (var path in Body.Select(b => b.Key))
             {
-                var matcherDifferences = matcher.Match(expectedToken, actualToken);
-                if (matcherDifferences.Any())
+                var matchingTokens = token.Root.SelectTokens(path).ToList();
+                if (matchingTokens.Select(t => t.Path).Intersect(token.AncestorsAndSelf().Select(t => t.Path)).Any())
                 {
-                    differences.AddRange(matcherDifferences);
+                    matchingPaths.Add(path);
+                }
+            }
+
+            if (!matchingPaths.Any())
+            {
+                matcherList = null;
+                return false;
+            }
+
+            var orderedPaths = matchingPaths.OrderBy(m => m, new MatchingRulePathComparer()).ToList();
+            matcherList = Body[orderedPaths.First()];
+            return true;
+        }
+
+        private class MatchingRulePathComparer : IComparer<string>
+        {
+            public int Compare(string x, string y)
+            {
+                var lengthComparison = x.Length.CompareTo(y.Length);
+                if (lengthComparison == 0)
+                {
+                    return y.Count(c => c == '*').CompareTo(x.Count(c => c == '*'));
                 }
                 else
                 {
-                    anySuccessfulMatchers = true;
+                    return lengthComparison;
                 }
             }
-
-            if ((Combine == "AND" && differences.Any()) || !anySuccessfulMatchers)
-            {
-                return differences;
-            }
-            return new List<string>();
-        }
-
-        internal List<string> Match<T>(object expectedValue, object actualValue)
-        {
-            return Match<T>(JToken.FromObject(expectedValue), JToken.FromObject(actualValue));
         }
     }
 }
