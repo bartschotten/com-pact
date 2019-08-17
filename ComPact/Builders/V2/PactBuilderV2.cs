@@ -1,4 +1,6 @@
-﻿using ComPact.Models;
+﻿using ComPact.Mock.Provider;
+using ComPact.Models;
+using ComPact.Models.V2;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,9 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace ComPact.Builders
+namespace ComPact.Builders.V2
 {
-    public class PactBuilderV2
+    public class PactBuilder
     {
         private readonly string _consumer;
         private readonly string _provider;
@@ -16,7 +18,7 @@ namespace ComPact.Builders
         private readonly IRequestResponseMatcher _matcher;
         private List<MatchableInteraction> _matchableInteractions;
 
-        public PactBuilderV2(string consumer, string provider, string mockProviderServiceBaseUri)
+        public PactBuilder(string consumer, string provider, string mockProviderServiceBaseUri)
         {
             _cts = new CancellationTokenSource();
 
@@ -39,7 +41,7 @@ namespace ComPact.Builders
             host.RunAsync(_cts.Token);
         }
 
-        public void SetupInteraction(InteractionV2Builder interactionBuilder)
+        public void SetupInteraction(InteractionBuilder interactionBuilder)
         {
             _matchableInteractions.Add(new MatchableInteraction(interactionBuilder.Build()));
         }
@@ -63,7 +65,7 @@ namespace ComPact.Builders
                 throw new PactException("Cannot build pact. Not all mocked interactions have been called.");
             }
 
-            var pact = new PactV2
+            var pact = new Contract
             {
                 Consumer = new Pacticipant { Name = _consumer },
                 Provider = new Pacticipant { Name = _provider },

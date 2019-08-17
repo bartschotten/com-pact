@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ComPact.Models
+namespace ComPact.Models.V3
 {
     internal class Interaction
     {

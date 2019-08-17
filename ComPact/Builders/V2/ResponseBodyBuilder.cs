@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ComPact.Builders
+namespace ComPact.Builders.V2
 {
     public class ResponseBody
     {

@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ComPact.Models
+namespace ComPact.Models.V3
 {
-    internal class MessagePact
+    internal class MessageContract
     {
         [JsonProperty("consumer")]
         internal Pacticipant Consumer { get; set; }

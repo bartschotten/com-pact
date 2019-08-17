@@ -1,19 +1,19 @@
-﻿using ComPact.Models;
+﻿using ComPact.Models.V2;
 using System;
 
-namespace ComPact.Builders
+namespace ComPact.Builders.V2
 {
-    public class InteractionV2Builder
+    public class InteractionBuilder
     {
-        private readonly InteractionV2 _interaction = new InteractionV2();
+        private readonly Interaction _interaction = new Interaction();
 
-        public InteractionV2Builder Given(string providerState)
+        public InteractionBuilder Given(string providerState)
         {
             _interaction.ProviderState = providerState ?? throw new ArgumentNullException(nameof(providerState));
             return this;
         }
 
-        public InteractionV2Builder UponReceiving(string description)
+        public InteractionBuilder UponReceiving(string description)
         {
             _interaction.Description = description ?? throw new ArgumentNullException(nameof(description));
             return this;
@@ -24,7 +24,7 @@ namespace ComPact.Builders
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public InteractionV2Builder With(RequestBuilder request)
+        public InteractionBuilder With(RequestBuilder request)
         {
             if (request == null)
             {
@@ -40,7 +40,7 @@ namespace ComPact.Builders
         /// </summary>
         /// <param name="response"></param>
         /// <returns></returns>
-        public InteractionV2Builder WillRespondWith(ResponseBuilder response)
+        public InteractionBuilder WillRespondWith(ResponseBuilder response)
         {
             if (response == null)
             {
@@ -51,7 +51,7 @@ namespace ComPact.Builders
             return this;
         }
 
-        internal InteractionV2 Build()
+        internal Interaction Build()
         {
             return _interaction;
         }

@@ -1,4 +1,5 @@
 ﻿using ComPact.Models;
+using ComPact.Models.V2;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Extensions.Primitives;
@@ -32,7 +33,7 @@ namespace ComPact.UnitTests.Models
             streamWriter.Flush();
             actualRequest.Body.Seek(0, SeekOrigin.Begin);
 
-            var pactRequest = new RequestV2(actualRequest);
+            var pactRequest = new Request(actualRequest);
 
             Assert.AreEqual(Method.GET, pactRequest.Method);
             Assert.AreEqual("/test", pactRequest.Path);
@@ -56,7 +57,7 @@ namespace ComPact.UnitTests.Models
                 Path = "/test"
             };
 
-            var pactRequest = new RequestV2(actualRequest);
+            var pactRequest = new Request(actualRequest);
 
             Assert.AreEqual(Method.GET, pactRequest.Method);
             Assert.AreEqual("/test", pactRequest.Path);
@@ -70,7 +71,7 @@ namespace ComPact.UnitTests.Models
         [ExpectedException(typeof(ArgumentNullException))]
         public void ShouldThrowIfRequestIsNull()
         {
-            new RequestV2(null);
+            new Request(null);
         }
 
         [TestMethod]
@@ -85,7 +86,7 @@ namespace ComPact.UnitTests.Models
 
             try
             {
-                var pactRequest = new RequestV2(actualRequest);
+                var pactRequest = new Request(actualRequest);
             }
             catch (PactException e)
             {
@@ -105,7 +106,7 @@ namespace ComPact.UnitTests.Models
 
             try
             {
-                var pactRequest = new RequestV2(actualRequest);
+                var pactRequest = new Request(actualRequest);
             }
             catch (PactException e)
             {

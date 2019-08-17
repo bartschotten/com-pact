@@ -1,6 +1,6 @@
-﻿using ComPact.Builders;
+﻿using ComPact.Mock.Provider;
 using ComPact.Models;
-using Microsoft.Extensions.Logging.Abstractions;
+using ComPact.Models.V2;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ namespace ComPact.UnitTests.Builders
         [TestMethod]
         public void ShouldMatchSingleRequestToRespons()
         {
-            var expectedRequest = new RequestV2
+            var expectedRequest = new Request
             {
                 Method = Method.GET,
                 Path = "/test",
@@ -22,14 +22,14 @@ namespace ComPact.UnitTests.Builders
                 Body = "test"
             };
 
-            var expectedResponse = new ResponseV2
+            var expectedResponse = new Response
             {
                 Status = 200,
                 Headers = new Headers { { "Content-Type", "application/json"} },
                 Body = "OK!"
             };
 
-            var interactions = new List<MatchableInteraction> { new MatchableInteraction(new InteractionV2 { Request = expectedRequest, Response = expectedResponse }) };
+            var interactions = new List<MatchableInteraction> { new MatchableInteraction(new Interaction { Request = expectedRequest, Response = expectedResponse }) };
 
             var matcher = new RequestResponseMatcher(interactions);
 
@@ -51,7 +51,7 @@ namespace ComPact.UnitTests.Builders
 
             try
             {
-                var actualResponse = matcher.FindMatch(new RequestV2());
+                var actualResponse = matcher.FindMatch(new Request());
             }
             catch (PactException e)
             {
@@ -64,7 +64,7 @@ namespace ComPact.UnitTests.Builders
         [ExpectedException(typeof(PactException))]
         public void ShouldThrowWhenMoreThanOneRequestMatches()
         {
-            var request1 = new RequestV2
+            var request1 = new Request
             {
                 Method = Method.GET,
                 Path = "/test",
@@ -73,7 +73,7 @@ namespace ComPact.UnitTests.Builders
                 Body = "test"
             };
 
-            var request2 = new RequestV2
+            var request2 = new Request
             {
                 Method = Method.GET,
                 Path = "/test",
@@ -82,14 +82,14 @@ namespace ComPact.UnitTests.Builders
                 Body = "test"
             };
 
-            var response1 = new ResponseV2
+            var response1 = new Response
             {
                 Status = 200,
                 Headers = new Headers { { "Content-Type", "application/json" } },
                 Body = "OK!"
             };
 
-            var response2 = new ResponseV2
+            var response2 = new Response
             {
                 Status = 404,
                 Headers = new Headers(),
@@ -98,8 +98,8 @@ namespace ComPact.UnitTests.Builders
 
             var interactions = new List<MatchableInteraction>
             {
-                new MatchableInteraction(new InteractionV2 { Request = request1, Response = response1 }),
-                new MatchableInteraction(new InteractionV2 { Request = request2, Response = response2 })
+                new MatchableInteraction(new Interaction { Request = request1, Response = response1 }),
+                new MatchableInteraction(new Interaction { Request = request2, Response = response2 })
             };
 
             var matcher = new RequestResponseMatcher(interactions);

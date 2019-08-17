@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ComPact.Models
+namespace ComPact.Models.V2
 {
-    public class ResponseV2
+    public class Response
     {
         [JsonProperty("status")]
         public int Status { get; set; }
@@ -18,11 +18,11 @@ namespace ComPact.Models
         [JsonProperty("matchingRules")]
         internal Dictionary<string, Matcher> MatchingRules { get; set; } = new Dictionary<string, Matcher>();
 
-        internal ResponseV2()
+        internal Response()
         {
         }
 
-        internal ResponseV2(IRestResponse restResponse)
+        internal Response(IRestResponse restResponse)
         {
             if (restResponse == null)
             {
@@ -34,7 +34,7 @@ namespace ComPact.Models
             Body = JsonConvert.DeserializeObject(restResponse.Content);
         }
 
-        internal List<string> Match(ResponseV2 actualResponse)
+        internal List<string> Match(Response actualResponse)
         {
             var expectedJObj = JObject.Parse(JsonConvert.SerializeObject(this));
             expectedJObj.Remove("matchingRules");

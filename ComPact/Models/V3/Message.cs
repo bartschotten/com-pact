@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace ComPact.Models
+namespace ComPact.Models.V3
 {
     internal class Message
     {

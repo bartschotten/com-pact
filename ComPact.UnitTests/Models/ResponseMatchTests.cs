@@ -1,4 +1,5 @@
 ﻿using ComPact.Models;
+using ComPact.Models.V2;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Globalization;
@@ -164,7 +165,7 @@ namespace ComPact.UnitTests.Models
 
         private void CompareExpectedAndActualBody(object expected, Dictionary<string, Matcher> matchingRules, object actual, string expectedDifference)
         {
-            var expectedResponse = new ResponseV2
+            var expectedResponse = new Response
             {
                 Status = 200,
                 Headers = new Headers { { "Content-Type", "application/json" } },
@@ -172,7 +173,7 @@ namespace ComPact.UnitTests.Models
                 MatchingRules = matchingRules ?? new Dictionary<string, Matcher>()
             };
 
-            var actualResponse = new ResponseV2
+            var actualResponse = new Response
             {
                 Status = 200,
                 Headers = new Headers { { "Content-Type", "application/json" } },

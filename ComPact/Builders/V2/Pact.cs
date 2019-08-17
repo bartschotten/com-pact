@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ComPact.Builders
+﻿namespace ComPact.Builders.V2
 {
     public static class Pact
     {

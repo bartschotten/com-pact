@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace ComPact.Models
+namespace ComPact.Models.V3
 {
     internal class Response
     {
@@ -15,7 +15,7 @@ namespace ComPact.Models
 
         internal Response() { }
 
-        internal Response(ResponseV2 responseV2)
+        internal Response(V2.Response responseV2)
         {
             if (responseV2 == null)
             {

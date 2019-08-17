@@ -1,4 +1,4 @@
-﻿using ComPact.Builders;
+﻿using ComPact.Builders.V2;
 using ComPact.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;

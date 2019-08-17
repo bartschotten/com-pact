@@ -1,14 +1,15 @@
 ﻿using ComPact.Models;
+using ComPact.Models.V2;
 
-namespace ComPact.Builders
+namespace ComPact.Builders.V2
 {
     public class RequestBuilder
     {
-        private readonly RequestV2 _request;
+        private readonly Request _request;
 
         internal RequestBuilder()
         {
-            _request = new RequestV2();
+            _request = new Request();
         }
 
         public RequestBuilder ToPath(string path)
@@ -51,7 +52,7 @@ namespace ComPact.Builders
             return this;
         }
 
-        internal RequestV2 Build()
+        internal Request Build()
         {
             return _request;
         }

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System;
-using ComPact.Models;
+using ComPact.Models.V2;
 
-namespace ComPact.Builders
+namespace ComPact.Mock.Provider
 {
     internal class RequestResponseMatcher: IRequestResponseMatcher
     {
@@ -14,7 +14,7 @@ namespace ComPact.Builders
             _matchableInteractions = interactions;
         }
 
-        public ResponseV2 FindMatch(RequestV2 actualRequest)
+        public Response FindMatch(Request actualRequest)
         {
             if (actualRequest == null)
             {

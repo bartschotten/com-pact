@@ -1,6 +1,5 @@
-using ComPact.Builders;
+using ComPact.Builders.V2;
 using ComPact.Models;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Net.Http;
@@ -16,7 +15,7 @@ namespace ComPact.ConsumerTests
         {
             var url = "http://localhost:9393";
 
-            var builder = new PactBuilderV2("test-consumer", "test-producer", url);
+            var builder = new PactBuilder("test-consumer", "test-producer", url);
 
             var recipeId = Guid.Parse("2860dedb-a193-425f-b73e-ef02db0aa8cf");
 
@@ -25,7 +24,7 @@ namespace ComPact.ConsumerTests
                                 Some.Element.Named("amount").Like(5.5),
                                 Some.Element.Named("unit").Like("gram"));
 
-            builder.SetupInteraction(new InteractionV2Builder()
+            builder.SetupInteraction(new InteractionBuilder()
                 .Given($"There is a recipe with id `{recipeId}`")
                 .UponReceiving("a request")
                 .With(Pact.Request
@@ -59,9 +58,9 @@ namespace ComPact.ConsumerTests
         {
             var url = "http://localhost:9393";
 
-            var builder = new PactBuilderV2("test-consumer", "test-producer", url);
+            var builder = new PactBuilder("test-consumer", "test-producer", url);
 
-            builder.SetupInteraction(new InteractionV2Builder()
+            builder.SetupInteraction(new InteractionBuilder()
                 .UponReceiving("a request")
                 .With(Pact.Request
                     .WithHeader("Accept", "application/json")
@@ -89,7 +88,7 @@ namespace ComPact.ConsumerTests
         {
             var url = "http://localhost:9393";
 
-            var builder = new PactBuilderV2("test-consumer", "test-producer", url);
+            var builder = new PactBuilder("test-consumer", "test-producer", url);
 
             try
             {

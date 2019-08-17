@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace ComPact.Models
+namespace ComPact.Models.V3
 {
     internal class Request
     {

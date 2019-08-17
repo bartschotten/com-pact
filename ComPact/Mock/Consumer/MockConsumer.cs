@@ -1,11 +1,11 @@
-﻿using ComPact.Models;
+﻿using ComPact.Models.V2;
 using System;
 using RestSharp;
 using System.IO;
 using Newtonsoft.Json;
 using System.Linq;
 
-namespace ComPact.MockConsumer
+namespace ComPact.Mock.Consumer
 {
     public class MockConsumer
     {
@@ -20,7 +20,7 @@ namespace ComPact.MockConsumer
         {
             var pactFile = File.ReadAllText(filePath);
 
-            var pact = JsonConvert.DeserializeObject<PactV2>(pactFile);
+            var pact = JsonConvert.DeserializeObject<Contract>(pactFile);
 
             foreach(var interaction in pact.Interactions)
             {
@@ -28,7 +28,7 @@ namespace ComPact.MockConsumer
                 _client.Execute(providerStatesRequest);
                 var restRequest = interaction.Request.ToRestRequest();
                 var actualResponse = _client.Execute(restRequest);
-                var differences = interaction.Response.Match(new ResponseV2(actualResponse));
+                var differences = interaction.Response.Match(new Response(actualResponse));
                 if (differences.Any())
                 {
                     throw new PactException(string.Join(Environment.NewLine, differences));

@@ -6,9 +6,9 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace ComPact.Models
+namespace ComPact.Models.V2
 {
-    public class RequestV2
+    public class Request
     {
         [JsonProperty("method")]
         [JsonConverter(typeof(StringEnumConverter))]
@@ -22,9 +22,9 @@ namespace ComPact.Models
         [JsonProperty("body")]
         public dynamic Body { get; set; }
 
-        public RequestV2() { }
+        public Request() { }
 
-        public RequestV2(HttpRequest request)
+        public Request(HttpRequest request)
         {
             if (request == null)
             {
@@ -66,7 +66,7 @@ namespace ComPact.Models
             return request;
         }
 
-        public bool Match(RequestV2 actualRequest)
+        public bool Match(Request actualRequest)
         {
             if (actualRequest == null)
             {

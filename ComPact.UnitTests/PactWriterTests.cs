@@ -1,4 +1,5 @@
 using ComPact.Models;
+using ComPact.Models.V2;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -11,22 +12,22 @@ namespace ComPact.UnitTests
         [TestMethod]
         public void ShouldWritePactFile()
         {
-            var pact = new PactV2
+            var pact = new Contract
             {
                 Consumer = new Pacticipant { Name = "consumer" },
                 Provider = new Pacticipant { Name = "provider" },
-                Interactions = new List<InteractionV2>
+                Interactions = new List<Interaction>
                 {
-                    new InteractionV2
+                    new Interaction
                     {
                         Description = "TestInteraction",
-                        Request = new RequestV2
+                        Request = new Request
                         {
                             Method = Method.GET,
                             Path = "/",
                             Headers = new Headers { { "Accept", "application/json" } }
                         },
-                        Response = new ResponseV2
+                        Response = new Response
                         {
                             Status = 200,
                             Headers = new Headers { { "Content-Type", "application/json" } },

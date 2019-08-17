@@ -1,4 +1,5 @@
 ﻿using ComPact.Models;
+using ComPact.Models.V2;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace ComPact.UnitTests.Models
         [TestMethod]
         public void ShouldCreateRestRequestFromRequest()
         {
-            var request = new RequestV2
+            var request = new Request
             {
                 Method = Method.POST,
                 Path = "/test",

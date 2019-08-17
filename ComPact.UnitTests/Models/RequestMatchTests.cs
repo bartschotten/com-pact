@@ -1,4 +1,5 @@
 ﻿using ComPact.Models;
+using ComPact.Models.V2;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
@@ -7,11 +8,11 @@ namespace ComPact.UnitTests.Models
     [TestClass]
     public class RequestMatchTests
     {
-        private readonly RequestV2 _expected;
+        private readonly Request _expected;
 
         public RequestMatchTests()
         {
-            _expected = new RequestV2
+            _expected = new Request
             {
                 Method = Method.GET,
                 Path = "/test",
@@ -24,7 +25,7 @@ namespace ComPact.UnitTests.Models
         [TestMethod]
         public void ShouldMatchRequests()
         {
-            var actual = new RequestV2
+            var actual = new Request
             {
                 Method = Method.GET,
                 Path = "/test",
@@ -39,7 +40,7 @@ namespace ComPact.UnitTests.Models
         [TestMethod]
         public void ShouldMatchWhenActualHasExtraHeader()
         {
-            var actual = new RequestV2
+            var actual = new Request
             {
                 Method = Method.GET,
                 Path = "/test",
@@ -55,7 +56,7 @@ namespace ComPact.UnitTests.Models
         [TestMethod]
         public void ShouldNotMatchWhenMethodDoesNotMatch()
         {
-            var actual = new RequestV2
+            var actual = new Request
             {
                 Method = Method.POST,
                 Path = "/test",
@@ -70,7 +71,7 @@ namespace ComPact.UnitTests.Models
         [TestMethod]
         public void ShouldNotMatchWhenPathDoesNotMatch()
         {
-            var actual = new RequestV2
+            var actual = new Request
             {
                 Method = Method.GET,
                 Path = "/test/resources",
@@ -85,7 +86,7 @@ namespace ComPact.UnitTests.Models
         [TestMethod]
         public void ShouldNotMatchWhenHeaderDoesNotMatch()
         {
-            var actual = new RequestV2
+            var actual = new Request
             {
                 Method = Method.GET,
                 Path = "/test",
@@ -100,7 +101,7 @@ namespace ComPact.UnitTests.Models
         [TestMethod]
         public void ShouldNotMatchWhenQueryDoesNotMatch()
         {
-            var actual = new RequestV2
+            var actual = new Request
             {
                 Method = Method.GET,
                 Path = "/test",
@@ -115,7 +116,7 @@ namespace ComPact.UnitTests.Models
         [TestMethod]
         public void ShouldNotMatchWhenBodyDoesNotMatch()
         {
-            var actual = new RequestV2
+            var actual = new Request
             {
                 Method = Method.GET,
                 Path = "/test",
@@ -131,7 +132,7 @@ namespace ComPact.UnitTests.Models
         [ExpectedException(typeof(ArgumentNullException))]
         public void ShouldThrowWhenNull()
         {
-            new RequestV2().Match(null);
+            new Request().Match(null);
         }
     }
 }

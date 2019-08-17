@@ -1,16 +1,15 @@
-﻿using ComPact.Models;
-using Newtonsoft.Json.Linq;
+﻿using ComPact.Models.V2;
 using System;
 
-namespace ComPact.Builders
+namespace ComPact.Builders.V2
 {
     public class ResponseBuilder
     {
-        private readonly ResponseV2 _response;
+        private readonly Response _response;
 
         internal ResponseBuilder()
         {
-            _response = new ResponseV2();
+            _response = new Response();
         }
 
         public ResponseBuilder WithStatus(int status)
@@ -47,7 +46,7 @@ namespace ComPact.Builders
             return this;
         }
 
-        internal ResponseV2 Build()
+        internal Response Build()
         {
             return _response;
         }

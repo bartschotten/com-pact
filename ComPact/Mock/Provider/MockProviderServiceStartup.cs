@@ -1,11 +1,10 @@
-﻿using ComPact.Builders;
-using ComPact.Models;
+﻿using ComPact.Models.V2;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
 using System.Text;
 
-namespace ComPact
+namespace ComPact.Mock.Provider
 {
     internal class MockProviderServiceStartup
     {
@@ -20,7 +19,7 @@ namespace ComPact
         {
             app.Run(async context =>
             {
-                var request = new RequestV2(context.Request);
+                var request = new Request(context.Request);
                 var response = _matcher.FindMatch(request);
 
                 context.Response.StatusCode = response.Status;

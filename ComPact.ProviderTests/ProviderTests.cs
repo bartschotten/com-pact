@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
-using ComPact.MockConsumer;
+using ComPact.Mock.Consumer;
 using ComPact.ProviderTests.TestSupport;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -20,7 +17,7 @@ namespace ComPact.ProviderTests
         {
             var baseUrl = "http://localhost:9494";
 
-            var mockConsumer = new MockConsumer.MockConsumer(baseUrl);
+            var mockConsumer = new MockConsumer(baseUrl);
 
             var cts = new CancellationTokenSource();
 
