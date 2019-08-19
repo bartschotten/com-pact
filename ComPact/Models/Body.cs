@@ -42,13 +42,22 @@ namespace ComPact.Models
                 var matchingActualTokens = actualRootToken.SelectTokens(path).ToList();
                 foreach (var actualToken in matchingActualTokens)
                 {
-                    var expectedToken = expectedRootToken.SelectToken(actualToken.Path);
-                    if (expectedToken == null)
-                    {
-                        var expectedTokenParent = expectedRootToken.SelectToken(actualToken.Parent.Path);
-                        expectedTokenParent?.First.AddAfterSelf(expectedTokenParent.First);
-                    }
+                    AddExpectedTokenToMatchActualToken(expectedRootToken, actualToken);
                 }
+            }
+        }
+
+        private static void AddExpectedTokenToMatchActualToken(JToken expectedRootToken, JToken actualToken)
+        {
+            var expectedToken = expectedRootToken.SelectToken(actualToken.Path);
+            if (expectedToken == null && actualToken.Parent.Type == JTokenType.Array)
+            {
+                var expectedTokenParent = expectedRootToken.SelectToken(actualToken.Parent.Path);
+                expectedTokenParent?.First.AddAfterSelf(expectedTokenParent.First);
+            }
+            foreach (var actualChildToken in actualToken.Children())
+            {
+                AddExpectedTokenToMatchActualToken(expectedRootToken, actualChildToken);
             }
         }
 
