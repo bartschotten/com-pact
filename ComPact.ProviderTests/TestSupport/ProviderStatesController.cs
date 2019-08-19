@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using ComPact.ProviderTests.Domain;
 using Microsoft.AspNetCore.Mvc;
@@ -21,9 +23,9 @@ namespace ComPact.ProviderTests.TestSupport
         [HttpPost]
         public ActionResult Post(ProviderState providerState)
         {
-            if (providerState.State.StartsWith("There is a recipe with id"))
+            if (providerState.Name.StartsWith("There is a recipe with id"))
             {
-                var id = providerState.State.Split('`')[1];
+                var id = providerState.Name.Split('`')[1];
 
                 var recipe = new Recipe
                 {

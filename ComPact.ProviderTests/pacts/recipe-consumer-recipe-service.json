@@ -40,7 +40,7 @@
           "$.body.instructions": {
             "match": "type"
           },
-          "$.body.ingredients[*]": {
+          "$.body.ingredients": {
             "match": "type",
             "min": "1"
           }

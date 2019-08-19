@@ -9,16 +9,19 @@ namespace ComPact.Models.V3
 
         internal Query(string queryString)
         {
-            var parameters = queryString.Split("&");
-            foreach (var param in parameters)
+            if (!string.IsNullOrWhiteSpace(queryString))
             {
-                var splitParam = param.Split("=");
-                if (TryGetValue(splitParam[0], out var existingValues))
+                var parameters = queryString.Split("&");
+                foreach (var param in parameters)
                 {
-                    Remove(splitParam[0]);
-                    splitParam[1] += existingValues;
+                    var splitParam = param.Split("=");
+                    if (TryGetValue(splitParam[0], out var existingValues))
+                    {
+                        Remove(splitParam[0]);
+                        splitParam[1] += existingValues;
+                    }
+                    Add(splitParam[0], splitParam[1].Split(","));
                 }
-                Add(splitParam[0], splitParam[1].Split(","));
             }
         }
 

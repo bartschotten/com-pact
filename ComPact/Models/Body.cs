@@ -39,7 +39,7 @@ namespace ComPact.Models
             }
             foreach (var path in matchingRules.Body.Select(m => m.Key))
             {
-                var matchingActualTokens = actualRootToken.SelectTokens(path);
+                var matchingActualTokens = actualRootToken.SelectTokens(path).ToList();
                 foreach (var actualToken in matchingActualTokens)
                 {
                     var expectedToken = expectedRootToken.SelectToken(actualToken.Path);
@@ -86,12 +86,12 @@ namespace ComPact.Models
             var actualToken = actualRootToken.SelectToken(expectedToken.Path);
             if (actualToken == null)
             {
-                return new List<string> { $"Property {expectedToken.Path} was not present in the actual response." };
+                return new List<string> { $"Property \'{expectedToken.Path}\' was not present in the actual response." };
             }
             var actualValue = actualToken.Value<T>();
             if (actualValue == null)
             {
-                return new List<string> { $"Expected {expectedValue} at {expectedToken.Path}, but had no value." };
+                return new List<string> { $"Expected \'{expectedValue}\' at \'{expectedToken.Path}\', but had no value." };
             }
             if (matchingRules != null && matchingRules.TryGetApplicableMatcherListForToken(expectedToken, out var matcherList))
             {
@@ -99,11 +99,11 @@ namespace ComPact.Models
             }
             else if (expectedToken.Type != actualToken.Type)
             {
-                return new List<string> { $"Expected value of type {expectedToken.Type} (like: {expectedToken.ToString()}) at {expectedToken.Path}, but was value of type {actualToken.Type}." };
+                return new List<string> { $"Expected value of type {expectedToken.Type} (like: \'{expectedToken.ToString()}\') at \'{expectedToken.Path}\', but was value of type {actualToken.Type}." };
             }
             else if (!actualValue.Equals(expectedValue))
             {
-                return new List<string> { $"Expected {expectedValue} at {expectedToken.Path}, but was {actualValue}." };
+                return new List<string> { $"Expected \'{expectedValue}\' at \'{expectedToken.Path}\', but was \'{actualValue}\'." };
             }
 
             return new List<string>();
@@ -114,11 +114,11 @@ namespace ComPact.Models
             var actualToken = actualRootToken.SelectToken(expectedToken.Path);
             if (actualToken == null)
             {
-                return new List<string> { $"Array {expectedToken.Path} was not present in the actual response." };
+                return new List<string> { $"Array \'{expectedToken.Path}\' was not present in the actual response." };
             }
             else if (actualToken.Children().Count() != expectedToken.Children().Count())
             {
-                return new List<string> { $"Expected array at {expectedToken.Path} to have {expectedToken.Children().Count()} items, but was {actualToken.Children().Count()}." };
+                return new List<string> { $"Expected array at \'{expectedToken.Path}\' to have {expectedToken.Children().Count()} items, but was {actualToken.Children().Count()}." };
             }
 
             return new List<string>();

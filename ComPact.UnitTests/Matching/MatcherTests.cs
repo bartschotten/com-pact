@@ -25,7 +25,7 @@ namespace ComPact.UnitTests.Matching
 
             var differences = matcher.Match("expected", 1);
 
-            Assert.AreEqual("Expected value of type String (like: expected) at , but was value of type Integer.", differences.First());
+            Assert.AreEqual("Expected value of type String (like: 'expected') at , but was value of type Integer.", differences.First());
         }
 
         [TestMethod]
@@ -45,7 +45,7 @@ namespace ComPact.UnitTests.Matching
 
             var differences = matcher.Match("expected", "actual");
 
-            Assert.AreEqual("Expected value matching ^ex.*$ (like: expected) at , but was actual.", differences.First());
+            Assert.AreEqual("Expected value matching '^ex.*$' (like: 'expected') at , but was 'actual'.", differences.First());
         }
 
         [TestMethod]
@@ -56,7 +56,7 @@ namespace ComPact.UnitTests.Matching
             var expectedObject = JToken.FromObject(new { body = new { name = "expected" } });
             var differences = matcher.Match(expectedObject.SelectToken("body.name"), 1);
 
-            Assert.AreEqual("Expected value of type String (like: expected) at body.name, but was value of type Integer.", differences.First());
+            Assert.AreEqual("Expected value of type String (like: 'expected') at body.name, but was value of type Integer.", differences.First());
         }
 
         [TestMethod]

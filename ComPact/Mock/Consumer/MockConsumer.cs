@@ -19,20 +19,42 @@ namespace ComPact.Mock.Consumer
 
         public void VerifyPact(string filePath)
         {
-            var pactFile = File.ReadAllText(filePath);
+            string pactFile;
 
-            var pactV3 = JsonConvert.DeserializeObject<Models.V3.Contract>(pactFile);
-            if (pactV3.Metadata.GetVersion() == SpecificationVersion.Two)
+            try
             {
-                var pactV2 = JsonConvert.DeserializeObject<Models.V2.Contract>(pactFile);
-                pactV3 = new Models.V3.Contract(pactV2);
+                pactFile = File.ReadAllText(filePath);
             }
-            else if (pactV3.Metadata.GetVersion() == SpecificationVersion.Unsupported)
+            catch
             {
-                throw new PactException("Pact specification version is not supported.");
+                throw new PactException($"Could not read file at {filePath}");
             }
 
-            foreach(var interaction in pactV3.Interactions)
+            Models.V3.Contract pact = null;
+
+            try
+            {
+                var contractWithSomeVersion = JsonConvert.DeserializeObject<ContractWithSomeVersion>(pactFile);
+                if (contractWithSomeVersion.Metadata.GetVersion() == SpecificationVersion.Three)
+                {
+                    pact = JsonConvert.DeserializeObject<Models.V3.Contract>(pactFile);
+                }
+                else if (contractWithSomeVersion.Metadata.GetVersion() == SpecificationVersion.Two)
+                {
+                    var pactV2 = JsonConvert.DeserializeObject<Models.V2.Contract>(pactFile);
+                    pact = new Models.V3.Contract(pactV2);
+                }
+                else if (contractWithSomeVersion.Metadata.GetVersion() == SpecificationVersion.Unsupported)
+                {
+                    throw new PactException("Pact specification version is not supported.");
+                }
+            }
+            catch
+            {
+                throw new PactException("File was not recognized as a valid Pact contract.");
+            }
+
+            foreach(var interaction in pact.Interactions)
             {
                 var providerStatesRequest = new RestRequest("provider-states", RestSharp.Method.POST).AddJsonBody(interaction.ProviderState);
                 _client.Execute(providerStatesRequest);
