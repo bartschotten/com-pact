@@ -1,4 +1,7 @@
 ﻿using Newtonsoft.Json;
+using RestSharp;
+using System;
+using System.Collections.Generic;
 
 namespace ComPact.Models.V3
 {
@@ -26,6 +29,34 @@ namespace ComPact.Models.V3
             Headers = responseV2.Headers;
             Body = responseV2.Body;
             MatchingRules = new MatchingRuleCollection(responseV2.MatchingRules);
+        }
+
+        internal Response(IRestResponse restResponse)
+        {
+            if (restResponse == null)
+            {
+                throw new ArgumentNullException(nameof(restResponse));
+            }
+
+            Status = (int)restResponse?.StatusCode;
+            Headers = new Headers(restResponse.Headers);
+            Body = JsonConvert.DeserializeObject(restResponse.Content);
+        }
+
+        internal List<string> Match(Response actualResponse)
+        {
+            var differences = new List<string>();
+
+            if (Status != actualResponse.Status)
+            {
+                differences.Add($"Expected status {Status}, but was {actualResponse.Status}");
+            }
+
+            differences.AddRange(Headers.Match(actualResponse.Headers, MatchingRules));
+
+            differences.AddRange(Models.Body.Match(Body, actualResponse.Body, MatchingRules));
+
+            return differences;
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace ComPact.Models.V3
+namespace ComPact.Models
 {
     internal class ProviderState
     {
