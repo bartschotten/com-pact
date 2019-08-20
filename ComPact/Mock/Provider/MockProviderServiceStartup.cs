@@ -1,4 +1,4 @@
-﻿using ComPact.Models.V2;
+﻿using ComPact.Models.V3;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
@@ -19,15 +19,7 @@ namespace ComPact.Mock.Provider
         {
             app.Run(async context =>
             {
-                var request = new Request(context.Request);
-                var response = _matcher.FindMatch(request);
-
-                context.Response.StatusCode = response.Status;
-                foreach(var header in response.Headers)
-                {
-                    context.Response.Headers.Add(header.Key, new Microsoft.Extensions.Primitives.StringValues(header.Value));
-                }
-                await context.Response.Body.WriteAsync(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response.Body)));
+                await _matcher.MatchRequestAndReturnResponse(context.Request, context.Response);
             });
         }
     }

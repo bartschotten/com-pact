@@ -1,7 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ComPact.Models.V3
 {
@@ -23,6 +22,15 @@ namespace ComPact.Models.V3
             ProviderState = new ProviderState { Name = interaction.ProviderState };
             Request = new Request(interaction.Request);
             Response = new Response(interaction.Response);
+        }
+
+        public Response Match(HttpRequest actualRequest)
+        {
+            if (Request.Match(new Request(actualRequest)))
+            {
+                return Response;
+            }
+            return null;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ComPact.Models.V3
@@ -23,6 +24,11 @@ namespace ComPact.Models.V3
                     Add(splitParam[0], splitParam[1].Split(","));
                 }
             }
+        }
+
+        internal Query(IQueryCollection queryCollection)
+        {
+            queryCollection.ToList().ForEach(q => Add(q.Key, q.Value.ToArray()));
         }
 
         internal string ToQueryString()

@@ -1,5 +1,5 @@
 ﻿using ComPact.Models;
-using ComPact.Models.V2;
+using ComPact.Models.V3;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using System.Linq;
@@ -17,7 +17,7 @@ namespace ComPact.UnitTests.Models
                 Method = Method.POST,
                 Path = "/test",
                 Headers = new Headers { { "Accept", "application/json" } },
-                Query = "skip=100&take=10",
+                Query = new Query("skip=100&take=10"),
                 Body = new
                 {
                     text = "Hello World!"
@@ -28,7 +28,7 @@ namespace ComPact.UnitTests.Models
 
             Assert.AreEqual(request.Method.ToString(), restRequest.Method.ToString());
             Assert.AreEqual(request.Path, restRequest.Resource);
-            Assert.AreEqual(request.Query, string.Join("&", restRequest.Parameters.Where(p => p.Type == RestSharp.ParameterType.QueryStringWithoutEncode)
+            Assert.AreEqual(request.Query.ToQueryString(), string.Join("&", restRequest.Parameters.Where(p => p.Type == RestSharp.ParameterType.QueryStringWithoutEncode)
                 .Select(p => p.Name + "=" + p.Value)));
             Assert.AreEqual("application/json", restRequest.Parameters.First(p => p.Type == RestSharp.ParameterType.HttpHeader).Value);
             Assert.AreEqual("{\"text\":\"Hello World!\"}", JsonConvert.SerializeObject(restRequest.Parameters.First(p => p.Type == RestSharp.ParameterType.RequestBody).Value));

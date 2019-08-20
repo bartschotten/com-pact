@@ -1,7 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System;
-using ComPact.Models.V2;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Primitives;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace ComPact.Mock.Provider
 {
@@ -14,27 +18,33 @@ namespace ComPact.Mock.Provider
             _matchableInteractions = interactions;
         }
 
-        public Response FindMatch(Request actualRequest)
+        public async Task MatchRequestAndReturnResponse(HttpRequest httpRequest, HttpResponse httpResponseToReturn)
         {
-            if (actualRequest == null)
+            if (httpRequest == null)
             {
-                throw new ArgumentNullException(nameof(actualRequest));
+                throw new ArgumentNullException(nameof(httpRequest));
             }
 
-            var matches = _matchableInteractions.Where(m => m.Interaction.Request.Match(actualRequest));
+            var request = new Models.V3.Request(httpRequest);
 
-            if (!matches.Any())
+            var responses = _matchableInteractions.Select(m => m.Match(request));
+
+            if (!responses.Any())
             {
                 throw new PactException("No matching response set up for this request.");
             }
-            else if (matches.Count() > 1)
+            else if (responses.Count() > 1)
             {
                 throw new PactException("More than one matching response found for this request.");
             }
             else
             {
-                matches.First().HasBeenMatched = true;
-                return matches.First().Interaction.Response;
+                httpResponseToReturn.StatusCode = responses.First().Status;
+                foreach (var header in httpResponseToReturn.Headers)
+                {
+                    httpResponseToReturn.Headers.Add(header.Key, new StringValues((string)header.Value));
+                }
+                await httpResponseToReturn.Body.WriteAsync(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(responses.First().Body)));
             }
         }
 

@@ -69,7 +69,7 @@ namespace ComPact.Builders.V2
             {
                 Consumer = new Pacticipant { Name = _consumer },
                 Provider = new Pacticipant { Name = _provider },
-                Interactions = _matchableInteractions.Select(m => m.Interaction).ToList()
+                Interactions = _matchableInteractions.Select(m => m.Interaction as Interaction).ToList()
             };
 
             PactWriter.Write(pact);

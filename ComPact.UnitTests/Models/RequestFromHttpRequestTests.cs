@@ -1,5 +1,5 @@
 ﻿using ComPact.Models;
-using ComPact.Models.V2;
+using ComPact.Models.V3;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Extensions.Primitives;
@@ -45,7 +45,7 @@ namespace ComPact.UnitTests.Models
             Assert.AreEqual(1, pactRequest.Headers.Count);
             Assert.AreEqual("application/json", pactRequest.Headers["Accept"]);
 
-            Assert.AreEqual("skip=100&take=10", pactRequest.Query);
+            Assert.AreEqual("skip=100&take=10", pactRequest.Query.ToQueryString());
         }
 
         [TestMethod]
@@ -64,14 +64,14 @@ namespace ComPact.UnitTests.Models
             Assert.IsNull(pactRequest.Body);
             Assert.IsNotNull(pactRequest.Headers);
             Assert.AreEqual(0, pactRequest.Headers.Count);
-            Assert.AreEqual(string.Empty, pactRequest.Query);
+            Assert.AreEqual(string.Empty, pactRequest.Query.ToQueryString());
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ShouldThrowIfRequestIsNull()
         {
-            new Request(null);
+            new Request(null as HttpRequest);
         }
 
         [TestMethod]

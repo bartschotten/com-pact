@@ -1,10 +1,12 @@
-﻿using ComPact.Models.V2;
+﻿using ComPact.Models;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace ComPact.Mock.Provider
 {
     internal interface IRequestResponseMatcher
     {
-        Response FindMatch(Request actualRequest);
+        Task MatchRequestAndReturnResponse(HttpRequest httpRequest, HttpResponse httpResponseToReturn);
         bool AllHaveBeenMatched();
     }
 }

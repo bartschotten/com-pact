@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 
 namespace ComPact.Models.V2
 {
@@ -13,5 +14,13 @@ namespace ComPact.Models.V2
         [JsonProperty("response")]
         public Response Response { get; set; } = new Response();
 
+        public Response Match(Models.V3.Request actualRequest)
+        {
+            if (new V3.Request(Request).Match(actualRequest))
+            {
+                return Response;
+            }
+            return null;
+        }
     }
 }

@@ -1,10 +1,7 @@
-﻿﻿using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using RestSharp;
 using System;
-using System.IO;
-using System.Text;
 
 namespace ComPact.Models.V2
 {
@@ -23,30 +20,6 @@ namespace ComPact.Models.V2
         public dynamic Body { get; set; }
 
         public Request() { }
-
-        public Request(HttpRequest request)
-        {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
-
-            if (!Enum.TryParse<Method>(request.Method, true, out var method))
-            {
-                throw new PactException($"Received method {request.Method} is not allowed in Pact contracts.");
-            }
-            Method = method;
-
-            Path = request.Path.HasValue ? request.Path.Value : throw new PactException("Received path must have a value.");
-
-            Headers = new Headers(request.Headers);
-
-            Query = request.QueryString.HasValue ? request.QueryString.Value.Substring(1) : string.Empty;
-
-            var streamReader = new StreamReader(request.Body, Encoding.UTF8);
-            var serializedBody = streamReader.ReadToEnd();
-            Body = JsonConvert.DeserializeObject<dynamic>(serializedBody);
-        }
 
         public RestRequest ToRestRequest()
         {

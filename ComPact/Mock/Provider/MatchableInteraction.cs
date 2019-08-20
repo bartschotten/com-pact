@@ -11,5 +11,15 @@ namespace ComPact.Mock.Provider
         {
             Interaction = interaction;
         }
+
+        public Response Match(Models.V3.Request request)
+        {
+            var response = Interaction.Match(request);
+            if (response != null)
+            {
+                HasBeenMatched = true;
+            }
+            return response;
+        }
     }
 }
