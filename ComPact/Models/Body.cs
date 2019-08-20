@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using ComPact.Extensions;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,13 +23,27 @@ namespace ComPact.Models
                 return differences;
             }
 
-            var expectedToken = JToken.FromObject(expectedBody);
-            var actualToken = JToken.FromObject(actualBody);
+            JToken expectedRootToken = JToken.FromObject(expectedBody);
+            JToken actualRootToken = JToken.FromObject(actualBody);
 
-            FillOutExpectedTokensToMatchAdditionalActualTokens(expectedToken, actualToken, matchingRules);
-            ProcessTokenAndItsChildren(expectedToken, matchingRules, actualToken, differences);
+            FillOutExpectedTokensToMatchAdditionalActualTokens(expectedRootToken, actualRootToken, matchingRules);
+
+            foreach (var token in expectedRootToken.ThisTokenAndAllItsDescendants())
+            {
+                ProcessToken(token, matchingRules, actualRootToken, differences);
+            }
 
             return differences;
+        }
+
+        private static void VerifyAdditionalActualTokensAgainstMatchingRules(JToken expectedRootToken, JToken actualRootToken, MatchingRuleCollection matchingRules)
+        {
+            var pathsInExpected = expectedRootToken.ThisTokenAndAllItsDescendants().Select(t => t.Path);
+            var additionalActualTokens = actualRootToken.ThisTokenAndAllItsDescendants().Where(t => !pathsInExpected.Contains(t.Path));
+            foreach(var token in additionalActualTokens)
+            {
+
+            }
         }
 
         private static void FillOutExpectedTokensToMatchAdditionalActualTokens(JToken expectedRootToken, JToken actualRootToken, MatchingRuleCollection matchingRules)
@@ -61,7 +76,7 @@ namespace ComPact.Models
             }
         }
 
-        private static void ProcessTokenAndItsChildren(JToken expectedToken, MatchingRuleCollection matchingRules, JToken actualRootToken, List<string> differences)
+        private static void ProcessToken(JToken expectedToken, MatchingRuleCollection matchingRules, JToken actualRootToken, List<string> differences)
         {
             switch (expectedToken.Type)
             {
@@ -81,11 +96,6 @@ namespace ComPact.Models
                 case JTokenType.Array:
                     differences.AddRange(CompareExpectedArrayWithActual(expectedToken, actualRootToken));
                     break;
-            }
-
-            foreach (var child in expectedToken.Children())
-            {
-                ProcessTokenAndItsChildren(child, matchingRules, actualRootToken, differences);
             }
         }
 
