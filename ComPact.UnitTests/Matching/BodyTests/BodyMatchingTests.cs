@@ -30,6 +30,7 @@ namespace ComPact.UnitTests.Matching.BodyTests
                     if (differences.Any() == testcase.Match)
                     {
                         failedCases.Add(file.Split(Path.DirectorySeparatorChar).Last());
+                        failedCases.AddRange(differences.Select(d => "- " + d));
                     }
                 }
             }

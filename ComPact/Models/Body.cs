@@ -26,76 +26,62 @@ namespace ComPact.Models
             JToken expectedRootToken = JToken.FromObject(expectedBody);
             JToken actualRootToken = JToken.FromObject(actualBody);
 
-            FillOutExpectedTokensToMatchAdditionalActualTokens(expectedRootToken, actualRootToken, matchingRules);
-
             foreach (var token in expectedRootToken.ThisTokenAndAllItsDescendants())
             {
-                ProcessToken(token, matchingRules, actualRootToken, differences);
+                differences.AddRange(ProcessToken(token, matchingRules, actualRootToken));
+            }
+
+            differences.AddRange(VerifyAdditionalActualTokensAgainstMatchingRules(expectedRootToken, actualRootToken, matchingRules));
+
+            return differences;
+        }
+
+        private static List<string> VerifyAdditionalActualTokensAgainstMatchingRules(JToken expectedRootToken, JToken actualRootToken, MatchingRuleCollection matchingRules)
+        {
+            var differences = new List<string>();
+
+            if (matchingRules?.Body == null || !matchingRules.Body.Any())
+            {
+                return differences;
+            }
+
+            var pathsInExpected = expectedRootToken.ThisTokenAndAllItsDescendants().Select(t => t.Path);
+            var additionalActualTokens = actualRootToken.ThisTokenAndAllItsDescendants().Where(t => !pathsInExpected.Contains(t.Path) && t.Type != JTokenType.Property);
+            foreach (var token in additionalActualTokens)
+            {
+                foreach (var jsonPath in matchingRules.Body.Select(b => b.Key))
+                {
+                    if (actualRootToken.SelectTokens(jsonPath).Any(t => t.Path == token.Path))
+                    {
+                        var expectedSibling = expectedRootToken.SelectTokens(jsonPath).FirstOrDefault();
+                        if (expectedSibling != null)
+                        {
+                            differences.AddRange(matchingRules.Body[jsonPath].Match(expectedSibling, token));
+                        }
+                    }
+                }
             }
 
             return differences;
         }
 
-        private static void VerifyAdditionalActualTokensAgainstMatchingRules(JToken expectedRootToken, JToken actualRootToken, MatchingRuleCollection matchingRules)
-        {
-            var pathsInExpected = expectedRootToken.ThisTokenAndAllItsDescendants().Select(t => t.Path);
-            var additionalActualTokens = actualRootToken.ThisTokenAndAllItsDescendants().Where(t => !pathsInExpected.Contains(t.Path));
-            foreach(var token in additionalActualTokens)
-            {
-
-            }
-        }
-
-        private static void FillOutExpectedTokensToMatchAdditionalActualTokens(JToken expectedRootToken, JToken actualRootToken, MatchingRuleCollection matchingRules)
-        {
-            if (matchingRules?.Body == null)
-            {
-                return;
-            }
-            foreach (var path in matchingRules.Body.Select(m => m.Key))
-            {
-                var matchingActualTokens = actualRootToken.SelectTokens(path).ToList();
-                foreach (var actualToken in matchingActualTokens)
-                {
-                    AddExpectedTokenToMatchActualToken(expectedRootToken, actualToken);
-                }
-            }
-        }
-
-        private static void AddExpectedTokenToMatchActualToken(JToken expectedRootToken, JToken actualToken)
-        {
-            var expectedToken = expectedRootToken.SelectToken(actualToken.Path);
-            if (expectedToken == null && actualToken.Parent.Type == JTokenType.Array)
-            {
-                var expectedTokenParent = expectedRootToken.SelectToken(actualToken.Parent.Path);
-                expectedTokenParent?.First.AddAfterSelf(expectedTokenParent.First);
-            }
-            foreach (var actualChildToken in actualToken.Children())
-            {
-                AddExpectedTokenToMatchActualToken(expectedRootToken, actualChildToken);
-            }
-        }
-
-        private static void ProcessToken(JToken expectedToken, MatchingRuleCollection matchingRules, JToken actualRootToken, List<string> differences)
+        private static List<string> ProcessToken(JToken expectedToken, MatchingRuleCollection matchingRules, JToken actualRootToken)
         {
             switch (expectedToken.Type)
             {
                 case JTokenType.String:
                 case JTokenType.Null:
-                    differences.AddRange(CompareExpectedTokenWithActual<string>(expectedToken, matchingRules, actualRootToken));
-                    break;
+                    return CompareExpectedTokenWithActual<string>(expectedToken, matchingRules, actualRootToken);
                 case JTokenType.Integer:
-                    differences.AddRange(CompareExpectedTokenWithActual<long>(expectedToken, matchingRules, actualRootToken));
-                    break;
+                    return CompareExpectedTokenWithActual<long>(expectedToken, matchingRules, actualRootToken);
                 case JTokenType.Float:
-                    differences.AddRange(CompareExpectedTokenWithActual<double>(expectedToken, matchingRules, actualRootToken));
-                    break;
+                    return CompareExpectedTokenWithActual<double>(expectedToken, matchingRules, actualRootToken);
                 case JTokenType.Boolean:
-                    differences.AddRange(CompareExpectedTokenWithActual<bool>(expectedToken, matchingRules, actualRootToken));
-                    break;
+                    return CompareExpectedTokenWithActual<bool>(expectedToken, matchingRules, actualRootToken);
                 case JTokenType.Array:
-                    differences.AddRange(CompareExpectedArrayWithActual(expectedToken, actualRootToken));
-                    break;
+                    return CompareExpectedArrayWithActual(expectedToken, matchingRules, actualRootToken);
+                default:
+                    return new List<string>();
             }
         }
 
@@ -128,12 +114,16 @@ namespace ComPact.Models
             return new List<string>();
         }
 
-        private static List<string> CompareExpectedArrayWithActual(JToken expectedToken, JToken actualRootToken)
+        private static List<string> CompareExpectedArrayWithActual(JToken expectedToken, MatchingRuleCollection matchingRules, JToken actualRootToken)
         {
             var actualToken = actualRootToken.SelectToken(expectedToken.Path);
             if (actualToken == null)
             {
                 return new List<string> { $"Array \'{expectedToken.Path}\' was not present in the actual response." };
+            }
+            if (matchingRules != null && matchingRules.TryGetApplicableMatcherListForToken(expectedToken, out var matcherList))
+            {
+                return matcherList.Match(expectedToken, actualToken);
             }
             else if (actualToken.Children().Count() != expectedToken.Children().Count())
             {
