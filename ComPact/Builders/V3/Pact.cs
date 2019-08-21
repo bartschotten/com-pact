@@ -1,6 +1,4 @@
-﻿using ComPact.Models;
-
-namespace ComPact.Builders.V2
+﻿namespace ComPact.Builders.V3
 {
     public static class Pact
     {

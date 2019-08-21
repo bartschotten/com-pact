@@ -35,7 +35,7 @@ namespace ComPact.Builders
         internal Dictionary<string, Matcher> CreateMatchingRules()
         {
             var matchingRules = new Dictionary<string, Matcher>();
-            _rootElement.AddMatchingRules(matchingRules, "$");
+            _rootElement.AddMatchingRules(matchingRules, "$.body");
             return matchingRules;
         }
     }

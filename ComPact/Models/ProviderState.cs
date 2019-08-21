@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ComPact.Models
 {
-    internal class ProviderState
+    public class ProviderState
     {
         [JsonProperty("name")]
         public string Name { get; set; }

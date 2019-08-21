@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 
 namespace ComPact.Models.V3
@@ -24,9 +23,9 @@ namespace ComPact.Models.V3
             Response = new Response(interaction.Response);
         }
 
-        public Response Match(HttpRequest actualRequest)
+        public Response Match(Request actualRequest)
         {
-            if (Request.Match(new Request(actualRequest)))
+            if (Request.Match(actualRequest))
             {
                 return Response;
             }

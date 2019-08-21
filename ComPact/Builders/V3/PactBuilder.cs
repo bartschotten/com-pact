@@ -1,6 +1,6 @@
 ﻿using ComPact.Mock.Provider;
 using ComPact.Models;
-using ComPact.Models.V2;
+using ComPact.Models.V3;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace ComPact.Builders.V2
+namespace ComPact.Builders.V3
 {
     public class PactBuilder
     {
@@ -16,7 +16,6 @@ namespace ComPact.Builders.V2
         private readonly string _provider;
         private readonly CancellationTokenSource _cts;
         private readonly IRequestResponseMatcher _matcher;
-        private List<Interaction> _interactions;
         private List<MatchableInteraction> _matchableInteractions;
 
         public PactBuilder(string consumer, string provider, string mockProviderServiceBaseUri)
@@ -25,7 +24,6 @@ namespace ComPact.Builders.V2
 
             _consumer = consumer;
             _provider = provider;
-            _interactions = new List<Interaction>();
             _matchableInteractions = new List<MatchableInteraction>();
 
             _matcher = new RequestResponseMatcher(_matchableInteractions);
@@ -45,14 +43,11 @@ namespace ComPact.Builders.V2
 
         public void SetupInteraction(InteractionBuilder interactionBuilder)
         {
-            var interaction = interactionBuilder.Build();
-            _interactions.Add(interaction);
-            _matchableInteractions.Add(new MatchableInteraction(new Models.V3.Interaction(interaction)));
+            _matchableInteractions.Add(new MatchableInteraction(interactionBuilder.Build()));
         }
 
         public void ClearInteractions()
         {
-            _interactions = new List<Interaction>();
             _matchableInteractions = new List<MatchableInteraction>();
         }
 
@@ -74,7 +69,7 @@ namespace ComPact.Builders.V2
             {
                 Consumer = new Pacticipant { Name = _consumer },
                 Provider = new Pacticipant { Name = _provider },
-                Interactions = _interactions
+                Interactions = _matchableInteractions.Select(m => m.Interaction as Interaction).ToList()
             };
 
             PactWriter.Write(pact);

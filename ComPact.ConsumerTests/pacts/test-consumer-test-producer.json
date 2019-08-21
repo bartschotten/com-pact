@@ -8,14 +8,16 @@
   "interactions": [
     {
       "description": "a request",
-      "providerState": "There is a recipe with id `2860dedb-a193-425f-b73e-ef02db0aa8cf`",
+      "providerState": {
+        "name": "There is a recipe with id `2860dedb-a193-425f-b73e-ef02db0aa8cf`"
+      },
       "request": {
         "method": "GET",
         "path": "/api/recipes/2860dedb-a193-425f-b73e-ef02db0aa8cf",
         "headers": {
           "Accept": "application/json"
         },
-        "query": ""
+        "query": {}
       },
       "response": {
         "status": 200,
@@ -32,30 +34,13 @@
               "unit": "gram"
             }
           ]
-        },
-        "matchingRules": {
-          "$.name": {
-            "match": "type"
-          },
-          "$.instructions": {
-            "match": "type"
-          },
-          "$.ingredients[0].name": {
-            "match": "type"
-          },
-          "$.ingredients[0].amount": {
-            "match": "type"
-          },
-          "$.ingredients[0].unit": {
-            "match": "type"
-          }
         }
       }
     }
   ],
   "metadata": {
     "pactSpecification": {
-      "version": "2.0.0"
+      "version": "3.0.0"
     }
   }
 }

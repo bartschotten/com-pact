@@ -1,4 +1,4 @@
-﻿using ComPact.Models.V2;
+﻿using ComPact.Models.V3;
 
 namespace ComPact.Mock.Provider
 {

@@ -1,4 +1,4 @@
-using ComPact.Builders.V2;
+using ComPact.Builders.V3;
 using ComPact.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace ComPact.ConsumerTests
 {
     [TestClass]
-    public class PactV2ConsumerTests
+    public class PactV3ConsumerTests
     {
         [TestMethod]
         public async Task ShouldMatchRequest()
@@ -25,7 +25,7 @@ namespace ComPact.ConsumerTests
                                 Some.Element.Named("unit").Like("gram"));
 
             builder.SetupInteraction(new InteractionBuilder()
-                .Given($"There is a recipe with id `{recipeId}`")
+                .Given(new ProviderState { Name = $"There is a recipe with id `{recipeId}`" })
                 .UponReceiving("a request")
                 .With(Pact.Request
                     .WithHeader("Accept", "application/json")

@@ -1,4 +1,4 @@
-﻿using ComPact.Models.V2;
+﻿using ComPact.Models;
 using Newtonsoft.Json;
 using System;
 using System.IO;
@@ -7,7 +7,7 @@ namespace ComPact
 {
     internal static class PactWriter
     {
-        public static void Write(Contract pact)
+        public static void Write(IContract pact)
         {
             var settings = new JsonSerializerSettings
             {
