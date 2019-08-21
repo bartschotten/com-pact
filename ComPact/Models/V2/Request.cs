@@ -20,39 +20,5 @@ namespace ComPact.Models.V2
         public dynamic Body { get; set; }
 
         public Request() { }
-
-        public RestRequest ToRestRequest()
-        {
-            var method = (RestSharp.Method)Enum.Parse(typeof(RestSharp.Method), Method.ToString());
-            var path = Path;
-            if (!string.IsNullOrWhiteSpace(Query))
-            {
-                path += ("?" + Query);
-            }
-            var request = new RestRequest(path, method);
-            foreach (var header in Headers)
-            {
-                request.AddHeader(header.Key, header.Value);
-            }
-            request.AddJsonBody(Body);
-
-            return request;
-        }
-
-        public bool Match(Request actualRequest)
-        {
-            if (actualRequest == null)
-            {
-                throw new ArgumentNullException(nameof(actualRequest));
-            }
-
-            var methodsMatch = Method == actualRequest.Method;
-            var pathsMatch = Path == actualRequest.Path;
-            var headersMatch = Headers.Match(actualRequest.Headers);
-            var queriesMatch = Query == actualRequest.Query;
-            var bodiesMatch = Body == actualRequest.Body;
-
-            return methodsMatch && pathsMatch && headersMatch && queriesMatch && bodiesMatch;
-        }
     }
 }

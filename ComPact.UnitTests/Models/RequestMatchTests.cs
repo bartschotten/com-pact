@@ -1,5 +1,5 @@
 ﻿using ComPact.Models;
-using ComPact.Models.V2;
+using ComPact.Models.V3;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
@@ -17,7 +17,7 @@ namespace ComPact.UnitTests.Models
                 Method = Method.GET,
                 Path = "/test",
                 Headers = new Headers { { "Accept", "application/json" } },
-                Query = "skip=100&take=10",
+                Query = new Query("skip=100&take=10"),
                 Body = "test"
             };
         }
@@ -30,7 +30,7 @@ namespace ComPact.UnitTests.Models
                 Method = Method.GET,
                 Path = "/test",
                 Headers = new Headers { { "Accept", "application/json"} },
-                Query = "skip=100&take=10",
+                Query = new Query("skip=100&take=10"),
                 Body = "test"
             };
 
@@ -45,7 +45,7 @@ namespace ComPact.UnitTests.Models
                 Method = Method.GET,
                 Path = "/test",
                 Headers = new Headers { { "Accept", "application/json" }, { "Host", "test" } },
-                Query = "skip=100&take=10",
+                Query = new Query("skip=100&take=10"),
                 Body = "test"
             };
 
@@ -61,7 +61,7 @@ namespace ComPact.UnitTests.Models
                 Method = Method.POST,
                 Path = "/test",
                 Headers = new Headers { { "Accept", "application/json" } },
-                Query = "skip=100&take=10",
+                Query = new Query("skip=100&take=10"),
                 Body = "test"
             };
 
@@ -76,7 +76,7 @@ namespace ComPact.UnitTests.Models
                 Method = Method.GET,
                 Path = "/test/resources",
                 Headers = new Headers { { "Accept", "application/json" } },
-                Query = "skip=100&take=10",
+                Query = new Query("skip=100&take=10"),
                 Body = "test"
             };
 
@@ -91,7 +91,7 @@ namespace ComPact.UnitTests.Models
                 Method = Method.GET,
                 Path = "/test",
                 Headers = new Headers { { "Accept", "application/hal+json" } },
-                Query = "skip=100&take=10",
+                Query = new Query("skip=100&take=10"),
                 Body = "test"
             };
 
@@ -106,7 +106,7 @@ namespace ComPact.UnitTests.Models
                 Method = Method.GET,
                 Path = "/test",
                 Headers = new Headers { { "Accept", "application/json" } },
-                Query = "offset=100&limit=10",
+                Query = new Query("offset=100&limit=10"),
                 Body = "test"
             };
 
@@ -121,7 +121,7 @@ namespace ComPact.UnitTests.Models
                 Method = Method.GET,
                 Path = "/test",
                 Headers = new Headers { { "Accept", "application/json" } },
-                Query = "skip=100&take=10",
+                Query = new Query("skip=100&take=10"),
                 Body = new { }
             };
 
