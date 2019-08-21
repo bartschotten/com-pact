@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ComPact.Builders.V2
+namespace ComPact.Builders
 {
     public class ResponseBody
     {
@@ -38,14 +38,6 @@ namespace ComPact.Builders.V2
             _rootElement.AddMatchingRules(matchingRules, "$");
             return matchingRules;
         }
-    }
-
-    public static class Some
-    {
-        public static UnknownSimpleValue Element => new UnknownSimpleValue();
-        public static UnknownRegexString String => new UnknownRegexString();
-        public static UnknownObject Object => new UnknownObject();
-        public static UnknownArray Array => new UnknownArray();
     }
 
     public abstract class Element

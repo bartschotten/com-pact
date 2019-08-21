@@ -12,7 +12,7 @@ namespace ComPact.UnitTests.Builders
         [TestMethod]
         public void SimpleValue()
         {
-            var pactJsonBody = new ResponseBody().With(Some.Element.Like("Hello world")).ToJToken();
+            var pactJsonBody = Pact.ResponseBody.With(Some.Element.Like("Hello world")).ToJToken();
 
             var expectedObject = "Hello world";
 
@@ -22,7 +22,7 @@ namespace ComPact.UnitTests.Builders
         [TestMethod]
         public void SimpleProperty()
         {
-            var pactJsonBody = new ResponseBody().With(Some.Element.Named("greeting").Like("Hello world")).ToJToken();
+            var pactJsonBody = Pact.ResponseBody.With(Some.Element.Named("greeting").Like("Hello world")).ToJToken();
 
             var expectedObject = new { greeting = "Hello world" };
 
@@ -32,7 +32,7 @@ namespace ComPact.UnitTests.Builders
         [TestMethod]
         public void NestedObject()
         {
-            var pactJsonBody = new ResponseBody().With
+            var pactJsonBody = Pact.ResponseBody.With
                 (
                     Some.Object.Named("package").With
                     (
@@ -49,7 +49,7 @@ namespace ComPact.UnitTests.Builders
         [TestMethod]
         public void RootLevelArray()
         {
-            var pactJsonBody = new ResponseBody().With
+            var pactJsonBody = Pact.ResponseBody.With
                 (
                     Some.Array.Of
                     (
@@ -70,6 +70,8 @@ namespace ComPact.UnitTests.Builders
 
             var matchingRules = new Dictionary<string, Matcher>();
             pactJsonElement.AddMatchingRules(matchingRules, "$");
+
+            Assert.AreEqual("{\"$\":{\"match\":\"type\"}}", JsonConvert.SerializeObject(matchingRules, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
         }
     }
 }
