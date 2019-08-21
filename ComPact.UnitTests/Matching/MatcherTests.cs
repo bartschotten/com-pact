@@ -11,7 +11,7 @@ namespace ComPact.UnitTests.Matching
         [TestMethod]
         public void TypeMatchForString()
         {
-            var matcher = new Matcher { MatcherType = "type" };
+            var matcher = new Matcher { MatcherType = MatcherType.type };
 
             var differences = matcher.Match("expected", "actual");
 
@@ -21,7 +21,7 @@ namespace ComPact.UnitTests.Matching
         [TestMethod]
         public void TypeMismatchForString()
         {
-            var matcher = new Matcher { MatcherType = "type" };
+            var matcher = new Matcher { MatcherType = MatcherType.type };
 
             var differences = matcher.Match("expected", 1);
 
@@ -31,7 +31,7 @@ namespace ComPact.UnitTests.Matching
         [TestMethod]
         public void RegexMatchForString()
         {
-            var matcher = new Matcher { MatcherType = "regex", Regex = "^ex.*$" };
+            var matcher = new Matcher { MatcherType = MatcherType.regex, Regex = "^ex.*$" };
 
             var differences = matcher.Match("expected", "example");
 
@@ -41,7 +41,7 @@ namespace ComPact.UnitTests.Matching
         [TestMethod]
         public void TypeMismatchForRegex()
         {
-            var matcher = new Matcher { MatcherType = "regex", Regex = "^ex.*$" };
+            var matcher = new Matcher { MatcherType = MatcherType.regex, Regex = "^ex.*$" };
 
             var differences = matcher.Match("expected", "actual");
 
@@ -51,7 +51,7 @@ namespace ComPact.UnitTests.Matching
         [TestMethod]
         public void ShouldReturnPathInMessage()
         {
-            var matcher = new Matcher { MatcherType = "type" };
+            var matcher = new Matcher { MatcherType = MatcherType.type };
 
             var expectedObject = JToken.FromObject(new { body = new { name = "expected" } });
             var differences = matcher.Match(expectedObject.SelectToken("body.name"), 1);
@@ -62,7 +62,7 @@ namespace ComPact.UnitTests.Matching
         [TestMethod]
         public void ArrayWithTooFewItems()
         {
-            var matcher = new Matcher { MatcherType = "type", Min = 2 };
+            var matcher = new Matcher { MatcherType = MatcherType.type, Min = 2 };
 
             var differences = matcher.Match(new [] { 1, 2 }, new[] { 1 } );
 
@@ -72,7 +72,7 @@ namespace ComPact.UnitTests.Matching
         [TestMethod]
         public void ArrayWithTooManyItems()
         {
-            var matcher = new Matcher { MatcherType = "type", Min = 1, Max = 1 };
+            var matcher = new Matcher { MatcherType = MatcherType.type, Min = 1, Max = 1 };
 
             var differences = matcher.Match(new[] { 1 }, new[] { 1, 2 });
 

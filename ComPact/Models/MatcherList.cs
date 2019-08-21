@@ -1,11 +1,12 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace ComPact.Models
 {
-    internal class MatcherList
+    public class MatcherList
     {
         [JsonProperty("combine")]
         internal string Combine { get; set; } = "AND";
@@ -40,6 +41,11 @@ namespace ComPact.Models
         internal List<string> Match(object expectedValue, object actualValue)
         {
             return Match(JToken.FromObject(expectedValue), JToken.FromObject(actualValue));
+        }
+
+        internal object First()
+        {
+            throw new NotImplementedException();
         }
     }
 }

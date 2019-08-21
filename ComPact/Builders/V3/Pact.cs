@@ -13,5 +13,6 @@
         public static UnknownRegexString String => new UnknownRegexString();
         public static UnknownObject Object => new UnknownObject();
         public static UnknownArray Array => new UnknownArray();
+        public static UnknownInteger Integer => new UnknownInteger();
     }
 }

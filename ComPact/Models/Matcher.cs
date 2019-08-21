@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,8 @@ namespace ComPact.Models
     internal class Matcher
     {
         [JsonProperty("match")]
-        internal string MatcherType { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        internal MatcherType MatcherType { get; set; }
         [JsonProperty("min")]
         internal uint? Min { get; set; }
         [JsonProperty("max")]
@@ -20,7 +22,7 @@ namespace ComPact.Models
         {
             var differences = new List<string>();
 
-            if (MatcherType == "type" && expectedToken.Type != actualToken.Type)
+            if (MatcherType == MatcherType.type && expectedToken.Type != actualToken.Type)
             {
                 differences.Add($"Expected value of type {expectedToken.Type} (like: \'{expectedToken.ToString()}\') at {expectedToken.Path}, but was value of type {actualToken.Type}.");
             }

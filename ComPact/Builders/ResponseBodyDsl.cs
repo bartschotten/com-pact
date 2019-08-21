@@ -42,6 +42,8 @@ namespace ComPact.Builders
 
     public abstract class Element
     {
+        public MatcherList MatcherList { get; set; }
+
         public Member Named(string name)
         {
             return new Member(name, this);
@@ -49,14 +51,20 @@ namespace ComPact.Builders
 
         internal abstract JToken ToJToken();
 
-        internal abstract void AddMatchingRules(Dictionary<string, Matcher> matchingRules, string path);
+        internal virtual void AddMatchingRules(Dictionary<string, Matcher> matchingRules, string path)
+        {
+            if (MatcherList != null && MatcherList.Matchers.Any())
+            {
+                matchingRules[path] = MatcherList.Matchers.First();
+            }
+        }
     }
 
     public class UnknownSimpleValue
     {
         public SimpleValueName Named(string name) => new SimpleValueName(name);
-        public SimpleValue Like(object example) => new SimpleValue(example, MatchType.Type);
-        public SimpleValue WithTheExactValue(object example) => new SimpleValue(example, MatchType.Exact);
+        public SimpleValue Like(object example) => new SimpleValue(example, MatcherType.type);
+        public SimpleValue WithTheExactValue(object example) => new SimpleValue(example, MatcherType.equality);
     }
 
     public class UnknownRegexString
@@ -91,8 +99,8 @@ namespace ComPact.Builders
     public class SimpleValueName : MemberName
     {
         public SimpleValueName(string name) : base(name) { }
-        public Member Like(object example) => new Member(Name, new SimpleValue(example, MatchType.Type));
-        public Member WithTheExactValue(object example) => new Member(Name, new SimpleValue(example, MatchType.Exact));
+        public Member Like(object example) => new Member(Name, new SimpleValue(example, MatcherType.type));
+        public Member WithTheExactValue(object example) => new Member(Name, new SimpleValue(example, MatcherType.equality));
     }
 
     public class RegexStringName : MemberName
@@ -135,30 +143,22 @@ namespace ComPact.Builders
     public class SimpleValue: Element
     {
         public object Example { get; set; }
-        public MatchType Match { get; set; }
 
-        public SimpleValue(object example, MatchType match)
+        public SimpleValue(object example, MatcherType match)
         {
             Example = example;
-            Match = match;
+            MatcherList = new MatcherList { Matchers = new List<Matcher> { new Matcher { MatcherType = match } } };
         }
 
         internal override JToken ToJToken()
         {
             return JToken.FromObject(Example);
         }
-
-        internal override void AddMatchingRules(Dictionary<string, Matcher> matchingRules, string path)
-        {
-            matchingRules[path] = new Matcher { MatcherType = "type" };
-        }
     }
 
     public class RegexString : Element
     {
         public string Example { get; set; }
-        public MatchType Match { get; set; }
-        public string Regex { get; set; }
 
         public RegexString(string example, string regex)
         {
@@ -168,18 +168,14 @@ namespace ComPact.Builders
             }
 
             Example = example;
-            Match = MatchType.Regex;
-            Regex = regex;
+            MatcherList = new MatcherList { Matchers = new List<Matcher> {
+                new Matcher { MatcherType = MatcherType.regex, Regex = regex }
+            } };
         }
 
         internal override JToken ToJToken()
         {
             return JToken.FromObject(Example);
-        }
-
-        internal override void AddMatchingRules(Dictionary<string, Matcher> matchingRules, string path)
-        {
-            matchingRules[path] = new Matcher { MatcherType = "regex", Regex = Regex };
         }
     }
 
@@ -201,6 +197,7 @@ namespace ComPact.Builders
 
         internal override void AddMatchingRules(Dictionary<string, Matcher> matchingRules, string path)
         {
+            base.AddMatchingRules(matchingRules, path);
             Members.ForEach(m => m.AddMatchingRules(matchingRules, path));
         }
     }
@@ -208,19 +205,21 @@ namespace ComPact.Builders
     public class Array : Element
     { 
         public Element[] Elements { get; set; }
-        public MatchType Match { get; set; }
-        public uint Min { get; set; }
 
         public Array(params Element[] elements)
         {
             Elements = elements;
-            Match = MatchType.Exact;
         }
 
         public Array ContainingAtLeast(uint numberOfElements)
         {
-            Match = MatchType.Type;
-            Min = numberOfElements;
+            MatcherList = new MatcherList
+            {
+                Matchers = new List<Matcher>
+                {
+                    new Matcher { MatcherType = MatcherType.type, Min = numberOfElements }
+                }
+            };
             return this;
         }
 
@@ -231,22 +230,12 @@ namespace ComPact.Builders
 
         internal override void AddMatchingRules(Dictionary<string, Matcher> matchingRules, string path)
         {
-            if (Match == MatchType.Type)
-            {
-                matchingRules[path] = new Matcher { MatcherType = "type", Min = Min };
-            }
+            base.AddMatchingRules(matchingRules, path);
 
             for (var i = 0; i < Elements.Length; i++)
             {
                 Elements[i].AddMatchingRules(matchingRules, path + "[" + i + "]");
             }
         }
-    }
-
-    public enum MatchType
-    {
-        Exact,
-        Type,
-        Regex
     }
 }
