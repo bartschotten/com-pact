@@ -36,11 +36,11 @@ namespace ComPact.Builders.V3
         }
 
         /// <summary>
-        /// Type Pact.ResponseBody...
+        /// Type Pact.JsonContent...
         /// </summary>
         /// <param name="responseBody"></param>
         /// <returns></returns>
-        public ResponseBuilder WithBody(ResponseBody responseBody)
+        public ResponseBuilder WithBody(PactJsonContent responseBody)
         {
             _response.Body = responseBody.ToJToken();
             if (_response.MatchingRules == null)

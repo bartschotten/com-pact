@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 namespace ComPact.UnitTests.Builders
 {
     [TestClass]
-    public class ResponseBodyDslTests
+    public class PactJsonContentDslTests
     {
         [TestMethod]
         public void SimpleValue()

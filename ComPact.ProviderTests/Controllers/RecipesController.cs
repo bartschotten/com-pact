@@ -1,5 +1,5 @@
 ﻿using System;
-using ComPact.ProviderTests.Domain;
+using ComPact.Tests.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ComPact.ProviderTests.Controllers

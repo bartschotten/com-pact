@@ -34,7 +34,7 @@ namespace ComPact.ConsumerTests
                 .WillRespondWith(Pact.Response
                     .WithStatus(200)
                     .WithHeader("Content-Type", "application/json")
-                    .WithBody(Pact.ResponseBody.With(
+                    .WithBody(Pact.JsonContent.With(
                         Some.Element.Named("name").Like("A Recipe"),
                         Some.Element.Named("instructions").Like("Mix it up"),
                         Some.Array.Named("ingredients").Of(ingredient)
@@ -68,7 +68,7 @@ namespace ComPact.ConsumerTests
                 .WillRespondWith(Pact.Response
                     .WithStatus(200)
                     .WithHeader("Content-Type", "application/json")
-                    .WithBody(Pact.ResponseBody.Empty())));
+                    .WithBody(Pact.JsonContent.Empty())));
 
             try
             {

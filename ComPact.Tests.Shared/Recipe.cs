@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace ComPact.ProviderTests.Domain
+namespace ComPact.Tests.Shared
 {
     public class Recipe
     {

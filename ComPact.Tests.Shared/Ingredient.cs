@@ -1,4 +1,4 @@
-﻿namespace ComPact.ProviderTests.Domain
+﻿namespace ComPact.Tests.Shared
 {
     public class Ingredient
     {

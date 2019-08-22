@@ -1,4 +1,4 @@
-﻿using ComPact.ProviderTests.Domain;
+﻿using ComPact.Tests.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;

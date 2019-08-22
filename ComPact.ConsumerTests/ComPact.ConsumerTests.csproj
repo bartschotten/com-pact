@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ComPact.Tests.Shared\ComPact.Tests.Shared.csproj" />
     <ProjectReference Include="..\ComPact\ComPact.csproj" />
   </ItemGroup>
 

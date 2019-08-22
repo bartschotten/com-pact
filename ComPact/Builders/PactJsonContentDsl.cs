@@ -5,23 +5,33 @@ using System.Linq;
 
 namespace ComPact.Builders
 {
-    public class ResponseBody
+    public class PactJsonContent
     {
         internal Element _rootElement;
 
-        public ResponseBody With(Element element)
+        /// <summary>
+        /// Type Some...
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        public PactJsonContent With(Element element)
         {
             _rootElement = element;
             return this;
         }
 
-        public ResponseBody With(params Member[] members)
+        /// <summary>
+        /// Type Some...
+        /// </summary>
+        /// <param name="members"></param>
+        /// <returns></returns>
+        public PactJsonContent With(params Member[] members)
         {
             _rootElement = new Object(members);
             return this;
         }
 
-        public ResponseBody Empty()
+        public PactJsonContent Empty()
         {
             _rootElement = new Object();
             return this;
@@ -274,9 +284,12 @@ namespace ComPact.Builders
         {
             base.AddV2MatchingRules(matchingRules, path);
 
-            for (var i = 0; i < Elements.Length; i++)
+            if (!matchingRules.ContainsKey(path + "[*]"))
             {
-                Elements[i].AddV2MatchingRules(matchingRules, path + "[" + i + "]");
+                for (var i = 0; i < Elements.Length; i++)
+                {
+                    Elements[i].AddV2MatchingRules(matchingRules, path + "[" + i + "]");
+                }
             }
         }
 
@@ -297,9 +310,12 @@ namespace ComPact.Builders
 
         internal override void AddV2MatchingRules(Dictionary<string, Matcher> matchingRules, string path)
         {
-            base.AddV2MatchingRules(matchingRules, path);
-
             Elements[0].AddV2MatchingRules(matchingRules, path + "[*]");
+        }
+
+        internal override void AddV3MatchingRules(Dictionary<string, MatcherList> matchingRules, string path)
+        {
+            Elements[0].AddV3MatchingRules(matchingRules, path + "[*]");
         }
     }
 }

@@ -4,7 +4,8 @@
     {
         public static RequestBuilder Request => new RequestBuilder();
         public static ResponseBuilder Response => new ResponseBuilder();
-        public static ResponseBody ResponseBody => new ResponseBody();
+        public static MessageBuilder Message => new MessageBuilder();
+        public static PactJsonContent JsonContent => new PactJsonContent();
     }
 
     public static class Some

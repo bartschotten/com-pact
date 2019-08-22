@@ -21,10 +21,15 @@ namespace ComPact.Builders.V2
 
         public PactBuilder(string consumer, string provider, string mockProviderServiceBaseUri)
         {
+            if (mockProviderServiceBaseUri is null)
+            {
+                throw new System.ArgumentNullException(nameof(mockProviderServiceBaseUri));
+            }
+
             _cts = new CancellationTokenSource();
 
-            _consumer = consumer;
-            _provider = provider;
+            _consumer = consumer ?? throw new System.ArgumentNullException(nameof(consumer));
+            _provider = provider ?? throw new System.ArgumentNullException(nameof(provider));
             _interactions = new List<Interaction>();
             _matchableInteractions = new List<MatchableInteraction>();
 

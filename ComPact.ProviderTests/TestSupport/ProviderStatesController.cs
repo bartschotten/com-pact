@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ComPact.Models;
-using ComPact.ProviderTests.Domain;
+using ComPact.Tests.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ComPact.ProviderTests.TestSupport

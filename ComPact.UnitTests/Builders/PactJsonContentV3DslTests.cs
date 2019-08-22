@@ -7,12 +7,12 @@ using System.Collections.Generic;
 namespace ComPact.UnitTests.Builders
 {
     [TestClass]
-    public class ResponseBodyV3DslTests
+    public class PactJsonContentV3DslTests
     {
         [TestMethod]
         public void Integer()
         {
-            var pactJsonBody = Pact.ResponseBody.With(Some.Integer.Like(1).Named("number")).ToJToken();
+            var pactJsonBody = Pact.JsonContent.With(Some.Integer.Like(1).Named("number")).ToJToken();
 
             var expectedObject = new { number = 1 };
 

@@ -39,7 +39,7 @@ namespace ComPact.Builders.V2
         /// </summary>
         /// <param name="responseBody"></param>
         /// <returns></returns>
-        public ResponseBuilder WithBody(ResponseBody responseBody)
+        public ResponseBuilder WithBody(PactJsonContent responseBody)
         {
             _response.Body = responseBody.ToJToken();
             _response.MatchingRules = responseBody.CreateV2MatchingRules();

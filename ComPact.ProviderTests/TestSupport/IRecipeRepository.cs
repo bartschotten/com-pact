@@ -1,6 +1,7 @@
-﻿using System;
+﻿using ComPact.Tests.Shared;
+using System;
 
-namespace ComPact.ProviderTests.Domain
+namespace ComPact.ProviderTests
 {
     public interface IRecipeRepository
     {
