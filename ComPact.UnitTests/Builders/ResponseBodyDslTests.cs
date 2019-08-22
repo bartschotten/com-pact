@@ -1,8 +1,6 @@
 ﻿using ComPact.Builders.V2;
-using ComPact.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 
 namespace ComPact.UnitTests.Builders
 {
@@ -61,17 +59,6 @@ namespace ComPact.UnitTests.Builders
             var expectedObject = new[] { "a", "b" };
 
             Assert.AreEqual(JsonConvert.SerializeObject(expectedObject), JsonConvert.SerializeObject(pactJsonBody));
-        }
-
-        [TestMethod]
-        public void RulesForSimpleValue()
-        {
-            var pactJsonElement = Some.Element.Like("Hello world");
-
-            var matchingRules = new Dictionary<string, Matcher>();
-            pactJsonElement.AddMatchingRules(matchingRules, "$");
-
-            Assert.AreEqual("{\"$\":{\"match\":\"type\"}}", JsonConvert.SerializeObject(matchingRules, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
         }
     }
 }

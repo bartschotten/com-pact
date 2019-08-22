@@ -42,7 +42,7 @@ namespace ComPact.Builders.V2
         public ResponseBuilder WithBody(ResponseBody responseBody)
         {
             _response.Body = responseBody.ToJToken();
-            _response.MatchingRules = responseBody.CreateMatchingRules();
+            _response.MatchingRules = responseBody.CreateV2MatchingRules();
             return this;
         }
 

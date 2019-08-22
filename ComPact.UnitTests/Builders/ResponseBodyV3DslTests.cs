@@ -18,16 +18,5 @@ namespace ComPact.UnitTests.Builders
 
             Assert.AreEqual(JsonConvert.SerializeObject(expectedObject), JsonConvert.SerializeObject(pactJsonBody));
         }
-
-        [TestMethod]
-        public void RulesForInteger()
-        {
-            var pactJsonElement = Some.Integer.Like(1);
-
-            var matchingRules = new Dictionary<string, Matcher>();
-            pactJsonElement.AddMatchingRules(matchingRules, "$");
-
-            Assert.AreEqual("{\"$\":{\"match\":\"integer\"}}", JsonConvert.SerializeObject(matchingRules, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
-        }
     }
 }

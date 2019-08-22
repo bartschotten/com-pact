@@ -28,7 +28,10 @@ namespace ComPact.Models.V3
             Status = responseV2.Status;
             Headers = responseV2.Headers;
             Body = responseV2.Body;
-            MatchingRules = new MatchingRuleCollection(responseV2.MatchingRules);
+            if (responseV2.MatchingRules != null)
+            {
+                MatchingRules = new MatchingRuleCollection(responseV2.MatchingRules);
+            }
         }
 
         internal Response(IRestResponse restResponse)

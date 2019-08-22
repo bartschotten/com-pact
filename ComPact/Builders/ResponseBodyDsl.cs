@@ -32,10 +32,21 @@ namespace ComPact.Builders
             return _rootElement.ToJToken();
         }
 
-        internal Dictionary<string, Matcher> CreateMatchingRules()
+        internal Dictionary<string, Matcher> CreateV2MatchingRules()
         {
             var matchingRules = new Dictionary<string, Matcher>();
-            _rootElement.AddMatchingRules(matchingRules, "$.body");
+            _rootElement.AddV2MatchingRules(matchingRules, "$.body");
+            if (!matchingRules.Any())
+            {
+                return null;
+            }
+            return matchingRules;
+        }
+
+        internal Dictionary<string, MatcherList> CreateV3MatchingRules()
+        {
+            var matchingRules = new Dictionary<string, MatcherList>();
+            _rootElement.AddV3MatchingRules(matchingRules, "$");
             return matchingRules;
         }
     }
@@ -51,11 +62,19 @@ namespace ComPact.Builders
 
         internal abstract JToken ToJToken();
 
-        internal virtual void AddMatchingRules(Dictionary<string, Matcher> matchingRules, string path)
+        internal virtual void AddV2MatchingRules(Dictionary<string, Matcher> matchingRules, string path)
         {
-            if (MatcherList != null && MatcherList.Matchers.Any())
+            if (MatcherList != null && MatcherList.Matchers.Any(m => m.MatcherType != MatcherType.equality))
             {
                 matchingRules[path] = MatcherList.Matchers.First();
+            }
+        }
+
+        internal virtual void AddV3MatchingRules(Dictionary<string, MatcherList> matchingRules, string path)
+        {
+            if (MatcherList != null)
+            {
+                matchingRules[path] = MatcherList;
             }
         }
     }
@@ -84,6 +103,7 @@ namespace ComPact.Builders
     {
         public ArrayName Named(string name) => new ArrayName(name);
         public Array Of(params Element[] elements) => new Array(elements);
+        public StarArray InWhichEveryElementIsLike(Element element) => new StarArray(element);
     }
 
     public abstract class MemberName
@@ -118,8 +138,15 @@ namespace ComPact.Builders
 
     public class ArrayName : MemberName
     {
+        private int Min { get; set; }
         public ArrayName(string name) : base(name) { }
-        public Member Of(params Element[] elements) => new Member(Name, new Array(elements));
+        public Member Of(params Element[] elements) => new Member(Name, new Array(elements).ContainingAtLeast(Min));
+        public Member InWhichEveryElementIsLike(Element element) => new Member(Name, new StarArray(element).ContainingAtLeast(Min));
+        public ArrayName ContainingAtLeast(int numberOfElements)
+        {
+            Min = numberOfElements;
+            return this;
+        }
     }
 
     public class Member
@@ -133,10 +160,16 @@ namespace ComPact.Builders
             Element = element;
         }
 
-        internal void AddMatchingRules(Dictionary<string, Matcher> matchingRules, string path)
+        internal void AddV2MatchingRules(Dictionary<string, Matcher> matchingRules, string path)
         {
             var extendedPath = path + "." + Name;
-            Element.AddMatchingRules(matchingRules, extendedPath);
+            Element.AddV2MatchingRules(matchingRules, extendedPath);
+        }
+
+        internal void AddV3MatchingRules(Dictionary<string, MatcherList> matchingRules, string path)
+        {
+            var extendedPath = path + "." + Name;
+            Element.AddV3MatchingRules(matchingRules, extendedPath);
         }
     }
 
@@ -195,10 +228,16 @@ namespace ComPact.Builders
             return JToken.FromObject(membersDictionary);
         }
 
-        internal override void AddMatchingRules(Dictionary<string, Matcher> matchingRules, string path)
+        internal override void AddV2MatchingRules(Dictionary<string, Matcher> matchingRules, string path)
         {
-            base.AddMatchingRules(matchingRules, path);
-            Members.ForEach(m => m.AddMatchingRules(matchingRules, path));
+            base.AddV2MatchingRules(matchingRules, path);
+            Members.ForEach(m => m.AddV2MatchingRules(matchingRules, path));
+        }
+
+        internal override void AddV3MatchingRules(Dictionary<string, MatcherList> matchingRules, string path)
+        {
+            base.AddV3MatchingRules(matchingRules, path);
+            Members.ForEach(m => m.AddV3MatchingRules(matchingRules, path));
         }
     }
 
@@ -211,15 +250,18 @@ namespace ComPact.Builders
             Elements = elements;
         }
 
-        public Array ContainingAtLeast(uint numberOfElements)
+        public Array ContainingAtLeast(int numberOfElements)
         {
-            MatcherList = new MatcherList
+            if (numberOfElements > 0)
             {
-                Matchers = new List<Matcher>
+                MatcherList = new MatcherList
+                {
+                    Matchers = new List<Matcher>
                 {
                     new Matcher { MatcherType = MatcherType.type, Min = numberOfElements }
                 }
-            };
+                };
+            }
             return this;
         }
 
@@ -228,14 +270,36 @@ namespace ComPact.Builders
             return JToken.FromObject(Elements.Select(e => e.ToJToken()));
         }
 
-        internal override void AddMatchingRules(Dictionary<string, Matcher> matchingRules, string path)
+        internal override void AddV2MatchingRules(Dictionary<string, Matcher> matchingRules, string path)
         {
-            base.AddMatchingRules(matchingRules, path);
+            base.AddV2MatchingRules(matchingRules, path);
 
             for (var i = 0; i < Elements.Length; i++)
             {
-                Elements[i].AddMatchingRules(matchingRules, path + "[" + i + "]");
+                Elements[i].AddV2MatchingRules(matchingRules, path + "[" + i + "]");
             }
+        }
+
+        internal override void AddV3MatchingRules(Dictionary<string, MatcherList> matchingRules, string path)
+        {
+            base.AddV3MatchingRules(matchingRules, path);
+
+            for (var i = 0; i < Elements.Length; i++)
+            {
+                Elements[i].AddV3MatchingRules(matchingRules, path + "[" + i + "]");
+            }
+        }
+    }
+
+    public class StarArray : Array
+    {
+        public StarArray(Element element) : base(element) { }
+
+        internal override void AddV2MatchingRules(Dictionary<string, Matcher> matchingRules, string path)
+        {
+            base.AddV2MatchingRules(matchingRules, path);
+
+            Elements[0].AddV2MatchingRules(matchingRules, path + "[*]");
         }
     }
 }

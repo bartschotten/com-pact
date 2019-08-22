@@ -12,9 +12,9 @@ namespace ComPact.Models
         [JsonConverter(typeof(StringEnumConverter))]
         internal MatcherType MatcherType { get; set; }
         [JsonProperty("min")]
-        internal uint? Min { get; set; }
+        internal int? Min { get; set; }
         [JsonProperty("max")]
-        internal uint? Max { get; set; }
+        internal int? Max { get; set; }
         [JsonProperty("regex")]
         internal string Regex { get; set; }
 
