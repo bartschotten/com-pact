@@ -15,7 +15,7 @@ namespace ComPact.ConsumerTests
         {
             var url = "http://localhost:9393";
 
-            var builder = new PactBuilder("test-consumer", "test-producer", url);
+            var builder = new PactBuilder("V3-consumer", "V3-producer", url);
 
             var recipeId = Guid.Parse("2860dedb-a193-425f-b73e-ef02db0aa8cf");
 

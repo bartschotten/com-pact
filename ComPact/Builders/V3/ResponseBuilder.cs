@@ -1,4 +1,5 @@
-﻿using ComPact.Models.V3;
+﻿using ComPact.Models;
+using ComPact.Models.V3;
 using System;
 
 namespace ComPact.Builders.V3
@@ -42,7 +43,11 @@ namespace ComPact.Builders.V3
         public ResponseBuilder WithBody(ResponseBody responseBody)
         {
             _response.Body = responseBody.ToJToken();
-            //_response.MatchingRules.Body = responseBody.CreateMatchingRules();
+            if (_response.MatchingRules == null)
+            {
+                _response.MatchingRules = new MatchingRuleCollection();
+            }
+            _response.MatchingRules.Body = responseBody.CreateV3MatchingRules();
             return this;
         }
 

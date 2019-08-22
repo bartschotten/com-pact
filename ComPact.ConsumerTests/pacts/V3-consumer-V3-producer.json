@@ -1,0 +1,90 @@
+{
+  "consumer": {
+    "name": "V3-consumer"
+  },
+  "provider": {
+    "name": "V3-producer"
+  },
+  "interactions": [
+    {
+      "description": "a request",
+      "providerState": {
+        "name": "There is a recipe with id `2860dedb-a193-425f-b73e-ef02db0aa8cf`"
+      },
+      "request": {
+        "method": "GET",
+        "path": "/api/recipes/2860dedb-a193-425f-b73e-ef02db0aa8cf",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "query": {}
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "A Recipe",
+          "instructions": "Mix it up",
+          "ingredients": [
+            {
+              "name": "Salt",
+              "amount": 5.5,
+              "unit": "gram"
+            }
+          ]
+        },
+        "matchingRules": {
+          "body": {
+            "$.name": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.instructions": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.ingredients[0].name": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.ingredients[0].amount": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.ingredients[0].unit": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "3.0.0"
+    }
+  }
+}

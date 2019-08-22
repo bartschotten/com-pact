@@ -1,0 +1,61 @@
+{
+  "consumer": {
+    "name": "V2-consumer"
+  },
+  "provider": {
+    "name": "V2-producer"
+  },
+  "interactions": [
+    {
+      "description": "a request",
+      "providerState": "There is a recipe with id `2860dedb-a193-425f-b73e-ef02db0aa8cf`",
+      "request": {
+        "method": "GET",
+        "path": "/api/recipes/2860dedb-a193-425f-b73e-ef02db0aa8cf",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "query": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "A Recipe",
+          "instructions": "Mix it up",
+          "ingredients": [
+            {
+              "name": "Salt",
+              "amount": 5.5,
+              "unit": "gram"
+            }
+          ]
+        },
+        "matchingRules": {
+          "$.body.name": {
+            "match": "type"
+          },
+          "$.body.instructions": {
+            "match": "type"
+          },
+          "$.body.ingredients[0].name": {
+            "match": "type"
+          },
+          "$.body.ingredients[0].amount": {
+            "match": "type"
+          },
+          "$.body.ingredients[0].unit": {
+            "match": "type"
+          }
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "2.0.0"
+    }
+  }
+}
