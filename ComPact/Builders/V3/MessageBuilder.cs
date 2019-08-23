@@ -46,31 +46,35 @@ namespace ComPact.Builders.V3
         /// <returns></returns>
         public MessageBuilder VerifyConsumer<T>(Action<T> messageHandler)
         {
-            if (messageHandler is null)
-            {
-                throw new ArgumentNullException(nameof(messageHandler));
-            }
+            CheckMessageHandler(messageHandler);
 
-            if (_message.Content == null)
-            {
-                throw new PactException("Message content has not been set. Please provide using the With method.");
-            }
-
-            _isVerified = false;
             try
             {
-                var content = JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(_message.Content));
-                messageHandler.Invoke(content);
-            }
-            catch (InvalidCastException)
-            {
-                throw new PactException($"Could not deserialize the specified message content to {typeof(T)}.");
+                var serializedContent = JsonConvert.SerializeObject(_message.Content);
+                var content = JsonConvert.DeserializeObject<T>(serializedContent);
+                InvokeMessageHandler(messageHandler, content);
             }
             catch
             {
-                throw new PactException("Message handler threw an exception");
+                throw new PactException($"Could not deserialize the specified message content to {typeof(T)}.");
             }
-            _isVerified = true;
+            
+            
+
+            return this;
+        }
+
+        /// <summary>
+        /// Invokes the provided message handler with the serialized message and checks that no exceptions are thrown.
+        /// </summary>
+        /// <param name="messageHandler">Actual handling code of your message consumer.</param>
+        /// <returns></returns>
+        public MessageBuilder VerifyConsumer(Action<string> messageHandler)
+        {
+            CheckMessageHandler(messageHandler);
+
+            var serializedContent = JsonConvert.SerializeObject(_message.Content);
+            InvokeMessageHandler(messageHandler, serializedContent);
 
             return this;
         }
@@ -83,6 +87,32 @@ namespace ComPact.Builders.V3
             }
 
             return _message;
+        }
+
+        private void CheckMessageHandler<T>(Action<T> messageHandler)
+        {
+            if (messageHandler is null)
+            {
+                throw new ArgumentNullException(nameof(messageHandler));
+            }
+            if (_message.Content == null)
+            {
+                throw new PactException("Message content has not been set. Please provide using the With method.");
+            }
+            _isVerified = false;
+        }
+
+        private void InvokeMessageHandler<T>(Action<T> messageHandler, T content)
+        {
+            try
+            {
+                messageHandler.Invoke(content);
+            }
+            catch
+            {
+                throw new PactException("Message handler threw an exception");
+            }
+            _isVerified = true;
         }
     }
 }
