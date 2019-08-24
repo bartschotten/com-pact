@@ -1,8 +1,5 @@
-﻿using ComPact.Models.V3;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Newtonsoft.Json;
-using System.Text;
 
 namespace ComPact.Mock.Provider
 {

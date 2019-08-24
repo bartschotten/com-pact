@@ -12,6 +12,8 @@ namespace ComPact.Models.V3
         public Pacticipant Provider { get; set; }
         [JsonProperty("interactions")]
         internal List<Interaction> Interactions { get; set; }
+        [JsonProperty("messages")]
+        internal List<Message> Messages { get; set; }
         [JsonProperty("metadata")]
         internal Metadata Metadata { get; set; } = new Metadata { PactSpecification = new PactSpecification { Version = "3.0.0" } };
 

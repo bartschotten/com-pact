@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace ComPact.Models.V3
 {
@@ -14,5 +15,10 @@ namespace ComPact.Models.V3
         internal MatchingRuleCollection MatchingRules { get; set; }
         [JsonProperty("metaData")]
         internal object Metadata { get; set; } = new { ContentType = "application/json" };
+
+        internal List<string> Match(object actualMessage)
+        {
+            return Body.Match(Content, actualMessage, MatchingRules);
+        }
     }
 }
