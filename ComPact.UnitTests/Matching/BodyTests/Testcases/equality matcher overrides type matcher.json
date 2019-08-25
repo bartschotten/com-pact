@@ -1,0 +1,42 @@
+{
+  "match": false,
+  "comment": "equality matcher overrides type matcher",
+  "expected" : {
+    "headers": {"Content-Type": "application/json"},
+    "matchingRules": {
+      "body": {
+        "$.alligator": {
+          "matchers": [
+            {
+              "match": "type"
+            }
+          ]
+        },
+        "$.alligator.feet": {
+          "matchers": [
+            {
+              "match": "equality"
+            }
+          ]
+        }
+      }
+    },
+    "body": {
+      "alligator":{
+        "name": "Mary",
+        "feet": 4,
+        "favouriteColours": ["red","blue"]
+      }
+    }
+  },
+  "actual": {
+    "headers": {"Content-Type": "application/json"},
+    "body": {
+      "alligator":{
+        "feet": 5,
+        "name": "Harry the very hungry alligator with an extra foot",
+        "favouriteColours": ["red","blue"]
+      }
+    }
+  }
+}

@@ -43,9 +43,17 @@ namespace ComPact.Models
             return Match(JToken.FromObject(expectedValue), JToken.FromObject(actualValue));
         }
 
-        internal object First()
+        internal bool ImpliesEquality()
         {
-            throw new NotImplementedException();
+            if (Combine == "AND" && Matchers.Any(m => m.MatcherType == MatcherType.equality))
+            {
+                return true;
+            }
+            if (Matchers.All(m => m.MatcherType == MatcherType.equality))
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

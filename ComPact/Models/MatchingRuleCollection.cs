@@ -53,7 +53,11 @@ namespace ComPact.Models
             }
 
             var orderedPaths = matchingPaths.OrderBy(m => m, new MatchingRulePathComparer()).ToList();
-            matcherList = Body[orderedPaths.First()];
+            matcherList = Body[orderedPaths.Last()];
+            if (matcherList.ImpliesEquality())
+            {
+                return false;
+            }
             return true;
         }
 
