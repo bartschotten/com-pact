@@ -1,6 +1,7 @@
 ﻿using ComPact.Builders.V3;
 using ComPact.ConsumerTests.Handler;
 using ComPact.Models;
+using ComPact.Tests.Shared;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using System;

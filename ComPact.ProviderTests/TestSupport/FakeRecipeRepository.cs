@@ -9,9 +9,19 @@ namespace ComPact.ProviderTests.TestSupport
     {
         public List<Recipe> Recipes { get; set; } = new List<Recipe>();
 
+        public void Add(Recipe recipe)
+        {
+            Recipes.Add(recipe);
+        }
+
         public Recipe GetById(Guid id)
         {
             return Recipes.FirstOrDefault(r => r.Id == id);
+        }
+
+        public Recipe GetLatestAdded()
+        {
+            return Recipes.LastOrDefault();
         }
     }
 }

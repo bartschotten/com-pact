@@ -141,6 +141,10 @@ namespace ComPact.Mock.Consumer
                         throw new PactException("Exception occured while invoking messageProducer.");
                     }
 
+                    if (!(providedMessage is string))
+                    {
+                        providedMessage = JsonConvert.DeserializeObject<dynamic>(JsonConvert.SerializeObject(providedMessage));
+                    }
                     var differences = message.Match(providedMessage);
                     if (differences.Any())
                     {

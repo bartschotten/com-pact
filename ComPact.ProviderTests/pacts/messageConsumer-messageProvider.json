@@ -1,0 +1,101 @@
+{
+  "consumer": {
+    "name": "messageConsumer"
+  },
+  "provider": {
+    "name": "messageProvider"
+  },
+  "messages": [
+    {
+      "providerState": {
+        "name": "A new recipe has been added with id `7169de6d-df9b-4cf5-8cdc-2654062e5cdc`."
+      },
+      "description": "a RecipeAdded event.",
+      "content": {
+        "eventId": "f84fe18f-d871-4dad-9723-65b6dc9b0578",
+        "recipe": {
+          "id": "7169de6d-df9b-4cf5-8cdc-2654062e5cdc",
+          "name": "A Recipe",
+          "instructions": "Mix it up",
+          "ingredients": [
+            {
+              "name": "Salt",
+              "amount": 5.5,
+              "unit": "gram"
+            }
+          ]
+        }
+      },
+      "matchingRules": {
+        "body": {
+          "$.eventId": {
+            "combine": "AND",
+            "matchers": [
+              {
+                "match": "regex",
+                "regex": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+              }
+            ]
+          },
+          "$.recipe.name": {
+            "combine": "AND",
+            "matchers": [
+              {
+                "match": "type"
+              }
+            ]
+          },
+          "$.recipe.instructions": {
+            "combine": "AND",
+            "matchers": [
+              {
+                "match": "type"
+              }
+            ]
+          },
+          "$.recipe.ingredients": {
+            "combine": "AND",
+            "matchers": [
+              {
+                "match": "type",
+                "min": 1
+              }
+            ]
+          },
+          "$.recipe.ingredients[*].name": {
+            "combine": "AND",
+            "matchers": [
+              {
+                "match": "type"
+              }
+            ]
+          },
+          "$.recipe.ingredients[*].amount": {
+            "combine": "AND",
+            "matchers": [
+              {
+                "match": "type"
+              }
+            ]
+          },
+          "$.recipe.ingredients[*].unit": {
+            "combine": "AND",
+            "matchers": [
+              {
+                "match": "type"
+              }
+            ]
+          }
+        }
+      },
+      "metaData": {
+        "ContentType": "application/json"
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "3.0.0"
+    }
+  }
+}

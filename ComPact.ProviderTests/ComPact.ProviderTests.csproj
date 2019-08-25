@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="pacts\messageConsumer-messageProvider.json" />
     <Content Remove="pacts\recipe-consumer-recipe-service.json" />
   </ItemGroup>
 
@@ -23,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="pacts\messageConsumer-messageProvider.json" />
     <None Include="pacts\recipe-consumer-recipe-service.json" />
   </ItemGroup>
 
