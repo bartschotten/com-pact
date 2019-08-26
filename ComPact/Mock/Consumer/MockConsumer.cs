@@ -5,13 +5,14 @@ using Newtonsoft.Json;
 using System.Linq;
 using ComPact.Models;
 using ComPact.Models.V3;
+using System.Collections.Generic;
 
 namespace ComPact.Mock.Consumer
 {
     public class MockConsumer
     {
         private readonly RestClient _client;
-        private readonly Action<ProviderState> _messageProviderStateHandler;
+        private readonly Action<IEnumerable<ProviderState>> _messageProviderStateHandler;
         private readonly Func<object> _messageProducer;
 
         /// <summary>
@@ -32,9 +33,9 @@ namespace ComPact.Mock.Consumer
         /// Set up a mock consumer that will call your code based on the defined interactions and messages in a provider Pact contract.
         /// </summary>
         /// <param name="baseUrl">The baseUrl where the mock consumer will call your provider for HTTP interactions.</param>
-        /// <param name="messageProviderStateHandler">An action that will be invoked for every providerState of a message interaction.</param>
+        /// <param name="messageProviderStateHandler">An action that will be invoked for the providerStates of a message interaction.</param>
         /// <param name="messageProducer">A function that will be called to retrieve the actual message you produce.</param>
-        public MockConsumer(string baseUrl, Action<ProviderState> messageProviderStateHandler, Func<object> messageProducer)
+        public MockConsumer(string baseUrl, Action<IEnumerable<ProviderState>> messageProviderStateHandler, Func<object> messageProducer)
         {
             if (string.IsNullOrWhiteSpace(baseUrl))
             {
@@ -49,9 +50,9 @@ namespace ComPact.Mock.Consumer
         /// <summary>
         /// Set up a mock consumer that will call your code based on the defined messages in a provider Pact contract.
         /// </summary>
-        /// <param name="messageProviderStateHandler">An action that will be invoked for every providerState of a message interaction.</param>
+        /// <param name="messageProviderStateHandler">An action that will be invoked for the providerStates of a message interaction.</param>
         /// <param name="messageProducer">A function that will be called to retrieve the actual message you produce.</param>
-        public MockConsumer(Action<ProviderState> messageProviderStateHandler, Func<object> messageProducer)
+        public MockConsumer(Action<IEnumerable<ProviderState>> messageProviderStateHandler, Func<object> messageProducer)
         {
             _messageProviderStateHandler = messageProviderStateHandler ?? throw new ArgumentNullException(nameof(messageProviderStateHandler));
             _messageProducer = messageProducer ?? throw new ArgumentNullException(nameof(messageProducer));

@@ -7,9 +7,11 @@
   },
   "messages": [
     {
-      "providerState": {
-        "name": "A new recipe has been added."
-      },
+      "providerState": [
+        {
+          "name": "A new recipe has been added."
+        }
+      ],
       "description": "a RecipeAdded event.",
       "content": {
         "eventId": "f84fe18f-d871-4dad-9723-65b6dc9b0578",

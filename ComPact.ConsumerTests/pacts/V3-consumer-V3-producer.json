@@ -8,9 +8,11 @@
   "interactions": [
     {
       "description": "a request",
-      "providerState": {
-        "name": "There is a recipe with id `2860dedb-a193-425f-b73e-ef02db0aa8cf`"
-      },
+      "providerState": [
+        {
+          "name": "There is a recipe with id `2860dedb-a193-425f-b73e-ef02db0aa8cf`"
+        }
+      ],
       "request": {
         "method": "GET",
         "path": "/api/recipes/2860dedb-a193-425f-b73e-ef02db0aa8cf",

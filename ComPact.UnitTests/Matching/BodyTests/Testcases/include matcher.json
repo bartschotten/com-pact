@@ -1,0 +1,32 @@
+{
+  "match": true,
+  "comment": "actual value includes the value associated with the matcher",
+  "expected": {
+    "headers": { "Content-Type": "application/json" },
+    "matchingRules": {
+      "body": {
+        "$.alligator.description": {
+          "matchers": [
+            {
+              "match": "include",
+              "value":  "Harry"
+            }
+          ]
+        }
+      }
+    },
+    "body": {
+      "alligator": {
+        "description": "An alligator called Harry"
+      }
+    }
+  },
+  "actual": {
+    "headers": { "Content-Type": "application/json" },
+    "body": {
+      "alligator": {
+        "description": "Harry the very hungry alligator with an extra foot"
+      }
+    }
+  }
+}

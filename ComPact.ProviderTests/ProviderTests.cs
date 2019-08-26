@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading;
 using ComPact.Mock.Consumer;
 using ComPact.ProviderTests.TestSupport;
-using ComPact.Tests.Shared;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

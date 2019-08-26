@@ -6,7 +6,7 @@ namespace ComPact.Models.V3
     internal class Message
     {
         [JsonProperty("providerState")]
-        internal ProviderState ProviderState { get; set; }
+        internal List<ProviderState> ProviderState { get; set; }
         [JsonProperty("description")]
         internal string Description { get; set; }
         [JsonProperty("content")]

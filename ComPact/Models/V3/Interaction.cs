@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 namespace ComPact.Models.V3
 {
@@ -8,7 +9,7 @@ namespace ComPact.Models.V3
         [JsonProperty("description")]
         public string Description { get; set; } = string.Empty;
         [JsonProperty("providerState")]
-        public ProviderState ProviderState { get; set; }
+        public List<ProviderState> ProviderState { get; set; }
         [JsonProperty("request")]
         public Request Request { get; set; } = new Request();
         [JsonProperty("response")]
@@ -18,7 +19,7 @@ namespace ComPact.Models.V3
         public Interaction(V2.Interaction interaction)
         {
             Description = interaction?.Description ?? throw new ArgumentNullException(nameof(interaction));
-            ProviderState = new ProviderState { Name = interaction.ProviderState };
+            ProviderState = new List<ProviderState> { new ProviderState { Name = interaction.ProviderState } };
             Request = new Request(interaction.Request);
             Response = new Response(interaction.Response);
         }

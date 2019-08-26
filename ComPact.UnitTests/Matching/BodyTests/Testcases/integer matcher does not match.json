@@ -1,0 +1,42 @@
+{
+  "match": false,
+  "comment": "response does not match because it does not contain an integer",
+  "expected" : {
+    "headers": {"Content-Type": "application/json"},
+    "matchingRules": {
+      "body": {
+        "$.alligator.name": {
+          "matchers": [
+            {
+              "match": "type"
+            }
+          ]
+        },
+        "$.alligator.feet": {
+          "matchers": [
+            {
+              "match": "integer"
+            }
+          ]
+        }
+      }
+    },
+    "body": {
+      "alligator":{
+        "name": "Mary",
+        "feet": 4,
+        "favouriteColours": ["red","blue"]
+      }
+    }
+  },
+  "actual": {
+    "headers": {"Content-Type": "application/json"},
+    "body": {
+      "alligator":{
+        "feet": 4.5,
+        "name": "Harry the very hungry alligator with half an extra foot",
+        "favouriteColours": ["red","blue"]
+      }
+    }
+  }
+}

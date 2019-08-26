@@ -94,7 +94,7 @@ namespace ComPact.Models
                 return new List<string> { $"Property \'{expectedToken.Path}\' was not present in the actual response." };
             }
             var actualValue = actualToken.Value<T>();
-            if (actualValue == null)
+            if (expectedToken.Type != JTokenType.Null && actualValue == null)
             {
                 return new List<string> { $"Expected \'{expectedValue}\' at \'{expectedToken.Path}\', but had no value." };
             }

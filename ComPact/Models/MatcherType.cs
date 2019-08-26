@@ -5,6 +5,9 @@
         equality,
         type,
         regex,
-        integer
+        integer,
+        @decimal,
+        include,
+        @null
     }
 }

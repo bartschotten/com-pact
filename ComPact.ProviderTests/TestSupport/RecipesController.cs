@@ -2,7 +2,7 @@
 using ComPact.Tests.Shared;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ComPact.ProviderTests.Controllers
+namespace ComPact.ProviderTests.TestSupport
 {
     [Route("api/[controller]")]
     [ApiController]

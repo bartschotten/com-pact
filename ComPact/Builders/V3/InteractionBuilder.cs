@@ -1,6 +1,7 @@
 ﻿using ComPact.Models;
 using ComPact.Models.V3;
 using System;
+using System.Collections.Generic;
 
 namespace ComPact.Builders.V3
 {
@@ -10,7 +11,16 @@ namespace ComPact.Builders.V3
 
         public InteractionBuilder Given(ProviderState providerState)
         {
-            _interaction.ProviderState = providerState ?? throw new ArgumentNullException(nameof(providerState));
+            if (providerState is null)
+            {
+                throw new ArgumentNullException(nameof(providerState));
+            }
+
+            if (_interaction.ProviderState == null)
+            {
+                _interaction.ProviderState = new List<ProviderState>();
+            }
+            _interaction.ProviderState.Add(providerState);
             return this;
         }
 

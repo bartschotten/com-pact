@@ -2,6 +2,7 @@
 using ComPact.Models.V3;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 namespace ComPact.Builders.V3
 {
@@ -12,7 +13,16 @@ namespace ComPact.Builders.V3
 
         public MessageBuilder Given(ProviderState providerState)
         {
-            _message.ProviderState = providerState ?? throw new ArgumentNullException(nameof(providerState));
+            if (providerState is null)
+            {
+                throw new ArgumentNullException(nameof(providerState));
+            }
+
+            if (_message.ProviderState == null)
+            {
+                _message.ProviderState = new List<ProviderState>();
+            }
+            _message.ProviderState.Add(providerState);
             return this;
         }
 

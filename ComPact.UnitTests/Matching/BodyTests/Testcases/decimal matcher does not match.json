@@ -1,0 +1,42 @@
+{
+  "match": false,
+  "comment": "response does not match because it does not contain a decimal",
+  "expected" : {
+    "headers": {"Content-Type": "application/json"},
+    "matchingRules": {
+      "body": {
+        "$.alligator.name": {
+          "matchers": [
+            {
+              "match": "type"
+            }
+          ]
+        },
+        "$.alligator.length": {
+          "matchers": [
+            {
+              "match": "decimal"
+            }
+          ]
+        }
+      }
+    },
+    "body": {
+      "alligator":{
+        "name": "Mary",
+        "length": 4.2,
+        "favouriteColours": ["red","blue"]
+      }
+    }
+  },
+  "actual": {
+    "headers": {"Content-Type": "application/json"},
+    "body": {
+      "alligator": {
+        "length": 5,
+        "name": "Harry the very long alligator",
+        "favouriteColours": [ "red", "blue" ]
+      }
+    }
+  }
+}

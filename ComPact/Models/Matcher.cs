@@ -2,7 +2,9 @@
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 
 namespace ComPact.Models
 {
@@ -17,6 +19,8 @@ namespace ComPact.Models
         internal int? Max { get; set; }
         [JsonProperty("regex")]
         internal string Regex { get; set; }
+        [JsonProperty("value")]
+        internal string Value { get; set; }
 
         internal List<string> Match(JToken expectedToken, JToken actualToken)
         {
@@ -30,6 +34,23 @@ namespace ComPact.Models
             {
                 differences.Add($"Expected value matching \'{Regex}\' (like: \'{expectedToken.Value<string>()}\') at {expectedToken.Path}, but was \'{actualToken.Value<string>()}\'.");
             }
+            if (MatcherType == MatcherType.include && !actualToken.Value<string>().Contains(Value))
+            {
+                differences.Add($"Expected value at {expectedToken.Path} to include '{Value}', but was {actualToken.Value<string>()}.");
+            }
+            if (MatcherType == MatcherType.integer && actualToken.Type != JTokenType.Integer)
+            {
+                differences.Add($"Expected integer (like: \'{expectedToken.Value<int>()}\') at {expectedToken.Path}, but was {actualToken.ToString()}.");
+            }
+            if (MatcherType == MatcherType.@decimal && actualToken.Type != JTokenType.Float)
+            {
+                differences.Add($"Expected decimal (like: \'{expectedToken.Value<double>()}\') at {expectedToken.Path}, but was {actualToken.ToString()}.");
+            }
+            if (MatcherType == MatcherType.@null && actualToken.Type != JTokenType.Null)
+            {
+                differences.Add($"Expected null at {expectedToken.Path}, but was {actualToken.ToString()}.");
+            }
+
             if (expectedToken.Type == JTokenType.Array)
             {
                 if (Min != null && actualToken.Children().Count() < Min)

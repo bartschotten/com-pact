@@ -1,0 +1,42 @@
+{
+  "match": false,
+  "comment": "Response does not match because it does not contain null",
+  "expected": {
+    "headers": { "Content-Type": "application/json" },
+    "matchingRules": {
+      "body": {
+        "$.alligator.name": {
+          "matchers": [
+            {
+              "match": "type"
+            }
+          ]
+        },
+        "$.alligator.wings": {
+          "matchers": [
+            {
+              "match": "null"
+            }
+          ]
+        }
+      }
+    },
+    "body": {
+      "alligator": {
+        "name": "Mary",
+        "wings": null,
+        "favouriteColours": [ "red", "blue" ]
+      }
+    }
+  },
+  "actual": {
+    "headers": { "Content-Type": "application/json" },
+    "body": {
+      "alligator": {
+        "wings": 2,
+        "name": "Harry",
+        "favouriteColours": [ "red", "blue" ]
+      }
+    }
+  }
+}

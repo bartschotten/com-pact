@@ -1,8 +1,6 @@
 ﻿using ComPact.Builders.V3;
-using ComPact.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 
 namespace ComPact.UnitTests.Builders
 {
@@ -15,6 +13,16 @@ namespace ComPact.UnitTests.Builders
             var pactJsonBody = Pact.JsonContent.With(Some.Integer.Like(1).Named("number")).ToJToken();
 
             var expectedObject = new { number = 1 };
+
+            Assert.AreEqual(JsonConvert.SerializeObject(expectedObject), JsonConvert.SerializeObject(pactJsonBody));
+        }
+
+        [TestMethod]
+        public void Decimal()
+        {
+            var pactJsonBody = Pact.JsonContent.With(Some.Decimal.Like(1).Named("number")).ToJToken();
+
+            var expectedObject = new { number = 1.0 };
 
             Assert.AreEqual(JsonConvert.SerializeObject(expectedObject), JsonConvert.SerializeObject(pactJsonBody));
         }
