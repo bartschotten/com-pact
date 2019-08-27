@@ -7,7 +7,7 @@
   },
   "messages": [
     {
-      "providerState": [
+      "providerStates": [
         {
           "name": "A new recipe has been added."
         }
@@ -30,7 +30,6 @@
       "matchingRules": {
         "body": {
           "$.eventId": {
-            "combine": "AND",
             "matchers": [
               {
                 "match": "regex",
@@ -39,7 +38,6 @@
             ]
           },
           "$.recipe.name": {
-            "combine": "AND",
             "matchers": [
               {
                 "match": "type"
@@ -47,7 +45,6 @@
             ]
           },
           "$.recipe.instructions": {
-            "combine": "AND",
             "matchers": [
               {
                 "match": "type"
@@ -55,7 +52,6 @@
             ]
           },
           "$.recipe.ingredients[*].name": {
-            "combine": "AND",
             "matchers": [
               {
                 "match": "type"
@@ -63,7 +59,6 @@
             ]
           },
           "$.recipe.ingredients[*].amount": {
-            "combine": "AND",
             "matchers": [
               {
                 "match": "type"
@@ -71,7 +66,6 @@
             ]
           },
           "$.recipe.ingredients[*].unit": {
-            "combine": "AND",
             "matchers": [
               {
                 "match": "type"

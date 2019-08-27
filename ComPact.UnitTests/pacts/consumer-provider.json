@@ -13,8 +13,7 @@
         "path": "/",
         "headers": {
           "Accept": "application/json"
-        },
-        "query": ""
+        }
       },
       "response": {
         "status": 200,
@@ -22,9 +21,8 @@
           "Content-Type": "application/json"
         },
         "body": {
-          "id": "c01e22bd-a8dd-4bcc-9943-7d27880f5c58"
-        },
-        "matchingRules": {}
+          "id": "1fd11ee4-c4fa-4996-8103-ecfdb15cac66"
+        }
       }
     }
   ],

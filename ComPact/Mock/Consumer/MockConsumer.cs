@@ -99,13 +99,13 @@ namespace ComPact.Mock.Consumer
             {
                 foreach (var interaction in pact.Interactions)
                 {
-                    if (interaction.ProviderState != null)
+                    if (interaction.ProviderStates != null)
                     {
-                        var providerStatesRequest = new RestRequest("provider-states", RestSharp.Method.POST).AddJsonBody(interaction.ProviderState);
+                        var providerStatesRequest = new RestRequest("provider-states", RestSharp.Method.POST).AddJsonBody(interaction.ProviderStates);
                         var providerStateResponse = _client.Execute(providerStatesRequest);
                         if (!providerStateResponse.IsSuccessful)
                         {
-                            throw new PactException($"Could not set providerState '{interaction.ProviderState}'. Got a {providerStateResponse.StatusCode} response.");
+                            throw new PactException($"Could not set providerState '{interaction.ProviderStates}'. Got a {providerStateResponse.StatusCode} response.");
                         }
                     }
 
@@ -125,7 +125,7 @@ namespace ComPact.Mock.Consumer
                 {
                     try
                     {
-                        _messageProviderStateHandler.Invoke(message.ProviderState);
+                        _messageProviderStateHandler.Invoke(message.ProviderStates);
                     }
                     catch
                     {

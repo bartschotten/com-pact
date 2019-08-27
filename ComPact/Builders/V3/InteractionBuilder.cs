@@ -16,11 +16,11 @@ namespace ComPact.Builders.V3
                 throw new ArgumentNullException(nameof(providerState));
             }
 
-            if (_interaction.ProviderState == null)
+            if (_interaction.ProviderStates == null)
             {
-                _interaction.ProviderState = new List<ProviderState>();
+                _interaction.ProviderStates = new List<ProviderState>();
             }
-            _interaction.ProviderState.Add(providerState);
+            _interaction.ProviderStates.Add(providerState);
             return this;
         }
 

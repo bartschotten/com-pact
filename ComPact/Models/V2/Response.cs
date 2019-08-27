@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ComPact.Models.V2
 {
@@ -16,6 +17,12 @@ namespace ComPact.Models.V2
 
         internal Response()
         {
+        }
+
+        internal void SetEmptyValuesToNull()
+        {
+            Headers = Headers.Any() ? Headers : null;
+            MatchingRules = MatchingRules.Any() ? MatchingRules : null;
         }
     }
 }

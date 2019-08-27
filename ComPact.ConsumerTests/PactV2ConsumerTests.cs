@@ -30,7 +30,7 @@ namespace ComPact.ConsumerTests
                 .With(Pact.Request
                     .WithHeader("Accept", "application/json")
                     .WithMethod(Method.GET)
-                    .ToPath($"/api/recipes/{recipeId}"))
+                    .WithPath($"/api/recipes/{recipeId}"))
                 .WillRespondWith(Pact.Response
                     .WithStatus(200)
                     .WithHeader("Content-Type", "application/json")
@@ -64,7 +64,7 @@ namespace ComPact.ConsumerTests
                 .With(Pact.Request
                     .WithHeader("Accept", "application/json")
                     .WithMethod(Method.GET)
-                    .ToPath("/testpath"))
+                    .WithPath("/testpath"))
                 .WillRespondWith(Pact.Response
                     .WithStatus(200)
                     .WithHeader("Content-Type", "application/json")

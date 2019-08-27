@@ -2,6 +2,7 @@
 using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ComPact.Models.V3
 {
@@ -60,6 +61,15 @@ namespace ComPact.Models.V3
             differences.AddRange(Models.Body.Match(Body, actualResponse.Body, MatchingRules));
 
             return differences;
+        }
+
+        internal void SetEmptyValuesToNull()
+        {
+            Headers = Headers.Any() ? Headers : null;
+            if (MatchingRules != null)
+            {
+                MatchingRules.SetEmptyValuesToNull();
+            }
         }
     }
 }

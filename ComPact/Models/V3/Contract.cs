@@ -24,5 +24,10 @@ namespace ComPact.Models.V3
             Provider = contract.Provider;
             Interactions = contract.Interactions.Select(i => new Interaction(i)).ToList();
         }
+
+        public void SetEmptyValuesToNull()
+        {
+            Interactions.ForEach(i => i.SetEmptyValuesToNull());
+        }
     }
 }

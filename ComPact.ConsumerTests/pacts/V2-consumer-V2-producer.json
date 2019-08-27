@@ -14,8 +14,7 @@
         "path": "/api/recipes/2860dedb-a193-425f-b73e-ef02db0aa8cf",
         "headers": {
           "Accept": "application/json"
-        },
-        "query": ""
+        }
       },
       "response": {
         "status": 200,

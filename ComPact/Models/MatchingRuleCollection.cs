@@ -24,13 +24,13 @@ namespace ComPact.Models
             Body = new Dictionary<string, MatcherList>();
             foreach (var rule in matchingRules.Where(m => m.Key.StartsWith("$.body")))
             {
-                Body.Add(rule.Key.Substring(7), new MatcherList { Matchers = new List<Matcher> { rule.Value } });
+                Body.Add(rule.Key.Replace(".body", ""), new MatcherList { Matchers = new List<Matcher> { rule.Value } });
             }
 
             Header = new Dictionary<string, MatcherList>();
             foreach (var rule in matchingRules.Where(m => m.Key.StartsWith("$.headers")))
             {
-                Header.Add(rule.Key.Substring(10), new MatcherList { Matchers = new List<Matcher> { rule.Value } });
+                Header.Add(rule.Key.Replace("$.headers.", ""), new MatcherList { Matchers = new List<Matcher> { rule.Value } });
             }
         }
 
@@ -75,6 +75,12 @@ namespace ComPact.Models
                     return lengthComparison;
                 }
             }
+        }
+
+        internal void SetEmptyValuesToNull()
+        {
+            Body = Body?.FirstOrDefault() != null ? Body : null;
+            Header = Header?.FirstOrDefault() != null ? Header : null;
         }
     }
 }

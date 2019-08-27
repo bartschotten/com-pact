@@ -3,7 +3,7 @@ using ComPact.Models.V3;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
-namespace ComPact.UnitTests.Models
+namespace ComPact.UnitTests.Models.V3
 {
     [TestClass]
     public class RequestMatchTests

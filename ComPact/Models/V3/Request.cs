@@ -4,6 +4,7 @@ using Newtonsoft.Json.Converters;
 using RestSharp;
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace ComPact.Models.V3
@@ -87,6 +88,12 @@ namespace ComPact.Models.V3
             var bodiesMatch = Body == actualRequest.Body;
 
             return methodsMatch && pathsMatch && headersMatch && queriesMatch && bodiesMatch;
+        }
+
+        internal void SetEmptyValuesToNull()
+        {
+            Headers = Headers.Any() ? Headers : null;
+            Query = Query.Any() ? Query : null;
         }
     }
 }

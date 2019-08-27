@@ -1,14 +1,15 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ComPact.Models.V3
 {
     internal class Message
     {
-        [JsonProperty("providerState")]
-        internal List<ProviderState> ProviderState { get; set; }
+        [JsonProperty("providerStates")]
+        internal List<ProviderState> ProviderStates { get; set; }
         [JsonProperty("description")]
-        internal string Description { get; set; }
+        internal string Description { get; set; } = string.Empty;
         [JsonProperty("content")]
         internal object Content { get; set; }
         [JsonProperty("matchingRules")]
@@ -19,6 +20,15 @@ namespace ComPact.Models.V3
         internal List<string> Match(object actualMessage)
         {
             return Body.Match(Content, actualMessage, MatchingRules);
+        }
+
+        internal void SetEmptyValuesToNull()
+        {
+            ProviderStates = ProviderStates?.FirstOrDefault() != null ? ProviderStates : null;
+            if (MatchingRules != null)
+            {
+                MatchingRules.SetEmptyValuesToNull();
+            }
         }
     }
 }

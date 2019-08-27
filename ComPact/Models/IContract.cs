@@ -4,5 +4,6 @@
     {
         Pacticipant Consumer { get; set; }
         Pacticipant Provider { get; set; }
+        void SetEmptyValuesToNull();
     }
 }

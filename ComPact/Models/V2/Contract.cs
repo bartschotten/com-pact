@@ -13,5 +13,9 @@ namespace ComPact.Models.V2
         internal List<Interaction> Interactions { get; set; }
         [JsonProperty("metadata")]
         internal Metadata Metadata { get; set; } = new Metadata { PactSpecification = new PactSpecification { Version = "2.0.0" } };
+        public void SetEmptyValuesToNull()
+        {
+            Interactions.ForEach(i => i.SetEmptyValuesToNull());
+        }
     }
 }

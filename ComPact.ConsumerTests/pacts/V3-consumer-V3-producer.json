@@ -8,7 +8,7 @@
   "interactions": [
     {
       "description": "a request",
-      "providerState": [
+      "providerStates": [
         {
           "name": "There is a recipe with id `2860dedb-a193-425f-b73e-ef02db0aa8cf`"
         }
@@ -18,8 +18,7 @@
         "path": "/api/recipes/2860dedb-a193-425f-b73e-ef02db0aa8cf",
         "headers": {
           "Accept": "application/json"
-        },
-        "query": {}
+        }
       },
       "response": {
         "status": 200,
@@ -40,7 +39,6 @@
         "matchingRules": {
           "body": {
             "$.name": {
-              "combine": "AND",
               "matchers": [
                 {
                   "match": "type"
@@ -48,7 +46,6 @@
               ]
             },
             "$.instructions": {
-              "combine": "AND",
               "matchers": [
                 {
                   "match": "type"
@@ -56,7 +53,6 @@
               ]
             },
             "$.ingredients[0].name": {
-              "combine": "AND",
               "matchers": [
                 {
                   "match": "type"
@@ -64,7 +60,6 @@
               ]
             },
             "$.ingredients[0].amount": {
-              "combine": "AND",
               "matchers": [
                 {
                   "match": "type"
@@ -72,7 +67,6 @@
               ]
             },
             "$.ingredients[0].unit": {
-              "combine": "AND",
               "matchers": [
                 {
                   "match": "type"

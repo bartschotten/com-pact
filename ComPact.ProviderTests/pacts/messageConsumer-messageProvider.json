@@ -7,7 +7,7 @@
   },
   "messages": [
     {
-      "providerState": [
+      "providerStates": [
         {
           "name": "A new recipe has been added.",
           "params": { "recipeId": "7169de6d-df9b-4cf5-8cdc-2654062e5cdc" }

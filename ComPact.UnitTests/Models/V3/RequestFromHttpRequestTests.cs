@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace ComPact.UnitTests.Models
+namespace ComPact.UnitTests.Models.V3
 {
     [TestClass]
     public class RequestFromHttpRequestTests

@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,7 +8,7 @@ namespace ComPact.Models
     public class MatcherList
     {
         [JsonProperty("combine")]
-        internal string Combine { get; set; } = "AND";
+        internal string Combine { get; set; }
         [JsonProperty("matchers")]
         internal List<Matcher> Matchers { get; set; }
 
@@ -31,7 +30,7 @@ namespace ComPact.Models
                 }
             }
 
-            if ((Combine == "AND" && differences.Any()) || !anySuccessfulMatchers)
+            if ((Combine != "OR" && differences.Any()) || !anySuccessfulMatchers)
             {
                 return differences;
             }
@@ -45,7 +44,7 @@ namespace ComPact.Models
 
         internal bool ImpliesEquality()
         {
-            if (Combine == "AND" && Matchers.Any(m => m.MatcherType == MatcherType.equality))
+            if (Combine != "OR" && Matchers.Any(m => m.MatcherType == MatcherType.equality))
             {
                 return true;
             }

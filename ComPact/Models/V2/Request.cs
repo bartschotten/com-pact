@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using RestSharp;
-using System;
+using System.Linq;
 
 namespace ComPact.Models.V2
 {
@@ -15,10 +14,16 @@ namespace ComPact.Models.V2
         [JsonProperty("headers")]
         public Headers Headers { get; set; } = new Headers();
         [JsonProperty("query")]
-        public string Query { get; set; } = string.Empty;
+        public string Query { get; set; }
         [JsonProperty("body")]
         public dynamic Body { get; set; }
 
         public Request() { }
+
+        internal void SetEmptyValuesToNull()
+        {
+            Headers = Headers.Any() ? Headers : null;
+            Query = string.IsNullOrWhiteSpace(Query) ? null : Query;
+        }
     }
 }

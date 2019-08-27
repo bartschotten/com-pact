@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using System.Linq;
 
-namespace ComPact.UnitTests.Models
+namespace ComPact.UnitTests.Models.V3
 {
     [TestClass]
     public class RestRequestFromRequestTests

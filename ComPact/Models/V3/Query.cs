@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace ComPact.Models.V3
 {
-    internal class Query : Dictionary<string, string[]>
+    internal class Query : Dictionary<string, List<string>>
     {
         internal Query() { }
 
@@ -16,19 +16,20 @@ namespace ComPact.Models.V3
                 foreach (var param in parameters)
                 {
                     var splitParam = param.Split("=");
+                    var valuesToAdd = splitParam[1].Split(",").ToList();
                     if (TryGetValue(splitParam[0], out var existingValues))
                     {
                         Remove(splitParam[0]);
-                        splitParam[1] += existingValues;
+                        valuesToAdd.AddRange(existingValues);
                     }
-                    Add(splitParam[0], splitParam[1].Split(","));
+                    Add(splitParam[0], valuesToAdd);
                 }
             }
         }
 
         internal Query(IQueryCollection queryCollection)
         {
-            queryCollection.ToList().ForEach(q => Add(q.Key, q.Value.ToArray()));
+            queryCollection.ToList().ForEach(q => Add(q.Key, q.Value.ToList()));
         }
 
         internal string ToQueryString()

@@ -13,19 +13,21 @@ namespace ComPact.UnitTests.Models
         {
             var oldMatchingRules = new Dictionary<string, Matcher>()
             {
+                { "$.body", new Matcher { MatcherType = MatcherType.type} },
                 { "$.body.name", new Matcher { MatcherType = MatcherType.regex, Regex = "\\w+" } },
-                { "$.body.number", new Matcher { MatcherType = MatcherType.type} },
                 { "$.headers.content-type", new Matcher { MatcherType = MatcherType.type} }
             };
 
             var newMatchingRules = new MatchingRuleCollection(oldMatchingRules);
 
             Assert.AreEqual(2, newMatchingRules.Body.Count);
-            Assert.AreEqual(1, newMatchingRules.Header.Count);
-            Assert.AreEqual("name", newMatchingRules.Body.First().Key);
-            Assert.AreEqual("AND", newMatchingRules.Body.First().Value.Combine);
             Assert.AreEqual(1, newMatchingRules.Body.First().Value.Matchers.Count);
-            Assert.AreEqual("regex", newMatchingRules.Body.First().Value.Matchers.First().MatcherType.ToString());
+            Assert.AreEqual(MatcherType.type, newMatchingRules.Body["$"].Matchers.First().MatcherType);
+            Assert.AreEqual("\\w+", newMatchingRules.Body["$.name"].Matchers.First().Regex);
+            Assert.AreEqual(MatcherType.regex, newMatchingRules.Body["$.name"].Matchers.First().MatcherType);
+
+            Assert.AreEqual(1, newMatchingRules.Header.Count);
+            Assert.AreEqual(MatcherType.type, newMatchingRules.Header["content-type"].Matchers.First().MatcherType);
         }
     }
 }

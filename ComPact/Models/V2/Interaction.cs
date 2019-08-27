@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace ComPact.Models.V2
 {
@@ -21,6 +20,13 @@ namespace ComPact.Models.V2
                 return Response;
             }
             return null;
+        }
+
+        internal void SetEmptyValuesToNull()
+        {
+            ProviderState = string.IsNullOrWhiteSpace(ProviderState) ? null : ProviderState;
+            Request.SetEmptyValuesToNull();
+            Response.SetEmptyValuesToNull();
         }
     }
 }

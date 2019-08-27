@@ -12,7 +12,7 @@ namespace ComPact.Builders.V3
             _request = new Request();
         }
 
-        public RequestBuilder ToPath(string path)
+        public RequestBuilder WithPath(string path)
         {
             _request.Path = path ?? throw new System.ArgumentNullException(nameof(path));
             return this;

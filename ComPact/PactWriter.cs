@@ -9,6 +9,8 @@ namespace ComPact
     {
         public static void Write(IContract pact)
         {
+            pact.SetEmptyValuesToNull();
+
             var settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore,
