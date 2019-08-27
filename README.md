@@ -4,6 +4,7 @@ An alternative Pact implementation for .NET
 1. Most importantly, it's a fun project which allows me to learn a lot about the details of the [Pact Specification](https://github.com/pact-foundation/pact-specification).
 2. My impression is that while the idea to reuse the same (Ruby) core logic for almost all Pact implementations has a lot going for it, in practice it adds quite some accidental complexity and as a result the project isn't moving forward as fast as it could. (So in my infinite hubris I've decided to take a shot at making something better.)
 3. I think it's healthy for a standard/specification to have more independent implementatations of it.
+
  #What's Not Supported
  For the foreseeable future, this implementation will not support:
 * Specification versions lower than 2.0.
