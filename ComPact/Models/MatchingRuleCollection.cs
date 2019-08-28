@@ -61,26 +61,26 @@ namespace ComPact.Models
             return true;
         }
 
-        private class MatchingRulePathComparer : IComparer<string>
-        {
-            public int Compare(string x, string y)
-            {
-                var lengthComparison = x.Length.CompareTo(y.Length);
-                if (lengthComparison == 0)
-                {
-                    return y.Count(c => c == '*').CompareTo(x.Count(c => c == '*'));
-                }
-                else
-                {
-                    return lengthComparison;
-                }
-            }
-        }
-
         internal void SetEmptyValuesToNull()
         {
             Body = Body?.FirstOrDefault() != null ? Body : null;
             Header = Header?.FirstOrDefault() != null ? Header : null;
+        }
+    }
+
+    internal class MatchingRulePathComparer : IComparer<string>
+    {
+        public int Compare(string x, string y)
+        {
+            var lengthComparison = x.Length.CompareTo(y.Length);
+            if (lengthComparison == 0)
+            {
+                return y.Count(c => c == '*').CompareTo(x.Count(c => c == '*'));
+            }
+            else
+            {
+                return lengthComparison;
+            }
         }
     }
 }

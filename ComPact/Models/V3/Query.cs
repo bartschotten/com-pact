@@ -32,6 +32,32 @@ namespace ComPact.Models.V3
             queryCollection.ToList().ForEach(q => Add(q.Key, q.Value.ToList()));
         }
 
+        internal bool Match(Query actualQuery)
+        {
+            if (Count != actualQuery.Count)
+            {
+                return false;
+            }
+            foreach (var expectedParam in this)
+            {
+                var existsInActual = actualQuery.TryGetValue(expectedParam.Key, out var actualValues);
+                if (!existsInActual)
+                {
+                    return false;
+                }
+                if (expectedParam.Value.Count != actualValues.Count)
+                {
+                    return false;
+                }
+                if (string.Join(',', expectedParam.Value) != string.Join(',', actualValues))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         internal string ToQueryString()
         {
             var queryString = string.Join("&", this.Select(q => q.Key + "=" + string.Join(",", q.Value)));

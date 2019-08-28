@@ -5,57 +5,20 @@ using Newtonsoft.Json;
 using System.Linq;
 using ComPact.Models;
 using ComPact.Models.V3;
-using System.Collections.Generic;
 
 namespace ComPact.Mock.Consumer
 {
     public class MockConsumer
     {
-        private readonly RestClient _client;
-        private readonly Action<IEnumerable<ProviderState>> _messageProviderStateHandler;
-        private readonly Func<object> _messageProducer;
+        private readonly MockConsumerConfig _config;
 
         /// <summary>
-        /// Set up a mock consumer that will call your code based on the defined interactions in a provider Pact contract.
+        /// Set up a mock consumer that will call your code based on the defined interactions or messages in a supplied Pact contract.
         /// </summary>
-        /// <param name="baseUrl">The baseUrl where the mock consumer will call your provider.</param>
-        public MockConsumer(string baseUrl)
+        /// <param name="config"></param>
+        public MockConsumer(MockConsumerConfig config)
         {
-            if (string.IsNullOrWhiteSpace(baseUrl))
-            {
-                throw new ArgumentException("message", nameof(baseUrl));
-            }
-
-            _client = new RestClient(baseUrl);
-        }
-
-        /// <summary>
-        /// Set up a mock consumer that will call your code based on the defined interactions and messages in a provider Pact contract.
-        /// </summary>
-        /// <param name="baseUrl">The baseUrl where the mock consumer will call your provider for HTTP interactions.</param>
-        /// <param name="messageProviderStateHandler">An action that will be invoked for the providerStates of a message interaction.</param>
-        /// <param name="messageProducer">A function that will be called to retrieve the actual message you produce.</param>
-        public MockConsumer(string baseUrl, Action<IEnumerable<ProviderState>> messageProviderStateHandler, Func<object> messageProducer)
-        {
-            if (string.IsNullOrWhiteSpace(baseUrl))
-            {
-                throw new ArgumentException("message", nameof(baseUrl));
-            }
-
-            _client = new RestClient(baseUrl);
-            _messageProviderStateHandler = messageProviderStateHandler ?? throw new ArgumentNullException(nameof(messageProviderStateHandler));
-            _messageProducer = messageProducer ?? throw new ArgumentNullException(nameof(messageProducer));
-        }
-
-        /// <summary>
-        /// Set up a mock consumer that will call your code based on the defined messages in a provider Pact contract.
-        /// </summary>
-        /// <param name="messageProviderStateHandler">An action that will be invoked for the providerStates of a message interaction.</param>
-        /// <param name="messageProducer">A function that will be called to retrieve the actual message you produce.</param>
-        public MockConsumer(Action<IEnumerable<ProviderState>> messageProviderStateHandler, Func<object> messageProducer)
-        {
-            _messageProviderStateHandler = messageProviderStateHandler ?? throw new ArgumentNullException(nameof(messageProviderStateHandler));
-            _messageProducer = messageProducer ?? throw new ArgumentNullException(nameof(messageProducer));
+            _config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
         public void VerifyPact(string filePath)
@@ -97,12 +60,17 @@ namespace ComPact.Mock.Consumer
 
             if (pact.Interactions != null)
             {
+                if (_config.ProviderBaseUrl == null)
+                {
+                    throw new PactException("Could not verify pacts. Please configure a ProviderBaseUrl.");
+                }
+                var client = new RestClient(_config.ProviderBaseUrl);
                 foreach (var interaction in pact.Interactions)
                 {
                     if (interaction.ProviderStates != null)
                     {
                         var providerStatesRequest = new RestRequest("provider-states", RestSharp.Method.POST).AddJsonBody(interaction.ProviderStates);
-                        var providerStateResponse = _client.Execute(providerStatesRequest);
+                        var providerStateResponse = client.Execute(providerStatesRequest);
                         if (!providerStateResponse.IsSuccessful)
                         {
                             throw new PactException($"Could not set providerState '{interaction.ProviderStates}'. Got a {providerStateResponse.StatusCode} response.");
@@ -110,7 +78,7 @@ namespace ComPact.Mock.Consumer
                     }
 
                     var restRequest = interaction.Request.ToRestRequest();
-                    var actualResponse = _client.Execute(restRequest);
+                    var actualResponse = client.Execute(restRequest);
                     var differences = interaction.Response.Match(new Response(actualResponse));
                     if (differences.Any())
                     {
@@ -125,21 +93,21 @@ namespace ComPact.Mock.Consumer
                 {
                     try
                     {
-                        _messageProviderStateHandler.Invoke(message.ProviderStates);
+                        _config.MessageProviderStateHandler.Invoke(message.ProviderStates);
                     }
                     catch
                     {
-                        throw new PactException("Exception occured while invoking messageProviderStateHandler.");
+                        throw new PactException("Exception occured while invoking MessageProviderStateHandler.");
                     }
 
                     object providedMessage = null;
                     try
                     {
-                        providedMessage = _messageProducer.Invoke();
+                        providedMessage = _config.MessageProducer.Invoke();
                     }
                     catch
                     {
-                        throw new PactException("Exception occured while invoking messageProducer.");
+                        throw new PactException("Exception occured while invoking MessageProducer.");
                     }
 
                     if (!(providedMessage is string))

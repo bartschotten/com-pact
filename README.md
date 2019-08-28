@@ -10,5 +10,6 @@ An alternative Pact implementation for .NET
 * Data formats other than JSON. The semantics of content-type headers and message metadata will be ignored.
 * Example generators.
 * "Body is present, but is null"-semantics. Due to the practicalities of .NET, no distiction will be made between a body that is non-existent and one that is null.
+* Matching rules on requests.
 
 Also note that the DSL to define a contract will not allow you to express everything that is valid within the Pact Specification. The goal is not to be complete, but to be simple and user friendly in such a way that it makes the right thing easy to do, and the wrong thing hard.

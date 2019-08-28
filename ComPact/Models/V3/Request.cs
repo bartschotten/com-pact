@@ -84,7 +84,7 @@ namespace ComPact.Models.V3
             var methodsMatch = Method == actualRequest.Method;
             var pathsMatch = Path == actualRequest.Path;
             var headersMatch = Headers.Match(actualRequest.Headers);
-            var queriesMatch = Query.ToQueryString() == actualRequest.Query.ToQueryString();
+            var queriesMatch = Query.Match(actualRequest.Query);
             var bodiesMatch = Body == actualRequest.Body;
 
             return methodsMatch && pathsMatch && headersMatch && queriesMatch && bodiesMatch;

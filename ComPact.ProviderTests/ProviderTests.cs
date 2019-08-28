@@ -17,7 +17,7 @@ namespace ComPact.ProviderTests
         {
             var baseUrl = "http://localhost:9494";
 
-            var mockConsumer = new MockConsumer(baseUrl);
+            var mockConsumer = new MockConsumer(new MockConsumerConfig { ProviderBaseUrl = baseUrl });
 
             var cts = new CancellationTokenSource();
 
@@ -41,7 +41,13 @@ namespace ComPact.ProviderTests
 
             var recipeAddedProducer = new RecipeAddedProducer(recipeRepository);
 
-            var mockConsumer = new MockConsumer(p => new MessageProviderStateHandler(recipeRepository).Handle(p), recipeAddedProducer.Send);
+            var config = new MockConsumerConfig
+            {
+                MessageProviderStateHandler = p => new MessageProviderStateHandler(recipeRepository).Handle(p),
+                MessageProducer = recipeAddedProducer.Send
+            };
+
+            var mockConsumer = new MockConsumer(config);
 
             var buildDirectory = AppContext.BaseDirectory;
             var pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");

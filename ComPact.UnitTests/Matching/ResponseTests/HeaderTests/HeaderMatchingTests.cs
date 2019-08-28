@@ -5,7 +5,7 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Linq;
 
-namespace ComPact.UnitTests.Matching.HeaderTests
+namespace ComPact.UnitTests.Matching.ResponseTests.HeaderTests
 {
     [TestClass]
     public class HeaderMatchingTests
@@ -14,7 +14,7 @@ namespace ComPact.UnitTests.Matching.HeaderTests
         public void ShouldSuccessfullyExecuteAllTestcase()
         {
             var testcasesDir = Path.GetFullPath($"{AppContext.BaseDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}.." +
-                $"{Path.DirectorySeparatorChar}Matching{Path.DirectorySeparatorChar}HeaderTests{Path.DirectorySeparatorChar}Testcases{Path.DirectorySeparatorChar}");
+                $"{Path.DirectorySeparatorChar}Matching{Path.DirectorySeparatorChar}ResponseTests{Path.DirectorySeparatorChar}HeaderTests{Path.DirectorySeparatorChar}Testcases{Path.DirectorySeparatorChar}");
 
             var testcaseFiles = Directory.GetFiles(testcasesDir);
 
@@ -22,7 +22,7 @@ namespace ComPact.UnitTests.Matching.HeaderTests
 
             foreach(var file in testcaseFiles)
             {
-                var testcase = JsonConvert.DeserializeObject<TestCase>(File.ReadAllText(file));
+                var testcase = JsonConvert.DeserializeObject<Testcase>(File.ReadAllText(file));
                 var differences = testcase.Expected.Headers.Match(testcase.Actual.Headers, testcase.Expected.MatchingRules);
                 if (differences.Any() == testcase.Match)
                 {

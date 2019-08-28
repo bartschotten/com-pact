@@ -1,8 +1,8 @@
 ﻿using ComPact.Models;
 
-namespace ComPact.UnitTests.Matching
+namespace ComPact.UnitTests.Matching.ResponseTests
 {
-    internal class TestCase
+    internal class Testcase
     {
         public bool Match { get; set; }
         public string Comment { get; set; }
