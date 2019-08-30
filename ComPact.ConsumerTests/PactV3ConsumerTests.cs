@@ -15,7 +15,9 @@ namespace ComPact.ConsumerTests
         {
             var url = "http://localhost:9393";
 
-            var builder = new PactBuilder("V3-consumer", "V3-producer", url);
+            var publisher = new PactPublisher(new HttpClient { BaseAddress = new Uri("http://localhost:9292") }, "1.0");
+
+            var builder = new PactBuilder("V3-consumer", "V3-producer", url, null, publisher);
 
             var recipeId = Guid.Parse("2860dedb-a193-425f-b73e-ef02db0aa8cf");
 
@@ -48,12 +50,12 @@ namespace ComPact.ConsumerTests
                 Assert.IsTrue(response.IsSuccessStatusCode);
             }
 
-            builder.Build();
+            await builder.Build();
         }
 
         [TestMethod]
         [ExpectedException(typeof(PactException))]
-        public void ShouldNotBuildWhenNotAllInteractionsHaveBeenMatched()
+        public async Task ShouldNotBuildWhenNotAllInteractionsHaveBeenMatched()
         {
             var url = "http://localhost:9393";
 
@@ -72,7 +74,7 @@ namespace ComPact.ConsumerTests
 
             try
             {
-                builder.Build();
+                await builder.Build();
             }
             catch (PactException e)
             {
@@ -83,7 +85,7 @@ namespace ComPact.ConsumerTests
 
         [TestMethod]
         [ExpectedException(typeof(PactException))]
-        public void ShouldNotBuildWhenNoInteractionsHaveBeenSetUp()
+        public async Task ShouldNotBuildWhenNoInteractionsHaveBeenSetUp()
         {
             var url = "http://localhost:9393";
 
@@ -91,7 +93,7 @@ namespace ComPact.ConsumerTests
 
             try
             {
-                builder.Build();
+                await builder.Build();
             }
             catch (PactException e)
             {

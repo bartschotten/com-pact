@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace ComPact.Builders.V3
 {
@@ -16,7 +16,7 @@ namespace ComPact.Builders.V3
         private readonly string _consumer;
         private readonly string _provider;
         private readonly string _pactDir;
-        private readonly HttpClient _pactBrokerClient;
+        private readonly PactPublisher _pactPublisher;
         private readonly CancellationTokenSource _cts;
         private readonly IRequestResponseMatcher _matcher;
         private List<MatchableInteraction> _matchableInteractions;
@@ -29,8 +29,8 @@ namespace ComPact.Builders.V3
         /// <param name="provider">Name of the providing party of the contract.</param>
         /// <param name="mockProviderServiceBaseUri">URL where you will call the mock provider service to verify your consumer.</param>
         /// <param name="pactDir">Directory where the generated pact file will be written to. Defaults to the current project directory.</param>
-        /// <param name="pactBrokerClient">HttpClient to call the Pact Broker with. Should be set up with at least a base URL. If not supplied the contract will not be published.</param>
-        public PactBuilder(string consumer, string provider, string mockProviderServiceBaseUri, string pactDir = null, HttpClient pactBrokerClient = null)
+        /// <param name="pactPublisher">If not supplied the contract will not be published.</param>
+        public PactBuilder(string consumer, string provider, string mockProviderServiceBaseUri, string pactDir = null, PactPublisher pactPublisher = null)
         {
             if (mockProviderServiceBaseUri is null)
             {
@@ -38,7 +38,7 @@ namespace ComPact.Builders.V3
             }
 
             _pactDir = pactDir;
-            _pactBrokerClient = pactBrokerClient;
+            _pactPublisher = pactPublisher;
 
             _cts = new CancellationTokenSource();
 
@@ -71,7 +71,7 @@ namespace ComPact.Builders.V3
             _matchableInteractions = new List<MatchableInteraction>();
         }
 
-        public void Build()
+        public async Task Build()
         {
             _cts.Cancel();
 
@@ -99,6 +99,11 @@ namespace ComPact.Builders.V3
             else
             {
                 PactWriter.Write(pact);
+            }
+
+            if (_pactPublisher != null)
+            {
+                await _pactPublisher.Publish(pact);
             }
         }
     }
