@@ -20,7 +20,8 @@ namespace ComPact.Mock.Consumer
         /// </summary>
         public Func<object> MessageProducer { get; set; }
         /// <summary>
-        /// Client that can be used to connect to your Pact Broker to retrieve pacts and (optionally) publish verification results.
+        /// Client that can be used to connect to your Pact Broker to retrieve pacts and (optionally) publish verification results. 
+        /// Should be set up with the correct base URL and if needed any necessary headers.
         /// </summary>
         public HttpClient PactBrokerClient { get; set; }
         /// <summary>
