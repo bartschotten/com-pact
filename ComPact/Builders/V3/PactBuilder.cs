@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 
 namespace ComPact.Builders.V3
@@ -14,16 +15,30 @@ namespace ComPact.Builders.V3
     {
         private readonly string _consumer;
         private readonly string _provider;
+        private readonly string _pactDir;
+        private readonly HttpClient _pactBrokerClient;
         private readonly CancellationTokenSource _cts;
         private readonly IRequestResponseMatcher _matcher;
         private List<MatchableInteraction> _matchableInteractions;
 
-        public PactBuilder(string consumer, string provider, string mockProviderServiceBaseUri)
+        /// <summary>
+        /// Sets up a mock provider service, generates a contract between a consumer and provider, 
+        /// writes the contract to disk and optionally publishes to a Pact Broker using the supplied Client.
+        /// </summary>
+        /// <param name="consumer">Name of consuming party of the contract.</param>
+        /// <param name="provider">Name of the providing party of the contract.</param>
+        /// <param name="mockProviderServiceBaseUri">URL where you will call the mock provider service to verify your consumer.</param>
+        /// <param name="pactDir">Directory where the generated pact file will be written to. Defaults to the current project directory.</param>
+        /// <param name="pactBrokerClient">HttpClient to call the Pact Broker with. Should be set up with at least a base URL. If not supplied the contract will not be published.</param>
+        public PactBuilder(string consumer, string provider, string mockProviderServiceBaseUri, string pactDir = null, HttpClient pactBrokerClient = null)
         {
             if (mockProviderServiceBaseUri is null)
             {
                 throw new System.ArgumentNullException(nameof(mockProviderServiceBaseUri));
             }
+
+            _pactDir = pactDir;
+            _pactBrokerClient = pactBrokerClient;
 
             _cts = new CancellationTokenSource();
 
@@ -77,7 +92,14 @@ namespace ComPact.Builders.V3
                 Interactions = _matchableInteractions.Select(m => m.Interaction as Interaction).ToList()
             };
 
-            PactWriter.Write(pact);
+            if (_pactDir != null)
+            {
+                PactWriter.Write(pact, _pactDir);
+            }
+            else
+            {
+                PactWriter.Write(pact);
+            }
         }
     }
 }
