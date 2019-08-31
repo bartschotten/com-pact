@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,7 +34,7 @@ namespace ComPact.ProviderTests
 
             var buildDirectory = AppContext.BaseDirectory;
             var pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
-            await mockConsumer.VerifyPact(pactDir + "recipe-consumer-recipe-service.json");
+            await mockConsumer.VerifyPactAsync(pactDir + "recipe-consumer-recipe-service.json");
 
             cts.Cancel();
             await hostTask;
@@ -56,7 +57,7 @@ namespace ComPact.ProviderTests
 
             var buildDirectory = AppContext.BaseDirectory;
             var pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
-            await mockConsumer.VerifyPact(pactDir + "messageConsumer-messageProvider.json");
+            await mockConsumer.VerifyPactAsync(pactDir + "messageConsumer-messageProvider.json");
         }
 
         [TestMethod]
@@ -81,9 +82,9 @@ namespace ComPact.ProviderTests
 
             var buildDirectory = AppContext.BaseDirectory;
             var pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
-            await mockConsumer.VerifyPact(pactDir + "messageConsumer-messageProvider.json");
+            await mockConsumer.VerifyPactAsync(pactDir + "messageConsumer-messageProvider.json");
 
-            var sentVerificationResults = JsonConvert.DeserializeObject<VerificationResults>(fakeHttpMessageHandler.SentRequestContent);
+            var sentVerificationResults = JsonConvert.DeserializeObject<VerificationResults>(fakeHttpMessageHandler.SentRequestContents.First().Value);
             Assert.IsTrue(sentVerificationResults.Success);
         }
     }

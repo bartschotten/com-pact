@@ -29,9 +29,9 @@ namespace ComPact.UnitTests.Mock.Consumer
             };
             var mockConsumer = new MockConsumer(config);
 
-            await mockConsumer.PublishVerificationResults(_pact, new List<FailedInteraction>());
+            await mockConsumer.PublishVerificationResultsAsync(_pact, new List<FailedInteraction>());
 
-            var sentVerificationResults = JsonConvert.DeserializeObject<VerificationResults>(fakeHttpMessageHandler.SentRequestContent);
+            var sentVerificationResults = JsonConvert.DeserializeObject<VerificationResults>(fakeHttpMessageHandler.SentRequestContents.First().Value);
             Assert.IsTrue(sentVerificationResults.Success);
             Assert.AreEqual(config.ProviderVersion, sentVerificationResults.ProviderApplicationVersion);
             Assert.AreEqual(_pact.Provider.Name, sentVerificationResults.ProviderName);
@@ -50,7 +50,7 @@ namespace ComPact.UnitTests.Mock.Consumer
 
             try
             {
-                await mockConsumer.PublishVerificationResults(_pact, new List<FailedInteraction>());
+                await mockConsumer.PublishVerificationResultsAsync(_pact, new List<FailedInteraction>());
             }
             catch (PactException e)
             {
@@ -74,7 +74,7 @@ namespace ComPact.UnitTests.Mock.Consumer
 
             try
             {
-                await mockConsumer.PublishVerificationResults(_pact, new List<FailedInteraction>());
+                await mockConsumer.PublishVerificationResultsAsync(_pact, new List<FailedInteraction>());
             }
             catch (PactException e)
             {
@@ -98,7 +98,7 @@ namespace ComPact.UnitTests.Mock.Consumer
 
             try
             {
-                await mockConsumer.PublishVerificationResults(_pact, new List<FailedInteraction>());
+                await mockConsumer.PublishVerificationResultsAsync(_pact, new List<FailedInteraction>());
             }
             catch (PactException e)
             {

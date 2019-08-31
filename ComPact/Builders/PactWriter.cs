@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 
-namespace ComPact
+namespace ComPact.Builders
 {
     internal static class PactWriter
     {

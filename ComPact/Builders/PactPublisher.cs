@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ComPact
+namespace ComPact.Builders
 {
     public class PactPublisher
     {
@@ -13,6 +13,12 @@ namespace ComPact
         private readonly string _consumerVersion;
         private readonly string _consumerTag;
 
+        /// <summary>
+        /// Publishes generated contracts to your Pact Broker.
+        /// </summary>
+        /// <param name="pactBrokerClient">Client that can be used to connect to your Pact Broker. Should be set up with the correct base URL and if needed any necessary headers.</param>
+        /// <param name="consumerVersion">The version of your consumer application.</param>
+        /// <param name="consumerTag">An optional tag to tag your consumer version with.</param>
         public PactPublisher(HttpClient pactBrokerClient, string consumerVersion, string consumerTag = null)
         {
             if (pactBrokerClient?.BaseAddress == null)
@@ -31,7 +37,7 @@ namespace ComPact
             _consumerTag = consumerTag;
         }
 
-        internal async Task Publish(IContract pact)
+        internal async Task PublishAsync(IContract pact)
         {
             var settings = new JsonSerializerSettings
             {
@@ -45,6 +51,15 @@ namespace ComPact
             if (!response.IsSuccessStatusCode)
             {
                 throw new PactException("Publishing contract failed. Pact Broker returned " + response.StatusCode);
+            }
+
+            if (_consumerTag != null)
+            {
+                var tagResponse = await _pactBrokerClient.PutAsync($"pacticipants/{pact.Consumer.Name}/versions/{_consumerVersion}/tags/{_consumerTag}", new StringContent(string.Empty, Encoding.UTF8, "application/json"));
+                if (!tagResponse.IsSuccessStatusCode)
+                {
+                    throw new PactException("Tagging consumer version failed. Pact Broker returned " + response.StatusCode);
+                }
             }
         }
     }

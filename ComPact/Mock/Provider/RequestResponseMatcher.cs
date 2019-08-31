@@ -18,7 +18,7 @@ namespace ComPact.Mock.Provider
             _matchableInteractions = interactions;
         }
 
-        public async Task MatchRequestAndReturnResponse(HttpRequest httpRequest, HttpResponse httpResponseToReturn)
+        public async Task MatchRequestAndReturnResponseAsync(HttpRequest httpRequest, HttpResponse httpResponseToReturn)
         {
             if (httpRequest == null)
             {

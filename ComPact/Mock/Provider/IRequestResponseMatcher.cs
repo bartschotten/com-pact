@@ -6,7 +6,7 @@ namespace ComPact.Mock.Provider
 {
     internal interface IRequestResponseMatcher
     {
-        Task MatchRequestAndReturnResponse(HttpRequest httpRequest, HttpResponse httpResponseToReturn);
+        Task MatchRequestAndReturnResponseAsync(HttpRequest httpRequest, HttpResponse httpResponseToReturn);
         bool AllHaveBeenMatched();
     }
 }

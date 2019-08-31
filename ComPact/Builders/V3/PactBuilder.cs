@@ -22,8 +22,8 @@ namespace ComPact.Builders.V3
         private List<MatchableInteraction> _matchableInteractions;
 
         /// <summary>
-        /// Sets up a mock provider service, generates a contract between a consumer and provider, 
-        /// writes the contract to disk and optionally publishes to a Pact Broker using the supplied Client.
+        /// Sets up a mock provider service, generates a V3 contract between a consumer and provider, 
+        /// writes the contract to disk and optionally publishes to a Pact Broker using the supplied client.
         /// </summary>
         /// <param name="consumer">Name of consuming party of the contract.</param>
         /// <param name="provider">Name of the providing party of the contract.</param>
@@ -71,7 +71,7 @@ namespace ComPact.Builders.V3
             _matchableInteractions = new List<MatchableInteraction>();
         }
 
-        public async Task Build()
+        public async Task BuildAsync()
         {
             _cts.Cancel();
 
@@ -103,7 +103,7 @@ namespace ComPact.Builders.V3
 
             if (_pactPublisher != null)
             {
-                await _pactPublisher.Publish(pact);
+                await _pactPublisher.PublishAsync(pact);
             }
         }
     }

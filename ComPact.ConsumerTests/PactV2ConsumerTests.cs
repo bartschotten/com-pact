@@ -48,12 +48,12 @@ namespace ComPact.ConsumerTests
                 Assert.IsTrue(response.IsSuccessStatusCode);
             }
 
-            builder.Build();
+            await builder.BuildAsync();
         }
 
         [TestMethod]
         [ExpectedException(typeof(PactException))]
-        public void ShouldNotBuildWhenNotAllInteractionsHaveBeenMatched()
+        public async Task ShouldNotBuildWhenNotAllInteractionsHaveBeenMatched()
         {
             var url = "http://localhost:9393";
 
@@ -72,7 +72,7 @@ namespace ComPact.ConsumerTests
 
             try
             {
-                builder.Build();
+                await builder.BuildAsync();
             }
             catch (PactException e)
             {
@@ -83,7 +83,7 @@ namespace ComPact.ConsumerTests
 
         [TestMethod]
         [ExpectedException(typeof(PactException))]
-        public void ShouldNotBuildWhenNoInteractionsHaveBeenSetUp()
+        public async Task ShouldNotBuildWhenNoInteractionsHaveBeenSetUp()
         {
             var url = "http://localhost:9393";
 
@@ -91,7 +91,7 @@ namespace ComPact.ConsumerTests
 
             try
             {
-                builder.Build();
+                await builder.BuildAsync();
             }
             catch (PactException e)
             {

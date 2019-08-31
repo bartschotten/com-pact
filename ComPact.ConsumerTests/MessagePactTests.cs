@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ComPact.ConsumerTests
 {
@@ -35,15 +36,15 @@ namespace ComPact.ConsumerTests
         }
 
         [TestMethod]
-        public void ShouldCreateMessagePactAfterVerifyingConsumer()
+        public async Task ShouldCreateMessagePactAfterVerifyingConsumer()
         {
             var handler = new RecipeAddedHandler();
 
             var builder = new MessagePactBuilder("messageConsumer", "messageProvider");
 
-            builder.SetupMessage(_messageBuilder
+            await builder.SetupMessage(_messageBuilder
                 .VerifyConsumer<RecipeAdded>(m => handler.Handle(m)))
-                .Build();
+                .BuildAsync();
 
             Assert.IsNotNull(handler.ReceivedRecipes.FirstOrDefault());
             Assert.AreEqual("A Recipe", handler.ReceivedRecipes.First().Name);

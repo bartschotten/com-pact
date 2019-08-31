@@ -2,6 +2,7 @@
 using ComPact.Models.V3;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ComPact.Builders.V3
 {
@@ -9,12 +10,26 @@ namespace ComPact.Builders.V3
     {
         private readonly string _consumer;
         private readonly string _provider;
+        private readonly string _pactDir;
+        private readonly PactPublisher _pactPublisher;
         private readonly List<Message> _messages;
 
-        public MessagePactBuilder(string consumer, string provider)
+        /// <summary>
+        /// Generates a V3 message contract between a consumer and provider, 
+        /// writes the contract to disk and optionally publishes to a Pact Broker using the supplied client.
+        /// </summary>
+        /// <param name="consumer">Name of consuming party of the contract.</param>
+        /// <param name="provider">Name of the providing party of the contract.</param>
+        /// <param name="pactDir">Directory where the generated pact file will be written to. Defaults to the current project directory.</param>
+        /// <param name="pactPublisher">If not supplied the contract will not be published.</param>
+        public MessagePactBuilder(string consumer, string provider, string pactDir = null, PactPublisher pactPublisher = null)
         {
             _consumer = consumer ?? throw new System.ArgumentNullException(nameof(consumer));
             _provider = provider ?? throw new System.ArgumentNullException(nameof(provider));
+
+            _pactDir = pactDir;
+            _pactPublisher = pactPublisher;
+
             _messages = new List<Message>();
         }
 
@@ -28,7 +43,7 @@ namespace ComPact.Builders.V3
             return this;
         }
 
-        public void Build()
+        public async Task BuildAsync()
         {
             if (!_messages.Any())
             {
@@ -42,7 +57,19 @@ namespace ComPact.Builders.V3
                 Messages = _messages
             };
 
-            PactWriter.Write(pact);
+            if (_pactDir != null)
+            {
+                PactWriter.Write(pact, _pactDir);
+            }
+            else
+            {
+                PactWriter.Write(pact);
+            }
+
+            if (_pactPublisher != null)
+            {
+                await _pactPublisher.PublishAsync(pact);
+            }
         }
     }
 }

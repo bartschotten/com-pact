@@ -16,7 +16,7 @@ namespace ComPact.Mock.Provider
         {
             app.Run(async context =>
             {
-                await _matcher.MatchRequestAndReturnResponse(context.Request, context.Response);
+                await _matcher.MatchRequestAndReturnResponseAsync(context.Request, context.Response);
             });
         }
     }

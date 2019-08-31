@@ -1,10 +1,11 @@
+using ComPact.Builders;
 using ComPact.Models;
 using ComPact.Models.V2;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 
-namespace ComPact.UnitTests
+namespace ComPact.UnitTests.Builders
 {
     [TestClass]
     public class PactWriterTests

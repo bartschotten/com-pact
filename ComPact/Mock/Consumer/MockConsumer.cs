@@ -24,7 +24,7 @@ namespace ComPact.Mock.Consumer
             _config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
-        public async Task VerifyPact(string filePath)
+        public async Task VerifyPactAsync(string filePath)
         {
             var pactFile = ReadPactFile(filePath);
 
@@ -44,7 +44,7 @@ namespace ComPact.Mock.Consumer
 
             if (_config.PublishVerificationResults)
             {
-                await PublishVerificationResults(pact, failedInteractions);
+                await PublishVerificationResultsAsync(pact, failedInteractions);
             }
 
             if (failedInteractions.Any())
@@ -163,7 +163,7 @@ namespace ComPact.Mock.Consumer
             return failedInteractions;
         }
 
-        internal async Task PublishVerificationResults(Contract pact, List<FailedInteraction> failedInteractions)
+        internal async Task PublishVerificationResultsAsync(Contract pact, List<FailedInteraction> failedInteractions)
         {
             if (_config.PactBrokerClient?.BaseAddress == null)
             {

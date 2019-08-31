@@ -1,3 +1,4 @@
+using ComPact.Builders;
 using ComPact.Builders.V3;
 using ComPact.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -15,7 +16,7 @@ namespace ComPact.ConsumerTests
         {
             var url = "http://localhost:9393";
 
-            var publisher = new PactPublisher(new HttpClient { BaseAddress = new Uri("http://localhost:9292") }, "1.0");
+            var publisher = new PactPublisher(new HttpClient { BaseAddress = new Uri("http://localhost:9292") }, "1.0", "local");
 
             var builder = new PactBuilder("V3-consumer", "V3-producer", url, null, publisher);
 
@@ -50,7 +51,7 @@ namespace ComPact.ConsumerTests
                 Assert.IsTrue(response.IsSuccessStatusCode);
             }
 
-            await builder.Build();
+            await builder.BuildAsync();
         }
 
         [TestMethod]
@@ -74,7 +75,7 @@ namespace ComPact.ConsumerTests
 
             try
             {
-                await builder.Build();
+                await builder.BuildAsync();
             }
             catch (PactException e)
             {
@@ -93,7 +94,7 @@ namespace ComPact.ConsumerTests
 
             try
             {
-                await builder.Build();
+                await builder.BuildAsync();
             }
             catch (PactException e)
             {
