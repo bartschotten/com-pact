@@ -8,12 +8,15 @@ using ComPact.Models.V3;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Text;
+using Newtonsoft.Json.Linq;
 
 namespace ComPact.Mock.Consumer
 {
     public class MockConsumer
     {
         private readonly MockConsumerConfig _config;
+        private string _publishVerificationResultsPath;
 
         /// <summary>
         /// Set up a mock consumer that will call your code based on the defined interactions or messages in a supplied Pact contract.
@@ -24,11 +27,16 @@ namespace ComPact.Mock.Consumer
             _config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
-        public async Task VerifyPactAsync(string filePath)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path">Will be interpreted as Pact Broker path when a Pact Broker Client is configured and as a file path otherwise.</param>
+        /// <returns></returns>
+        public async Task VerifyPactAsync(string path)
         {
-            var pactFile = ReadPactFile(filePath);
+            var pactContent = await RetrievePactContent(path);
 
-            Contract pact = DeserializePactFile(pactFile);
+            Contract pact = DeserializePactContent(pactContent);
 
             var failedInteractions = new List<FailedInteraction>();
 
@@ -53,6 +61,33 @@ namespace ComPact.Mock.Consumer
             }
         }
 
+        internal async Task<string> RetrievePactContent(string path)
+        {
+            if (_config.PactBrokerClient != null)
+            {
+                return await GetPactFromBroker(path);
+            }
+            else
+            {
+                return ReadPactFile(path);
+            }
+        }
+
+        internal async Task<string> GetPactFromBroker(string path)
+        {
+            var response = await _config.PactBrokerClient.GetAsync(path);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new PactException("Getting pact from Pact Broker failed. Pact Broker returned " + response.StatusCode);
+            }
+
+            var stringContent = await response.Content.ReadAsStringAsync();
+            var pactJObject = JObject.Parse(stringContent);
+            _publishVerificationResultsPath = pactJObject.SelectToken("_links.pb:publish-verification-results.href").Value<string>();
+
+            return stringContent;
+        }
+
         internal string ReadPactFile(string filePath)
         {
             try
@@ -65,18 +100,18 @@ namespace ComPact.Mock.Consumer
             }
         }
 
-        internal Contract DeserializePactFile(string pactFile)
+        internal Contract DeserializePactContent(string pactContent)
         {
             try
             {
-                var contractWithSomeVersion = JsonConvert.DeserializeObject<ContractWithSomeVersion>(pactFile);
+                var contractWithSomeVersion = JsonConvert.DeserializeObject<ContractWithSomeVersion>(pactContent);
                 if (contractWithSomeVersion.Metadata.GetVersion() == SpecificationVersion.Three)
                 {
-                    return JsonConvert.DeserializeObject<Contract>(pactFile);
+                    return JsonConvert.DeserializeObject<Contract>(pactContent);
                 }
                 else if (contractWithSomeVersion.Metadata.GetVersion() == SpecificationVersion.Two)
                 {
-                    var pactV2 = JsonConvert.DeserializeObject<Models.V2.Contract>(pactFile);
+                    var pactV2 = JsonConvert.DeserializeObject<Models.V2.Contract>(pactContent);
                     return new Contract(pactV2);
                 }
                 else if (contractWithSomeVersion.Metadata.GetVersion() == SpecificationVersion.Unsupported)
@@ -180,12 +215,12 @@ namespace ComPact.Mock.Consumer
                 ProviderName = pact.Provider.Name,
                 ProviderApplicationVersion = _config.ProviderVersion,
                 Success = !failedInteractions.Any(),
-                VerificationDate = DateTime.Now.ToString("u"),
+                VerificationDate = DateTime.UtcNow.ToString("u"),
                 FailedInteractions = failedInteractions
             };
-            var content = new StringContent(JsonConvert.SerializeObject(verificationResults));
+            var content = new StringContent(JsonConvert.SerializeObject(verificationResults), Encoding.UTF8, "application/json");
 
-            var response = await _config.PactBrokerClient.PostAsync($"pacts/provider/{pact.Provider.Name}/consumer/{pact.Consumer.Name}/pact-version/{_config.ProviderVersion}/verification-results", content);
+            var response = await _config.PactBrokerClient.PostAsync(_publishVerificationResultsPath, content);
             if (!response.IsSuccessStatusCode)
             {
                 throw new PactException("Publishing verification results failed. Pact Broker returned " + response.StatusCode);

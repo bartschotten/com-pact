@@ -1,11 +1,14 @@
-﻿using ComPact.Builders.V3;
+﻿using ComPact.Builders;
+using ComPact.Builders.V3;
 using ComPact.ConsumerTests.Handler;
 using ComPact.Models;
 using ComPact.Tests.Shared;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace ComPact.ConsumerTests
@@ -24,14 +27,14 @@ namespace ComPact.ConsumerTests
                                 Some.Element.Named("unit").Like("gram"));
 
             _messageBuilder = Pact.Message
-                .Given(new ProviderState { Name = "A new recipe has been added." })
+                .Given(new ProviderState { Name = "A new recipe has been added.", Params = new Dictionary<string, string> { { "recipeId", "7169de6d-df9b-4cf5-8cdc-2654062e5cdc" } } })
                 .ShouldSend("a RecipeAdded event.")
                 .With(Pact.JsonContent.With(
                     Some.String.Named("eventId").LikeGuid("f84fe18f-d871-4dad-9723-65b6dc9b0578"),
                     Some.Object.Named("recipe").With(
                         Some.Element.Named("name").Like("A Recipe"),
                         Some.Element.Named("instructions").Like("Mix it up"),
-                        Some.Array.Named("ingredients").InWhichEveryElementIsLike(ingredient)
+                        Some.Array.Named("ingredients").ContainingAtLeast(1).InWhichEveryElementIsLike(ingredient)
                     )));
         }
 
@@ -40,7 +43,9 @@ namespace ComPact.ConsumerTests
         {
             var handler = new RecipeAddedHandler();
 
-            var builder = new MessagePactBuilder("messageConsumer", "messageProvider");
+            var publisher = new PactPublisher(new HttpClient { BaseAddress = new Uri("http://localhost:9292") }, "1.0", "local");
+
+            var builder = new MessagePactBuilder("messageConsumer", "messageProvider", null, publisher);
 
             await builder.SetupMessage(_messageBuilder
                 .VerifyConsumer<RecipeAdded>(m => handler.Handle(m)))

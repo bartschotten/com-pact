@@ -9,7 +9,10 @@
     {
       "providerStates": [
         {
-          "name": "A new recipe has been added."
+          "name": "A new recipe has been added.",
+          "params": {
+            "recipeId": "7169de6d-df9b-4cf5-8cdc-2654062e5cdc"
+          }
         }
       ],
       "description": "a RecipeAdded event.",
@@ -48,6 +51,14 @@
             "matchers": [
               {
                 "match": "type"
+              }
+            ]
+          },
+          "$.recipe.ingredients": {
+            "matchers": [
+              {
+                "match": "type",
+                "min": 1
               }
             ]
           },

@@ -78,8 +78,9 @@ namespace ComPact.UnitTests.Builders
 
             var matchingRules = pactJsonBody.CreateV2MatchingRules();
 
-            Assert.AreEqual(1, matchingRules.Count);
+            Assert.AreEqual(2, matchingRules.Count);
             Assert.AreEqual(MatcherType.type, matchingRules["$.body.anArray[*]"].MatcherType);
+            Assert.AreEqual(1, matchingRules["$.body.anArray"].Min);
         }
     }
 }

@@ -267,9 +267,9 @@ namespace ComPact.Builders
                 MatcherList = new MatcherList
                 {
                     Matchers = new List<Matcher>
-                {
-                    new Matcher { MatcherType = MatcherType.type, Min = numberOfElements }
-                }
+                    {
+                        new Matcher { MatcherType = MatcherType.type, Min = numberOfElements }
+                    }
                 };
             }
             return this;
@@ -310,11 +310,43 @@ namespace ComPact.Builders
 
         internal override void AddV2MatchingRules(Dictionary<string, Matcher> matchingRules, string path)
         {
+            if (MatcherList?.Matchers?.FirstOrDefault().Min != null)
+            {
+                matchingRules[path] = MatcherList.Matchers.First();
+            }
+            else
+            {
+                MatcherList = new MatcherList
+                {
+                    Matchers = new List<Matcher>
+                    {
+                        new Matcher { MatcherType = MatcherType.type, Min = 1 }
+                    }
+                };
+                matchingRules[path] = MatcherList.Matchers.First();
+            }
+
             Elements[0].AddV2MatchingRules(matchingRules, path + "[*]");
         }
 
         internal override void AddV3MatchingRules(Dictionary<string, MatcherList> matchingRules, string path)
         {
+            if (MatcherList?.Matchers?.FirstOrDefault().Min != null)
+            {
+                matchingRules[path] = MatcherList;
+            }
+            else
+            {
+                MatcherList = new MatcherList
+                {
+                    Matchers = new List<Matcher>
+                    {
+                        new Matcher { MatcherType = MatcherType.type, Min = 1 }
+                    }
+                };
+                matchingRules[path] = MatcherList;
+            }
+
             Elements[0].AddV3MatchingRules(matchingRules, path + "[*]");
         }
     }

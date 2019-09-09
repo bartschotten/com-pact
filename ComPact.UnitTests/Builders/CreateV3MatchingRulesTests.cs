@@ -79,8 +79,21 @@ namespace ComPact.UnitTests.Builders
 
             var matchingRules = pactJsonBody.CreateV3MatchingRules();
 
-            Assert.AreEqual(1, matchingRules.Count);
+            Assert.AreEqual(2, matchingRules.Count);
             Assert.AreEqual(MatcherType.type, matchingRules["$.anArray[*]"].Matchers.First().MatcherType);
+            Assert.AreEqual(1, matchingRules["$.anArray"].Matchers.First().Min);
+        }
+
+        [TestMethod]
+        public void ArrayWithStarAndMinTwoElements()
+        {
+            var pactJsonBody = Pact.JsonContent.With(Some.Array.Named("anArray").ContainingAtLeast(2).InWhichEveryElementIsLike(Some.Element.Like("Hello world")));
+
+            var matchingRules = pactJsonBody.CreateV3MatchingRules();
+
+            Assert.AreEqual(2, matchingRules.Count);
+            Assert.AreEqual(MatcherType.type, matchingRules["$.anArray[*]"].Matchers.First().MatcherType);
+            Assert.AreEqual(2, matchingRules["$.anArray"].Matchers.First().Min);
         }
 
         [TestMethod]

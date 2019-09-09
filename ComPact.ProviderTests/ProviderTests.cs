@@ -67,7 +67,7 @@ namespace ComPact.ProviderTests
 
             var recipeAddedProducer = new RecipeAddedProducer(recipeRepository);
 
-            var fakeHttpMessageHandler = new FakeHttpMessageHandler();
+            //var fakeHttpMessageHandler = new FakeHttpMessageHandler();
 
             var config = new MockConsumerConfig
             {
@@ -75,17 +75,17 @@ namespace ComPact.ProviderTests
                 MessageProducer = recipeAddedProducer.Send,
                 ProviderVersion = "1.0",
                 PublishVerificationResults = true,
-                PactBrokerClient = new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://local-pact-broker")}
+                PactBrokerClient = new HttpClient() { BaseAddress = new Uri("http://localhost:9292")}
             };
 
             var mockConsumer = new MockConsumer(config);
 
             var buildDirectory = AppContext.BaseDirectory;
             var pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
-            await mockConsumer.VerifyPactAsync(pactDir + "messageConsumer-messageProvider.json");
+            await mockConsumer.VerifyPactAsync("pacts/provider/messageProvider/consumer/messageConsumer/latest");
 
-            var sentVerificationResults = JsonConvert.DeserializeObject<VerificationResults>(fakeHttpMessageHandler.SentRequestContents.First().Value);
-            Assert.IsTrue(sentVerificationResults.Success);
+            //var sentVerificationResults = JsonConvert.DeserializeObject<VerificationResults>(fakeHttpMessageHandler.SentRequestContents.First().Value);
+            //Assert.IsTrue(sentVerificationResults.Success);
         }
     }
 }
