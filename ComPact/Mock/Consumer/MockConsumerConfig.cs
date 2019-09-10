@@ -8,7 +8,7 @@ namespace ComPact.Mock.Consumer
     public class MockConsumerConfig
     {
         /// <summary>
-        /// The base url where to call your actual provider service. To set up provider states, <base-url>/provider-states will be called.
+        /// The base url where to call your actual provider service. To set up provider states, {base-url}/provider-states will be called.
         /// </summary>
         public string ProviderBaseUrl { get; set; }
         /// <summary>

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <RootNamespace>ComPact</RootNamespace>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <Authors>Bart Schotten</Authors>
     <Description>An alternative Pact implementation for .NET with support for Pact Specification v3.</Description>
     <Copyright></Copyright>
@@ -13,6 +13,11 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>Pact, Pact Broker, Message, Async, v3</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
