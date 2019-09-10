@@ -12,13 +12,10 @@ namespace ComPact.Mock.Consumer
         /// </summary>
         public string ProviderBaseUrl { get; set; }
         /// <summary>
-        /// An action that will be invoked for the providerStates of a message interaction.
+        /// For message interactions, this function will be called with the provider states and decription defined in the contract as parameters.
+        /// It should return the message that your code produces, so the mock consumer can verify it.
         /// </summary>
-        public Action<IEnumerable<ProviderState>> MessageProviderStateHandler { get; set; }
-        /// <summary>
-        /// A function that will be called to retrieve the actual message you produce based on the description.
-        /// </summary>
-        public Func<string, object> MessageProducer { get; set; }
+        public Func<IEnumerable<ProviderState>, string, object> MessageProducer { get; set; }
         /// <summary>
         /// Client that can be used to connect to your Pact Broker to retrieve pacts and (optionally) publish verification results. 
         /// Should be set up with the correct base URL and if needed any necessary headers.

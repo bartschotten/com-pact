@@ -43,14 +43,11 @@ namespace ComPact.ProviderTests
         [TestMethod]
         public async Task ShouldVerifyMessagePact()
         {
-            FakeRecipeRepository recipeRepository = new FakeRecipeRepository();
-
-            var recipeAddedProducer = new RecipeAddedProducer(recipeRepository);
+            var messageSender = new MessageSender();
 
             var config = new MockConsumerConfig
             {
-                MessageProviderStateHandler = p => new MessageProviderStateHandler(recipeRepository).Handle(p),
-                MessageProducer = recipeAddedProducer.Send
+                MessageProducer = messageSender.Send
             };
 
             var mockConsumer = new MockConsumer(config);
@@ -63,10 +60,6 @@ namespace ComPact.ProviderTests
         [TestMethod]
         public async Task ShouldPublishVerificationResults()
         {
-            FakeRecipeRepository recipeRepository = new FakeRecipeRepository();
-
-            var recipeAddedProducer = new RecipeAddedProducer(recipeRepository);
-
             var buildDirectory = AppContext.BaseDirectory;
             var pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
             var pactFileToReturn = File.ReadAllText(pactDir + "messageConsumer-messageProvider.json");
@@ -75,10 +68,11 @@ namespace ComPact.ProviderTests
                 ObjectToReturn = JsonConvert.DeserializeObject(pactFileToReturn)
             };
 
+            var messageSender = new MessageSender();
+
             var config = new MockConsumerConfig
             {
-                MessageProviderStateHandler = p => new MessageProviderStateHandler(recipeRepository).Handle(p),
-                MessageProducer = recipeAddedProducer.Send,
+                MessageProducer = messageSender.Send,
                 ProviderVersion = "1.0",
                 PublishVerificationResults = true,
                 PactBrokerClient = new HttpClient(fakePactBrokerMessageHandler) { BaseAddress = new Uri("http://localhost:9292")}

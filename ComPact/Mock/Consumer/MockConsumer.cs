@@ -165,19 +165,10 @@ namespace ComPact.Mock.Consumer
 
             foreach (var message in messages)
             {
-                try
-                {
-                    _config.MessageProviderStateHandler.Invoke(message.ProviderStates);
-                }
-                catch
-                {
-                    throw new PactException("Exception occured while invoking MessageProviderStateHandler.");
-                }
-
                 object providedMessage = null;
                 try
                 {
-                    providedMessage = _config.MessageProducer.Invoke(message.Description);
+                    providedMessage = _config.MessageProducer.Invoke(message.ProviderStates, message.Description);
                 }
                 catch
                 {
