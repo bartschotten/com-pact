@@ -20,7 +20,7 @@ namespace ComPact.UnitTests.Mock.Consumer
         [TestMethod]
         public async Task SuccessfulPublication()
         {
-            var fakeHttpMessageHandler = new FakeHttpMessageHandler();
+            var fakeHttpMessageHandler = new FakePactBrokerMessageHandler();
 
             var config = new MockConsumerConfig
             {
@@ -63,7 +63,7 @@ namespace ComPact.UnitTests.Mock.Consumer
         [ExpectedException(typeof(PactException))]
         public async Task BaseAddressNotSet()
         {
-            var fakeHttpMessageHandler = new FakeHttpMessageHandler();
+            var fakeHttpMessageHandler = new FakePactBrokerMessageHandler();
 
             var config = new MockConsumerConfig
             {
@@ -87,7 +87,7 @@ namespace ComPact.UnitTests.Mock.Consumer
         [ExpectedException(typeof(PactException))]
         public async Task PactBrokerReturnsNonSuccessStatusCode()
         {
-            var fakeHttpMessageHandler = new FakeHttpMessageHandler { StatusCodeToReturn = System.Net.HttpStatusCode.NotFound };
+            var fakeHttpMessageHandler = new FakePactBrokerMessageHandler { StatusCodeToReturn = System.Net.HttpStatusCode.NotFound };
 
             var config = new MockConsumerConfig
             {

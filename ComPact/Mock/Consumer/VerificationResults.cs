@@ -15,8 +15,8 @@ namespace ComPact.Mock.Consumer
         public bool Success { get; set; }
         [JsonProperty("verificationDate")]
         public string VerificationDate { get; set; }
-        [JsonProperty("failedInteractions")]
-        public List<FailedInteraction> FailedInteractions{ get; set; }
+        [JsonProperty("testResults")]
+        public List<FailedInteraction> FailedInteractions { get; set; }
     }
 
     public class FailedInteraction

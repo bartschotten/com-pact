@@ -18,4 +18,8 @@
     <ProjectReference Include="..\ComPact\ComPact.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="pacts\" />
+  </ItemGroup>
+
 </Project>

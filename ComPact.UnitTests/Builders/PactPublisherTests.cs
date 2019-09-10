@@ -19,7 +19,7 @@ namespace ComPact.UnitTests.Builders
         [TestMethod]
         public async Task SuccessfulPublicationAndTagging()
         {
-            var fakeHttpMessageHandler = new FakeHttpMessageHandler();
+            var fakeHttpMessageHandler = new FakePactBrokerMessageHandler();
 
             var pactPublisher = new PactPublisher(new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://local-pact-broker") }, "1.0", "local");
 
@@ -84,7 +84,7 @@ namespace ComPact.UnitTests.Builders
         [TestMethod]
         public async Task TaggingIsOptional()
         {
-            var fakeHttpMessageHandler = new FakeHttpMessageHandler();
+            var fakeHttpMessageHandler = new FakePactBrokerMessageHandler();
 
             var pactPublisher = new PactPublisher(new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://local-pact-broker") }, "1.0");
 
@@ -100,7 +100,7 @@ namespace ComPact.UnitTests.Builders
         [ExpectedException(typeof(PactException))]
         public async Task ShouldThrowWhenCallNotSuccessful()
         {
-            var fakeHttpMessageHandler = new FakeHttpMessageHandler() { StatusCodeToReturn = System.Net.HttpStatusCode.BadRequest };
+            var fakeHttpMessageHandler = new FakePactBrokerMessageHandler() { StatusCodeToReturn = System.Net.HttpStatusCode.BadRequest };
 
             var pactPublisher = new PactPublisher(new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://local-pact-broker") }, "1.0");
 

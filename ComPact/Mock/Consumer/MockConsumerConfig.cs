@@ -16,9 +16,9 @@ namespace ComPact.Mock.Consumer
         /// </summary>
         public Action<IEnumerable<ProviderState>> MessageProviderStateHandler { get; set; }
         /// <summary>
-        /// A function that will be called to retrieve the actual message you produce.
+        /// A function that will be called to retrieve the actual message you produce based on the description.
         /// </summary>
-        public Func<object> MessageProducer { get; set; }
+        public Func<string, object> MessageProducer { get; set; }
         /// <summary>
         /// Client that can be used to connect to your Pact Broker to retrieve pacts and (optionally) publish verification results. 
         /// Should be set up with the correct base URL and if needed any necessary headers.

@@ -67,7 +67,13 @@ namespace ComPact.ProviderTests
 
             var recipeAddedProducer = new RecipeAddedProducer(recipeRepository);
 
-            //var fakeHttpMessageHandler = new FakeHttpMessageHandler();
+            var buildDirectory = AppContext.BaseDirectory;
+            var pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
+            var pactFileToReturn = File.ReadAllText(pactDir + "messageConsumer-messageProvider.json");
+            var fakePactBrokerMessageHandler = new FakePactBrokerMessageHandler
+            {
+                ObjectToReturn = JsonConvert.DeserializeObject(pactFileToReturn)
+            };
 
             var config = new MockConsumerConfig
             {
@@ -75,17 +81,15 @@ namespace ComPact.ProviderTests
                 MessageProducer = recipeAddedProducer.Send,
                 ProviderVersion = "1.0",
                 PublishVerificationResults = true,
-                PactBrokerClient = new HttpClient() { BaseAddress = new Uri("http://localhost:9292")}
+                PactBrokerClient = new HttpClient(fakePactBrokerMessageHandler) { BaseAddress = new Uri("http://localhost:9292")}
             };
 
             var mockConsumer = new MockConsumer(config);
 
-            var buildDirectory = AppContext.BaseDirectory;
-            var pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
             await mockConsumer.VerifyPactAsync("pacts/provider/messageProvider/consumer/messageConsumer/latest");
 
-            //var sentVerificationResults = JsonConvert.DeserializeObject<VerificationResults>(fakeHttpMessageHandler.SentRequestContents.First().Value);
-            //Assert.IsTrue(sentVerificationResults.Success);
+            var sentVerificationResults = JsonConvert.DeserializeObject<VerificationResults>(fakePactBrokerMessageHandler.SentRequestContents.First().Value);
+            Assert.IsTrue(sentVerificationResults.Success);
         }
     }
 }

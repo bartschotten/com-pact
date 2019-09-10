@@ -1,7 +1,13 @@
+using ComPact.Builders;
 using ComPact.Builders.V2;
+using ComPact.ConsumerTests.TestSupport;
 using ComPact.Models;
+using ComPact.Tests.Shared;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 using System;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -15,7 +21,10 @@ namespace ComPact.ConsumerTests
         {
             var url = "http://localhost:9393";
 
-            var builder = new PactBuilder("V2-consumer", "V2-producer", url);
+            var fakePactBrokerMessageHandler = new FakePactBrokerMessageHandler();
+            var publisher = new PactPublisher(new HttpClient(fakePactBrokerMessageHandler) { BaseAddress = new Uri("http://localhost:9292") }, "1.0", "local");
+
+            var builder = new PactBuilder("V2-consumer", "V2-provider", url, publisher);
 
             var recipeId = Guid.Parse("2860dedb-a193-425f-b73e-ef02db0aa8cf");
 
@@ -49,6 +58,17 @@ namespace ComPact.ConsumerTests
             }
 
             await builder.BuildAsync();
+
+            // Check if pact has been published and tagged
+            Assert.AreEqual("V2-consumer", JsonConvert.DeserializeObject<Contract>(fakePactBrokerMessageHandler.SentRequestContents.First().Value).Consumer.Name);
+            Assert.IsTrue(fakePactBrokerMessageHandler.SentRequestContents.Last().Key.Contains("local"));
+
+            // Check if pact has been written to project directory.
+            var buildDirectory = AppContext.BaseDirectory;
+            var pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
+            var pactFile = File.ReadAllText(pactDir + "V2-consumer-V2-provider.json");
+            Assert.AreEqual("V2-consumer", JsonConvert.DeserializeObject<Contract>(pactFile).Consumer.Name);
+            File.Delete(pactDir + "V2-consumer-V2-provider.json");
         }
 
         [TestMethod]

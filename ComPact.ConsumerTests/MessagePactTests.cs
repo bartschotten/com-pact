@@ -1,12 +1,14 @@
 ﻿using ComPact.Builders;
 using ComPact.Builders.V3;
 using ComPact.ConsumerTests.Handler;
+using ComPact.ConsumerTests.TestSupport;
 using ComPact.Models;
 using ComPact.Tests.Shared;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -34,7 +36,7 @@ namespace ComPact.ConsumerTests
                     Some.Object.Named("recipe").With(
                         Some.Element.Named("name").Like("A Recipe"),
                         Some.Element.Named("instructions").Like("Mix it up"),
-                        Some.Array.Named("ingredients").ContainingAtLeast(1).InWhichEveryElementIsLike(ingredient)
+                        Some.Array.Named("ingredients").InWhichEveryElementIsLike(ingredient)
                     )));
         }
 
@@ -43,16 +45,29 @@ namespace ComPact.ConsumerTests
         {
             var handler = new RecipeAddedHandler();
 
-            var publisher = new PactPublisher(new HttpClient { BaseAddress = new Uri("http://localhost:9292") }, "1.0", "local");
+            var fakePactBrokerMessageHandler = new FakePactBrokerMessageHandler();
+            var publisher = new PactPublisher(new HttpClient(fakePactBrokerMessageHandler) { BaseAddress = new Uri("http://localhost:9292") }, "1.0", "local");
 
-            var builder = new MessagePactBuilder("messageConsumer", "messageProvider", null, publisher);
+            var builder = new MessagePactBuilder("messageConsumer", "messageProvider", publisher);
 
             await builder.SetupMessage(_messageBuilder
                 .VerifyConsumer<RecipeAdded>(m => handler.Handle(m)))
                 .BuildAsync();
 
+            // Check if handler has been called
             Assert.IsNotNull(handler.ReceivedRecipes.FirstOrDefault());
             Assert.AreEqual("A Recipe", handler.ReceivedRecipes.First().Name);
+
+            // Check if pact has been published and tagged
+            Assert.AreEqual("messageConsumer", JsonConvert.DeserializeObject<Contract>(fakePactBrokerMessageHandler.SentRequestContents.First().Value).Consumer.Name);
+            Assert.IsTrue(fakePactBrokerMessageHandler.SentRequestContents.Last().Key.Contains("local"));
+
+            // Check if pact has been written to project directory.
+            var buildDirectory = AppContext.BaseDirectory;
+            var pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
+            var pactFile = File.ReadAllText(pactDir + "messageConsumer-messageProvider.json");
+            Assert.AreEqual("messageConsumer", JsonConvert.DeserializeObject<Contract>(pactFile).Consumer.Name);
+            File.Delete(pactDir + "messageConsumer-messageProvider.json");
         }
 
         [TestMethod]

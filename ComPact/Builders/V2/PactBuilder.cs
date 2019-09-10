@@ -29,9 +29,9 @@ namespace ComPact.Builders.V2
         /// <param name="consumer">Name of consuming party of the contract.</param>
         /// <param name="provider">Name of the providing party of the contract.</param>
         /// <param name="mockProviderServiceBaseUri">URL where you will call the mock provider service to verify your consumer.</param>
-        /// <param name="pactDir">Directory where the generated pact file will be written to. Defaults to the current project directory.</param>
         /// <param name="pactPublisher">If not supplied the contract will not be published.</param>
-        public PactBuilder(string consumer, string provider, string mockProviderServiceBaseUri, string pactDir = null, PactPublisher pactPublisher = null)
+        /// <param name="pactDir">Directory where the generated pact file will be written to. Defaults to the current project directory.</param>
+        public PactBuilder(string consumer, string provider, string mockProviderServiceBaseUri, PactPublisher pactPublisher = null, string pactDir = null)
         {
             if (mockProviderServiceBaseUri is null)
             {

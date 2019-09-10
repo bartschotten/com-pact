@@ -12,7 +12,7 @@ namespace ComPact.ProviderTests.TestSupport
             _recipeRepository = recipeRepository;
         }
 
-        public RecipeAdded Send()
+        public RecipeAdded Send(string description)
         {
             return new RecipeAdded
             {

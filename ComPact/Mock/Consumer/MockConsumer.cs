@@ -177,7 +177,7 @@ namespace ComPact.Mock.Consumer
                 object providedMessage = null;
                 try
                 {
-                    providedMessage = _config.MessageProducer.Invoke();
+                    providedMessage = _config.MessageProducer.Invoke(message.Description);
                 }
                 catch
                 {

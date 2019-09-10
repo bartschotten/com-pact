@@ -20,9 +20,9 @@ namespace ComPact.Builders.V3
         /// </summary>
         /// <param name="consumer">Name of consuming party of the contract.</param>
         /// <param name="provider">Name of the providing party of the contract.</param>
-        /// <param name="pactDir">Directory where the generated pact file will be written to. Defaults to the current project directory.</param>
         /// <param name="pactPublisher">If not supplied the contract will not be published.</param>
-        public MessagePactBuilder(string consumer, string provider, string pactDir = null, PactPublisher pactPublisher = null)
+        /// <param name="pactDir">Directory where the generated pact file will be written to. Defaults to the current project directory.</param>
+        public MessagePactBuilder(string consumer, string provider, PactPublisher pactPublisher = null, string pactDir = null)
         {
             _consumer = consumer ?? throw new System.ArgumentNullException(nameof(consumer));
             _provider = provider ?? throw new System.ArgumentNullException(nameof(provider));

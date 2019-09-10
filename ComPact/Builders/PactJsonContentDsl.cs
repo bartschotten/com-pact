@@ -113,7 +113,7 @@ namespace ComPact.Builders
     {
         public ArrayName Named(string name) => new ArrayName(name);
         public Array Of(params Element[] elements) => new Array(elements);
-        public StarArray InWhichEveryElementIsLike(Element element) => new StarArray(element);
+        public StarArray InWhichEveryElementIsLike(Element element) => (StarArray)(new StarArray(element).ContainingAtLeast(1));
     }
 
     public abstract class MemberName
@@ -151,7 +151,7 @@ namespace ComPact.Builders
         private int Min { get; set; }
         public ArrayName(string name) : base(name) { }
         public Member Of(params Element[] elements) => new Member(Name, new Array(elements).ContainingAtLeast(Min));
-        public Member InWhichEveryElementIsLike(Element element) => new Member(Name, new StarArray(element).ContainingAtLeast(Min));
+        public Member InWhichEveryElementIsLike(Element element) => new Member(Name, new StarArray(element).ContainingAtLeast(Min != 0 ? Min : 1));
         public ArrayName ContainingAtLeast(int numberOfElements)
         {
             Min = numberOfElements;
@@ -310,43 +310,13 @@ namespace ComPact.Builders
 
         internal override void AddV2MatchingRules(Dictionary<string, Matcher> matchingRules, string path)
         {
-            if (MatcherList?.Matchers?.FirstOrDefault().Min != null)
-            {
-                matchingRules[path] = MatcherList.Matchers.First();
-            }
-            else
-            {
-                MatcherList = new MatcherList
-                {
-                    Matchers = new List<Matcher>
-                    {
-                        new Matcher { MatcherType = MatcherType.type, Min = 1 }
-                    }
-                };
-                matchingRules[path] = MatcherList.Matchers.First();
-            }
-
+            matchingRules[path] = MatcherList.Matchers.First();
             Elements[0].AddV2MatchingRules(matchingRules, path + "[*]");
         }
 
         internal override void AddV3MatchingRules(Dictionary<string, MatcherList> matchingRules, string path)
         {
-            if (MatcherList?.Matchers?.FirstOrDefault().Min != null)
-            {
-                matchingRules[path] = MatcherList;
-            }
-            else
-            {
-                MatcherList = new MatcherList
-                {
-                    Matchers = new List<Matcher>
-                    {
-                        new Matcher { MatcherType = MatcherType.type, Min = 1 }
-                    }
-                };
-                matchingRules[path] = MatcherList;
-            }
-
+            matchingRules[path] = MatcherList;
             Elements[0].AddV3MatchingRules(matchingRules, path + "[*]");
         }
     }
