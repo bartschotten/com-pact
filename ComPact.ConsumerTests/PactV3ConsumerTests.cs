@@ -77,7 +77,7 @@ namespace ComPact.ConsumerTests
         {
             var url = "http://localhost:9393";
 
-            var builder = new PactBuilder("test-consumer", "test-producer", url);
+            var builder = new PactBuilder("test-consumer", "test-provider", url);
 
             builder.SetupInteraction(new InteractionBuilder()
                 .UponReceiving("a request")
@@ -103,11 +103,59 @@ namespace ComPact.ConsumerTests
 
         [TestMethod]
         [ExpectedException(typeof(PactException))]
+        public async Task ShouldNotBuildWhenMultipleRequestsMatch()
+        {
+            var url = "http://localhost:9393";
+
+            var builder = new PactBuilder("test-consumer", "test-provider", url);
+
+            builder.SetupInteraction(new InteractionBuilder()
+                .UponReceiving("a request")
+                .With(Pact.Request
+                    .WithHeader("Accept", "application/json")
+                    .WithMethod(Method.GET)
+                    .WithPath("/testpath"))
+                .WillRespondWith(Pact.Response
+                    .WithStatus(200)
+                    .WithHeader("Content-Type", "application/json")
+                    .WithBody(Pact.JsonContent.Empty())));
+
+            builder.SetupInteraction(new InteractionBuilder()
+                .UponReceiving("a request")
+                .With(Pact.Request
+                    .WithHeader("Accept", "application/json")
+                    .WithMethod(Method.GET)
+                    .WithPath("/testpath"))
+                .WillRespondWith(Pact.Response
+                    .WithStatus(200)
+                    .WithHeader("Content-Type", "application/json")
+                    .WithBody(Pact.JsonContent.With(Some.Element.WithTheExactValue("test")))));
+
+            var httpClient = new HttpClient { BaseAddress = new Uri(url) };
+            httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+            var response = await httpClient.GetAsync("testpath");
+            Assert.AreEqual(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            Assert.IsTrue(responseContent.Contains("More than one matching response found for this request."));
+
+            try
+            {
+                await builder.BuildAsync();
+            }
+            catch (PactException e)
+            {
+                Assert.AreEqual("Cannot build pact. Not all mocked interactions have been called.", e.Message);
+                throw;
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PactException))]
         public async Task ShouldNotBuildWhenNoInteractionsHaveBeenSetUp()
         {
             var url = "http://localhost:9393";
 
-            var builder = new PactBuilder("test-consumer", "test-producer", url);
+            var builder = new PactBuilder("test-consumer", "test-provider", url);
 
             try
             {

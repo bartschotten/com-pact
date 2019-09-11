@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Primitives;
 using System.Text;
 using Newtonsoft.Json;
+using ComPact.Models.V3;
 
 namespace ComPact.Mock.Provider
 {
@@ -25,19 +26,11 @@ namespace ComPact.Mock.Provider
                 throw new ArgumentNullException(nameof(httpRequest));
             }
 
-            var request = new Models.V3.Request(httpRequest);
+            var request = new Request(httpRequest);
 
-            var responses = _matchableInteractions.Select(m => m.Match(request));
+            var responses = _matchableInteractions.Select(m => m.Match(request)).Where(r => r != null);
 
-            if (!responses.Any())
-            {
-                throw new PactException("No matching response set up for this request.");
-            }
-            else if (responses.Count() > 1)
-            {
-                throw new PactException("More than one matching response found for this request.");
-            }
-            else
+            if (responses.Count() == 1)
             {
                 httpResponseToReturn.StatusCode = responses.First().Status;
                 foreach (var header in httpResponseToReturn.Headers)
@@ -45,6 +38,26 @@ namespace ComPact.Mock.Provider
                     httpResponseToReturn.Headers.Add(header.Key, new StringValues((string)header.Value));
                 }
                 await httpResponseToReturn.Body.WriteAsync(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(responses.First().Body)));
+            }
+            else
+            {
+                var errorResponse = new RequestResponseMatchingErrorResponse()
+                {
+                    ActualRequest = request,
+                    ExpectedRequests = _matchableInteractions.Select(m => m.Interaction.Request).ToList()
+                };
+                if (responses.Any())
+                {
+                    errorResponse.Message = "More than one matching response found for this request.";
+                    responses.ToList().ForEach(r => _matchableInteractions.First(m => m.Interaction.Response == r).HasBeenMatched = false);
+                }
+                else
+                {
+                    errorResponse.Message = "No matching response set up for this request.";
+                }
+                httpResponseToReturn.StatusCode = 400;
+                var stringToReturn = JsonConvert.SerializeObject(errorResponse);
+                await httpResponseToReturn.Body.WriteAsync(Encoding.UTF8.GetBytes(stringToReturn));
             }
         }
 

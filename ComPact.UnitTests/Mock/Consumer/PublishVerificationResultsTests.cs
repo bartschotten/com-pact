@@ -40,51 +40,6 @@ namespace ComPact.UnitTests.Mock.Consumer
 
         [TestMethod]
         [ExpectedException(typeof(PactException))]
-        public async Task HttpClientNotSet()
-        {
-            var config = new MockConsumerConfig
-            {
-                ProviderVersion = "1.0",
-            };
-            var mockConsumer = new MockConsumer(config);
-
-            try
-            {
-                await mockConsumer.PublishVerificationResultsAsync(_pact, new List<FailedInteraction>());
-            }
-            catch (PactException e)
-            {
-                Assert.AreEqual("PactBrokerClient with at least a BaseAddress should be configured to be able to publish verification results.", e.Message);
-                throw;
-            }
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(PactException))]
-        public async Task BaseAddressNotSet()
-        {
-            var fakeHttpMessageHandler = new FakePactBrokerMessageHandler();
-
-            var config = new MockConsumerConfig
-            {
-                ProviderVersion = "1.0",
-                PactBrokerClient = new HttpClient(fakeHttpMessageHandler)
-            };
-            var mockConsumer = new MockConsumer(config);
-
-            try
-            {
-                await mockConsumer.PublishVerificationResultsAsync(_pact, new List<FailedInteraction>());
-            }
-            catch (PactException e)
-            {
-                Assert.AreEqual("PactBrokerClient with at least a BaseAddress should be configured to be able to publish verification results.", e.Message);
-                throw;
-            }
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(PactException))]
         public async Task PactBrokerReturnsNonSuccessStatusCode()
         {
             var fakeHttpMessageHandler = new FakePactBrokerMessageHandler { StatusCodeToReturn = System.Net.HttpStatusCode.NotFound };

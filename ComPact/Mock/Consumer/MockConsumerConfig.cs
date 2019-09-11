@@ -14,6 +14,7 @@ namespace ComPact.Mock.Consumer
         /// <summary>
         /// For message interactions, this function will be called with the provider states and decription defined in the contract as parameters.
         /// It should return the message that your code produces, so the mock consumer can verify it.
+        /// If a string is returned, the mock consumer will assume that it is a serialized json string and try to deserialize it.
         /// </summary>
         public Func<IEnumerable<ProviderState>, string, object> MessageProducer { get; set; }
         /// <summary>

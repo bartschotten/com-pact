@@ -43,7 +43,7 @@ namespace ComPact.ConsumerTests
                 .WillRespondWith(Pact.Response
                     .WithStatus(200)
                     .WithHeader("Content-Type", "application/json")
-                    .WithBody(Pact.ResponseBody.With(
+                    .WithBody(Pact.JsonContent.With(
                         Some.Element.Named("name").Like("A Recipe"),
                         Some.Element.Named("instructions").Like("Mix it up"),
                         Some.Array.Named("ingredients").Of(ingredient)
@@ -77,7 +77,7 @@ namespace ComPact.ConsumerTests
         {
             var url = "http://localhost:9393";
 
-            var builder = new PactBuilder("test-consumer", "test-producer", url);
+            var builder = new PactBuilder("test-consumer", "test-provider", url);
 
             builder.SetupInteraction(new InteractionBuilder()
                 .UponReceiving("a request")
@@ -88,7 +88,13 @@ namespace ComPact.ConsumerTests
                 .WillRespondWith(Pact.Response
                     .WithStatus(200)
                     .WithHeader("Content-Type", "application/json")
-                    .WithBody(Pact.ResponseBody.Empty())));
+                    .WithBody(Pact.JsonContent.Empty())));
+
+            var httpClient = new HttpClient { BaseAddress = new Uri(url) };
+            var response = await httpClient.GetAsync("wrongPath");
+            Assert.AreEqual(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            Assert.IsTrue(responseContent.Contains("No matching response set up for this request."));
 
             try
             {
@@ -107,7 +113,7 @@ namespace ComPact.ConsumerTests
         {
             var url = "http://localhost:9393";
 
-            var builder = new PactBuilder("test-consumer", "test-producer", url);
+            var builder = new PactBuilder("test-consumer", "test-provider", url);
 
             try
             {

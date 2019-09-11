@@ -47,7 +47,16 @@ namespace ComPact.Builders
 
             var content = new StringContent(JsonConvert.SerializeObject(pact, settings), Encoding.UTF8, "application/json");
 
-            var response = await _pactBrokerClient.PutAsync($"pacts/provider/{pact.Provider.Name}/consumer/{pact.Consumer.Name}/version/{_consumerVersion}", content);
+            HttpResponseMessage response;
+
+            try
+            {
+                response = await _pactBrokerClient.PutAsync($"pacts/provider/{pact.Provider.Name}/consumer/{pact.Consumer.Name}/version/{_consumerVersion}", content);
+            }
+            catch (Exception e)
+            {
+                throw new PactException($"Pact cannot be published using the provided Pact Broker Client: {e.Message}");
+            }
             if (!response.IsSuccessStatusCode)
             {
                 throw new PactException("Publishing contract failed. Pact Broker returned " + response.StatusCode);

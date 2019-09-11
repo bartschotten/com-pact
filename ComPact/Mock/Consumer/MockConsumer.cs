@@ -75,7 +75,20 @@ namespace ComPact.Mock.Consumer
 
         internal async Task<string> GetPactFromBroker(string path)
         {
-            var response = await _config.PactBrokerClient.GetAsync(path);
+            if (_config.PactBrokerClient.BaseAddress == null)
+            {
+                throw new PactException("A PactBrokerClient with at least a BaseAddress should be configured to be able to retrieve contracts.");
+            }
+
+            HttpResponseMessage response;
+            try
+            {
+                response = await _config.PactBrokerClient.GetAsync(path);
+            }
+            catch (Exception e)
+            {
+                throw new PactException($"Pact cannot be retrieved using the provided Pact Broker Client: {e.Message}");
+            }
             if (!response.IsSuccessStatusCode)
             {
                 throw new PactException("Getting pact from Pact Broker failed. Pact Broker returned " + response.StatusCode);
@@ -175,7 +188,11 @@ namespace ComPact.Mock.Consumer
                     throw new PactException("Exception occured while invoking MessageProducer.");
                 }
 
-                if (!(providedMessage is string))
+                if (providedMessage is string messageString)
+                {
+                    providedMessage = JsonConvert.DeserializeObject<dynamic>(messageString);
+                }
+                else
                 {
                     providedMessage = JsonConvert.DeserializeObject<dynamic>(JsonConvert.SerializeObject(providedMessage));
                 }
@@ -191,11 +208,6 @@ namespace ComPact.Mock.Consumer
 
         internal async Task PublishVerificationResultsAsync(Contract pact, List<FailedInteraction> failedInteractions)
         {
-            if (_config.PactBrokerClient?.BaseAddress == null)
-            {
-                throw new PactException("PactBrokerClient with at least a BaseAddress should be configured to be able to publish verification results.");
-            }
-
             if (string.IsNullOrWhiteSpace(_config.ProviderVersion))
             {
                 throw new PactException("ProviderVersion should be configured to be able to publish verification results.");

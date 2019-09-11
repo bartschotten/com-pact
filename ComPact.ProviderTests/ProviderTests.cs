@@ -58,6 +58,23 @@ namespace ComPact.ProviderTests
         }
 
         [TestMethod]
+        public async Task ShouldVerifyMessagePactWhenSerializedJsonIsReturned()
+        {
+            var messageSender = new MessageSender();
+
+            var config = new MockConsumerConfig
+            {
+                MessageProducer = (p, d) => JsonConvert.SerializeObject(messageSender.Send(p, d))
+            };
+
+            var mockConsumer = new MockConsumer(config);
+
+            var buildDirectory = AppContext.BaseDirectory;
+            var pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
+            await mockConsumer.VerifyPactAsync(pactDir + "messageConsumer-messageProvider.json");
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(PactException))]
         public async Task VerificationForMessagePactShouldFailWhenWrongMessageIsReturned()
         {

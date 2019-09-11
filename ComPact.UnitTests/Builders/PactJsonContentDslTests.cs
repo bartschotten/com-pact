@@ -10,7 +10,7 @@ namespace ComPact.UnitTests.Builders
         [TestMethod]
         public void SimpleValue()
         {
-            var pactJsonBody = Pact.ResponseBody.With(Some.Element.Like("Hello world")).ToJToken();
+            var pactJsonBody = Pact.JsonContent.With(Some.Element.Like("Hello world")).ToJToken();
 
             var expectedObject = "Hello world";
 
@@ -20,7 +20,7 @@ namespace ComPact.UnitTests.Builders
         [TestMethod]
         public void SimpleProperty()
         {
-            var pactJsonBody = Pact.ResponseBody.With(Some.Element.Named("greeting").Like("Hello world")).ToJToken();
+            var pactJsonBody = Pact.JsonContent.With(Some.Element.Named("greeting").Like("Hello world")).ToJToken();
 
             var expectedObject = new { greeting = "Hello world" };
 
@@ -30,7 +30,7 @@ namespace ComPact.UnitTests.Builders
         [TestMethod]
         public void NestedObject()
         {
-            var pactJsonBody = Pact.ResponseBody.With
+            var pactJsonBody = Pact.JsonContent.With
                 (
                     Some.Object.Named("package").With
                     (
@@ -47,7 +47,7 @@ namespace ComPact.UnitTests.Builders
         [TestMethod]
         public void RootLevelArray()
         {
-            var pactJsonBody = Pact.ResponseBody.With
+            var pactJsonBody = Pact.JsonContent.With
                 (
                     Some.Array.Of
                     (

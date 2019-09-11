@@ -10,7 +10,7 @@ namespace ComPact.UnitTests.Builders
         [TestMethod]
         public void SimpleValue()
         {
-            var pactJsonBody = Pact.ResponseBody.With(Some.Element.Like("Hello world"));
+            var pactJsonBody = Pact.JsonContent.With(Some.Element.Like("Hello world"));
 
             var matchingRules = pactJsonBody.CreateV2MatchingRules();
 
@@ -20,7 +20,7 @@ namespace ComPact.UnitTests.Builders
         [TestMethod]
         public void NamedValueInObject()
         {
-            var pactJsonBody = Pact.ResponseBody.With(Some.Element.Like("Hello world").Named("greeting"));
+            var pactJsonBody = Pact.JsonContent.With(Some.Element.Like("Hello world").Named("greeting"));
 
             var matchingRules = pactJsonBody.CreateV2MatchingRules();
 
@@ -30,7 +30,7 @@ namespace ComPact.UnitTests.Builders
         [TestMethod]
         public void ExactValue()
         {
-            var pactJsonBody = Pact.ResponseBody.With(Some.Element.WithTheExactValue("Hello world"));
+            var pactJsonBody = Pact.JsonContent.With(Some.Element.WithTheExactValue("Hello world"));
 
             var matchingRules = pactJsonBody.CreateV2MatchingRules();
 
@@ -40,7 +40,7 @@ namespace ComPact.UnitTests.Builders
         [TestMethod]
         public void ElementWithinArray()
         {
-            var pactJsonBody = Pact.ResponseBody.With(Some.Array.Named("anArray").Of(Some.Element.Like("Hello world")));
+            var pactJsonBody = Pact.JsonContent.With(Some.Array.Named("anArray").Of(Some.Element.Like("Hello world")));
 
             var matchingRules = pactJsonBody.CreateV2MatchingRules();
 
@@ -50,7 +50,7 @@ namespace ComPact.UnitTests.Builders
         [TestMethod]
         public void ElementWithinArrayWithMin()
         {
-            var pactJsonBody = Pact.ResponseBody.With(Some.Array.Named("anArray").ContainingAtLeast(2).Of(Some.Element.Like("Hello world")));
+            var pactJsonBody = Pact.JsonContent.With(Some.Array.Named("anArray").ContainingAtLeast(2).Of(Some.Element.Like("Hello world")));
 
             var matchingRules = pactJsonBody.CreateV2MatchingRules();
 
@@ -63,7 +63,7 @@ namespace ComPact.UnitTests.Builders
         [TestMethod]
         public void Regex()
         {
-            var pactJsonBody = Pact.ResponseBody.With(Some.String.Like("Hello world", "Hello.*"));
+            var pactJsonBody = Pact.JsonContent.With(Some.String.Like("Hello world", "Hello.*"));
 
             var matchingRules = pactJsonBody.CreateV2MatchingRules();
 
@@ -74,7 +74,7 @@ namespace ComPact.UnitTests.Builders
         [TestMethod]
         public void ArrayWithStar()
         {
-            var pactJsonBody = Pact.ResponseBody.With(Some.Array.Named("anArray").InWhichEveryElementIsLike(Some.Element.Like("Hello world")));
+            var pactJsonBody = Pact.JsonContent.With(Some.Array.Named("anArray").InWhichEveryElementIsLike(Some.Element.Like("Hello world")));
 
             var matchingRules = pactJsonBody.CreateV2MatchingRules();
 

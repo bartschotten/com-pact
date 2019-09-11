@@ -114,5 +114,24 @@ namespace ComPact.UnitTests.Builders
                 throw;
             }
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(PactException))]
+        public async Task ShouldThrowWhenClientThrowsForAnyOtherReason()
+        {
+            var fakeHttpMessageHandler = new FakePactBrokerMessageHandler() { ExceptionToThrow = new HttpRequestException("Something went wrong.") };
+
+            var pactPublisher = new PactPublisher(new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://local-pact-broker") }, "1.0");
+
+            try
+            {
+                await pactPublisher.PublishAsync(_pact);
+            }
+            catch (PactException e)
+            {
+                Assert.AreEqual("Pact cannot be published using the provided Pact Broker Client: Something went wrong.", e.Message);
+                throw;
+            }
+        }
     }
 }
