@@ -39,7 +39,7 @@ namespace ComPact.Builders.V3
         /// <returns></returns>
         public MessageBuilder With(PactJsonContent messageContent)
         {
-            _message.Content = messageContent.ToJToken();
+            _message.Contents = messageContent.ToJToken();
             if (_message.MatchingRules == null)
             {
                 _message.MatchingRules = new MatchingRuleCollection();
@@ -60,7 +60,7 @@ namespace ComPact.Builders.V3
 
             try
             {
-                var serializedContent = JsonConvert.SerializeObject(_message.Content);
+                var serializedContent = JsonConvert.SerializeObject(_message.Contents);
                 var content = JsonConvert.DeserializeObject<T>(serializedContent);
                 InvokeMessageHandler(messageHandler, content);
             }
@@ -83,7 +83,7 @@ namespace ComPact.Builders.V3
         {
             CheckMessageHandler(messageHandler);
 
-            var serializedContent = JsonConvert.SerializeObject(_message.Content);
+            var serializedContent = JsonConvert.SerializeObject(_message.Contents);
             InvokeMessageHandler(messageHandler, serializedContent);
 
             return this;
@@ -105,7 +105,7 @@ namespace ComPact.Builders.V3
             {
                 throw new ArgumentNullException(nameof(messageHandler));
             }
-            if (_message.Content == null)
+            if (_message.Contents == null)
             {
                 throw new PactException("Message content has not been set. Please provide using the With method.");
             }

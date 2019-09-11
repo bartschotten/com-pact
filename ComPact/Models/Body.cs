@@ -19,7 +19,7 @@ namespace ComPact.Models
 
             if (actualBody == null)
             {
-                differences.Add("Expected body to be present, but was not.");
+                differences.Add("Expected body or contents to be present, but was not.");
                 return differences;
             }
 

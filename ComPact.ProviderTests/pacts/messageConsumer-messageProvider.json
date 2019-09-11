@@ -14,7 +14,7 @@
         }
       ],
       "description": "a RecipeAdded event.",
-      "content": {
+      "contents": {
         "eventId": "f84fe18f-d871-4dad-9723-65b6dc9b0578",
         "recipe": {
           "id": "7169de6d-df9b-4cf5-8cdc-2654062e5cdc",

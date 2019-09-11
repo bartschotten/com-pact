@@ -10,8 +10,8 @@ namespace ComPact.Models.V3
         internal List<ProviderState> ProviderStates { get; set; }
         [JsonProperty("description")]
         internal string Description { get; set; } = string.Empty;
-        [JsonProperty("content")]
-        internal object Content { get; set; }
+        [JsonProperty("contents")]
+        internal object Contents { get; set; }
         [JsonProperty("matchingRules")]
         internal MatchingRuleCollection MatchingRules { get; set; }
         [JsonProperty("metaData")]
@@ -19,7 +19,7 @@ namespace ComPact.Models.V3
 
         internal List<string> Match(object actualMessage)
         {
-            return Body.Match(Content, actualMessage, MatchingRules);
+            return Body.Match(Contents, actualMessage, MatchingRules);
         }
 
         internal void SetEmptyValuesToNull()

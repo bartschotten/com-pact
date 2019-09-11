@@ -58,6 +58,30 @@ namespace ComPact.ProviderTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(PactException))]
+        public async Task VerificationForMessagePactShouldFailWhenWrongMessageIsReturned()
+        {
+            var config = new MockConsumerConfig
+            {
+                MessageProducer = (p, d) => null
+            };
+
+            var mockConsumer = new MockConsumer(config);
+
+            var buildDirectory = AppContext.BaseDirectory;
+            var pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
+            try
+            {
+                await mockConsumer.VerifyPactAsync(pactDir + "messageConsumer-messageProvider.json");
+            }
+            catch (PactException e)
+            {
+                Assert.IsTrue(e.Message.Contains("Expected body or contents to be present, but was not"));
+                throw;
+            }
+        }
+
+        [TestMethod]
         public async Task ShouldPublishVerificationResults()
         {
             var buildDirectory = AppContext.BaseDirectory;
