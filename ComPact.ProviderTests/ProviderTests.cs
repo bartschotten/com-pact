@@ -22,7 +22,7 @@ namespace ComPact.ProviderTests
         {
             var baseUrl = "http://localhost:9494";
 
-            var mockConsumer = new PactVerifier(new PactVerifierConfig { ProviderBaseUrl = baseUrl });
+            var pactVerifier = new PactVerifier(new PactVerifierConfig { ProviderBaseUrl = baseUrl });
 
             var cts = new CancellationTokenSource();
 
@@ -34,7 +34,7 @@ namespace ComPact.ProviderTests
 
             var buildDirectory = AppContext.BaseDirectory;
             var pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
-            await mockConsumer.VerifyPactAsync(pactDir + "recipe-consumer-recipe-service.json");
+            await pactVerifier.VerifyPactAsync(pactDir + "recipe-consumer-recipe-service.json");
 
             cts.Cancel();
             await hostTask;
@@ -50,11 +50,11 @@ namespace ComPact.ProviderTests
                 MessageProducer = messageSender.Send
             };
 
-            var mockConsumer = new PactVerifier(config);
+            var pactVerifier = new PactVerifier(config);
 
             var buildDirectory = AppContext.BaseDirectory;
             var pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
-            await mockConsumer.VerifyPactAsync(pactDir + "messageConsumer-messageProvider.json");
+            await pactVerifier.VerifyPactAsync(pactDir + "messageConsumer-messageProvider.json");
         }
 
         [TestMethod]
@@ -67,11 +67,11 @@ namespace ComPact.ProviderTests
                 MessageProducer = (p, d) => JsonConvert.SerializeObject(messageSender.Send(p, d))
             };
 
-            var mockConsumer = new PactVerifier(config);
+            var pactVerifier = new PactVerifier(config);
 
             var buildDirectory = AppContext.BaseDirectory;
             var pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
-            await mockConsumer.VerifyPactAsync(pactDir + "messageConsumer-messageProvider.json");
+            await pactVerifier.VerifyPactAsync(pactDir + "messageConsumer-messageProvider.json");
         }
 
         [TestMethod]
@@ -83,13 +83,13 @@ namespace ComPact.ProviderTests
                 MessageProducer = (p, d) => null
             };
 
-            var mockConsumer = new PactVerifier(config);
+            var pactVerifier = new PactVerifier(config);
 
             var buildDirectory = AppContext.BaseDirectory;
             var pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
             try
             {
-                await mockConsumer.VerifyPactAsync(pactDir + "messageConsumer-messageProvider.json");
+                await pactVerifier.VerifyPactAsync(pactDir + "messageConsumer-messageProvider.json");
             }
             catch (PactException e)
             {
@@ -119,9 +119,9 @@ namespace ComPact.ProviderTests
                 PactBrokerClient = new HttpClient(fakePactBrokerMessageHandler) { BaseAddress = new Uri("http://localhost:9292")}
             };
 
-            var mockConsumer = new PactVerifier(config);
+            var pactVerifier = new PactVerifier(config);
 
-            await mockConsumer.VerifyPactAsync("pacts/provider/messageProvider/consumer/messageConsumer/latest");
+            await pactVerifier.VerifyPactAsync("pacts/provider/messageProvider/consumer/messageConsumer/latest");
 
             var sentVerificationResults = JsonConvert.DeserializeObject<VerificationResults>(fakePactBrokerMessageHandler.SentRequestContents.First().Value);
             Assert.IsTrue(sentVerificationResults.Success);
