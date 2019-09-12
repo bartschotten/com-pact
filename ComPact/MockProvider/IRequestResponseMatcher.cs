@@ -1,8 +1,7 @@
-﻿using ComPact.Models;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 
-namespace ComPact.Mock.Provider
+namespace ComPact.MockProvider
 {
     internal interface IRequestResponseMatcher
     {

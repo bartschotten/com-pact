@@ -8,7 +8,7 @@ using System.Text;
 using Newtonsoft.Json;
 using ComPact.Models.V3;
 
-namespace ComPact.Mock.Provider
+namespace ComPact.MockProvider
 {
     internal class RequestResponseMatcher: IRequestResponseMatcher
     {

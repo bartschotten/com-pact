@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace ComPact.Mock.Provider
+namespace ComPact.MockProvider
 {
     internal class RequestResponseMatchingErrorResponse
     {

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ComPact.Mock.Consumer;
 using ComPact.ProviderTests.TestSupport;
 using ComPact.Tests.Shared;
+using ComPact.Verifier;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -22,7 +22,7 @@ namespace ComPact.ProviderTests
         {
             var baseUrl = "http://localhost:9494";
 
-            var mockConsumer = new MockConsumer(new MockConsumerConfig { ProviderBaseUrl = baseUrl });
+            var mockConsumer = new PactVerifier(new PactVerifierConfig { ProviderBaseUrl = baseUrl });
 
             var cts = new CancellationTokenSource();
 
@@ -45,12 +45,12 @@ namespace ComPact.ProviderTests
         {
             var messageSender = new MessageSender();
 
-            var config = new MockConsumerConfig
+            var config = new PactVerifierConfig
             {
                 MessageProducer = messageSender.Send
             };
 
-            var mockConsumer = new MockConsumer(config);
+            var mockConsumer = new PactVerifier(config);
 
             var buildDirectory = AppContext.BaseDirectory;
             var pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
@@ -62,12 +62,12 @@ namespace ComPact.ProviderTests
         {
             var messageSender = new MessageSender();
 
-            var config = new MockConsumerConfig
+            var config = new PactVerifierConfig
             {
                 MessageProducer = (p, d) => JsonConvert.SerializeObject(messageSender.Send(p, d))
             };
 
-            var mockConsumer = new MockConsumer(config);
+            var mockConsumer = new PactVerifier(config);
 
             var buildDirectory = AppContext.BaseDirectory;
             var pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
@@ -78,12 +78,12 @@ namespace ComPact.ProviderTests
         [ExpectedException(typeof(PactException))]
         public async Task VerificationForMessagePactShouldFailWhenWrongMessageIsReturned()
         {
-            var config = new MockConsumerConfig
+            var config = new PactVerifierConfig
             {
                 MessageProducer = (p, d) => null
             };
 
-            var mockConsumer = new MockConsumer(config);
+            var mockConsumer = new PactVerifier(config);
 
             var buildDirectory = AppContext.BaseDirectory;
             var pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
@@ -111,7 +111,7 @@ namespace ComPact.ProviderTests
 
             var messageSender = new MessageSender();
 
-            var config = new MockConsumerConfig
+            var config = new PactVerifierConfig
             {
                 MessageProducer = messageSender.Send,
                 ProviderVersion = "1.0",
@@ -119,7 +119,7 @@ namespace ComPact.ProviderTests
                 PactBrokerClient = new HttpClient(fakePactBrokerMessageHandler) { BaseAddress = new Uri("http://localhost:9292")}
             };
 
-            var mockConsumer = new MockConsumer(config);
+            var mockConsumer = new PactVerifier(config);
 
             await mockConsumer.VerifyPactAsync("pacts/provider/messageProvider/consumer/messageConsumer/latest");
 

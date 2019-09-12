@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ComPact.Mock.Consumer
+namespace ComPact.Verifier
 {
     public class VerificationResults
     {

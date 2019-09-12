@@ -1,13 +1,13 @@
-﻿using ComPact.Mock.Consumer;
-using ComPact.Models.V3;
+﻿using ComPact.Models.V3;
 using ComPact.Tests.Shared;
+using ComPact.Verifier;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace ComPact.UnitTests.Mock.Consumer
+namespace ComPact.UnitTests.Verifier
 {
     [TestClass]
     public class GetPactFromPactBrokerTests
@@ -20,12 +20,12 @@ namespace ComPact.UnitTests.Mock.Consumer
                 ObjectToReturn = new Contract()
             };
 
-            var config = new MockConsumerConfig
+            var config = new PactVerifierConfig
             {
                 PactBrokerClient = new HttpClient(fakePactBrokerMessageHandler) { BaseAddress = new Uri("http://localhost:9292") }
             };
 
-            var mockConsumer = new MockConsumer(config);
+            var mockConsumer = new PactVerifier(config);
 
             var stringContent = await mockConsumer.GetPactFromBroker("some/path");
 
@@ -43,12 +43,12 @@ namespace ComPact.UnitTests.Mock.Consumer
                 StatusCodeToReturn = System.Net.HttpStatusCode.BadRequest
             };
 
-            var config = new MockConsumerConfig
+            var config = new PactVerifierConfig
             {
                 PactBrokerClient = new HttpClient(fakePactBrokerMessageHandler) { BaseAddress = new Uri("http://localhost:9292") }
             };
 
-            var mockConsumer = new MockConsumer(config);
+            var mockConsumer = new PactVerifier(config);
 
             try
             {
@@ -70,12 +70,12 @@ namespace ComPact.UnitTests.Mock.Consumer
                 ObjectToReturn = new Contract(),
             };
 
-            var config = new MockConsumerConfig
+            var config = new PactVerifierConfig
             {
                 PactBrokerClient = new HttpClient(fakePactBrokerMessageHandler)
             };
 
-            var mockConsumer = new MockConsumer(config);
+            var mockConsumer = new PactVerifier(config);
 
             try
             {
@@ -98,12 +98,12 @@ namespace ComPact.UnitTests.Mock.Consumer
                 ExceptionToThrow = new HttpRequestException("Something went wrong.")
             };
 
-            var config = new MockConsumerConfig
+            var config = new PactVerifierConfig
             {
                 PactBrokerClient = new HttpClient(fakePactBrokerMessageHandler) { BaseAddress = new Uri("http://localhost:9292") }
             };
 
-            var mockConsumer = new MockConsumer(config);
+            var mockConsumer = new PactVerifier(config);
 
             try
             {

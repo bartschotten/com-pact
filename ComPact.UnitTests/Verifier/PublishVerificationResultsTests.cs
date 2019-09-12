@@ -1,5 +1,4 @@
 ﻿using ComPact.Models.V3;
-using ComPact.Mock.Consumer;
 using ComPact.Models;
 using ComPact.Tests.Shared;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -9,8 +8,9 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Linq;
+using ComPact.Verifier;
 
-namespace ComPact.UnitTests.Mock.Consumer
+namespace ComPact.UnitTests.Verifier
 {
     [TestClass]
     public class PublishVerificationResultsTests
@@ -22,12 +22,12 @@ namespace ComPact.UnitTests.Mock.Consumer
         {
             var fakeHttpMessageHandler = new FakePactBrokerMessageHandler();
 
-            var config = new MockConsumerConfig
+            var config = new PactVerifierConfig
             {
                 ProviderVersion = "1.0",
                 PactBrokerClient = new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://local-pact-broker") }
             };
-            var mockConsumer = new MockConsumer(config);
+            var mockConsumer = new PactVerifier(config);
 
             await mockConsumer.PublishVerificationResultsAsync(_pact, new List<FailedInteraction>());
 
@@ -44,12 +44,12 @@ namespace ComPact.UnitTests.Mock.Consumer
         {
             var fakeHttpMessageHandler = new FakePactBrokerMessageHandler { StatusCodeToReturn = System.Net.HttpStatusCode.NotFound };
 
-            var config = new MockConsumerConfig
+            var config = new PactVerifierConfig
             {
                 ProviderVersion = "1.0",
                 PactBrokerClient = new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://local-pact-broker") }
             };
-            var mockConsumer = new MockConsumer(config);
+            var mockConsumer = new PactVerifier(config);
 
             try
             {

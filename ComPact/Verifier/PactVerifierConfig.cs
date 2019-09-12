@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 
-namespace ComPact.Mock.Consumer
+namespace ComPact.Verifier
 {
-    public class MockConsumerConfig
+    public class PactVerifierConfig
     {
         /// <summary>
         /// The base url where to call your actual provider service. To set up provider states, {base-url}/provider-states will be called.

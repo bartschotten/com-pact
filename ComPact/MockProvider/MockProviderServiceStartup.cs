@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 
-namespace ComPact.Mock.Provider
+namespace ComPact.MockProvider
 {
     internal class MockProviderServiceStartup
     {

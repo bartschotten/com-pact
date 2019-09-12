@@ -11,18 +11,18 @@ using System.Threading.Tasks;
 using System.Text;
 using Newtonsoft.Json.Linq;
 
-namespace ComPact.Mock.Consumer
+namespace ComPact.Verifier
 {
-    public class MockConsumer
+    public class PactVerifier
     {
-        private readonly MockConsumerConfig _config;
+        private readonly PactVerifierConfig _config;
         private string _publishVerificationResultsPath;
 
         /// <summary>
         /// Set up a mock consumer that will call your code based on the defined interactions or messages in a supplied Pact contract.
         /// </summary>
         /// <param name="config"></param>
-        public MockConsumer(MockConsumerConfig config)
+        public PactVerifier(PactVerifierConfig config)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
         }
