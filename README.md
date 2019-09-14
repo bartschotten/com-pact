@@ -12,7 +12,7 @@ This implementation will not support:
 * Matching rules on requests.
 
 In the foreseeable future it might support:
-* Data formats other than JSON. The semantics of content-type headers and message metadata will be ignored.
+* Data formats other than JSON (i.e. XML). For now the semantics of content-type headers and message metadata will be ignored.
 * Example generators.
 
 Also note that the [DSL](#pact-content-dsl) to define a contract will not allow you to express everything that is valid within the Pact Specification. The goal is not to be complete, but to be simple and user friendly in such a way that it makes the right thing easy to do, and the wrong thing hard.
