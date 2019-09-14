@@ -102,8 +102,7 @@ namespace ComPact.ConsumerTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(PactException))]
-        public async Task ShouldNotBuildWhenMultipleRequestsMatch()
+        public async Task ShouldReturnLastResponseWhenMultipleRequestsMatch()
         {
             var url = "http://localhost:9393";
 
@@ -121,6 +120,7 @@ namespace ComPact.ConsumerTests
                     .WithBody(Pact.JsonContent.Empty())));
 
             builder.SetUp(Pact.Interaction
+                .Given(new ProviderState { Name = "some state" })
                 .UponReceiving("a request")
                 .With(Pact.Request
                     .WithHeader("Accept", "application/json")
@@ -134,19 +134,9 @@ namespace ComPact.ConsumerTests
             var httpClient = new HttpClient { BaseAddress = new Uri(url) };
             httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
             var response = await httpClient.GetAsync("testpath");
-            Assert.AreEqual(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.AreEqual(System.Net.HttpStatusCode.OK, response.StatusCode);
             var responseContent = await response.Content.ReadAsStringAsync();
-            Assert.IsTrue(responseContent.Contains("More than one matching response found for this request."));
-
-            try
-            {
-                await builder.BuildAsync();
-            }
-            catch (PactException e)
-            {
-                Assert.AreEqual("Cannot build pact. Not all mocked interactions have been called.", e.Message);
-                throw;
-            }
+            Assert.IsTrue(responseContent.Contains("test"));
         }
 
         [TestMethod]

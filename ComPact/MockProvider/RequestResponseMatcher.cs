@@ -28,33 +28,25 @@ namespace ComPact.MockProvider
 
             var request = new Request(httpRequest);
 
-            var responses = _matchableInteractions.Select(m => m.Match(request)).Where(r => r != null);
+            var response = _matchableInteractions.Select(m => m.Match(request)).Where(r => r != null).LastOrDefault();
 
-            if (responses.Count() == 1)
+            if (response != null)
             {
-                httpResponseToReturn.StatusCode = responses.First().Status;
-                foreach (var header in httpResponseToReturn.Headers)
+                httpResponseToReturn.StatusCode = response.Status;
+                foreach (var header in response.Headers)
                 {
                     httpResponseToReturn.Headers.Add(header.Key, new StringValues((string)header.Value));
                 }
-                await httpResponseToReturn.Body.WriteAsync(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(responses.First().Body)));
+                await httpResponseToReturn.Body.WriteAsync(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response.Body)));
             }
             else
             {
                 var errorResponse = new RequestResponseMatchingErrorResponse()
                 {
                     ActualRequest = request,
-                    ExpectedRequests = _matchableInteractions.Select(m => m.Interaction.Request).ToList()
+                    ExpectedRequests = _matchableInteractions.Select(m => m.Interaction.Request).ToList(),
+                    Message = "No matching response set up for this request."
                 };
-                if (responses.Any())
-                {
-                    errorResponse.Message = "More than one matching response found for this request.";
-                    responses.ToList().ForEach(r => _matchableInteractions.First(m => m.Interaction.Response == r).HasBeenMatched = false);
-                }
-                else
-                {
-                    errorResponse.Message = "No matching response set up for this request.";
-                }
                 httpResponseToReturn.StatusCode = 400;
                 var stringToReturn = JsonConvert.SerializeObject(errorResponse);
                 await httpResponseToReturn.Body.WriteAsync(Encoding.UTF8.GetBytes(stringToReturn));
