@@ -2,6 +2,7 @@
 {
     public static class Pact
     {
+        public static InteractionBuilder Interaction => new InteractionBuilder();
         public static RequestBuilder Request => new RequestBuilder();
         public static ResponseBuilder Response => new ResponseBuilder();
         public static PactJsonContent JsonContent => new PactJsonContent();

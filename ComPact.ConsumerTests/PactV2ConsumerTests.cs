@@ -33,7 +33,7 @@ namespace ComPact.ConsumerTests
                                 Some.Element.Named("amount").Like(5.5),
                                 Some.Element.Named("unit").Like("gram"));
 
-            builder.SetupInteraction(new InteractionBuilder()
+            builder.SetUp(Pact.Interaction
                 .Given($"There is a recipe with id `{recipeId}`")
                 .UponReceiving("a request")
                 .With(Pact.Request
@@ -79,7 +79,7 @@ namespace ComPact.ConsumerTests
 
             var builder = new PactBuilder("test-consumer", "test-provider", url);
 
-            builder.SetupInteraction(new InteractionBuilder()
+            builder.SetUp(Pact.Interaction
                 .UponReceiving("a request")
                 .With(Pact.Request
                     .WithHeader("Accept", "application/json")

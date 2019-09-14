@@ -30,8 +30,8 @@ var builder = new PactBuilder("test-consumer", "test-provider", url);
 ```
 Set up an interaction, which simply tells the mock provider that when it receives the specified request, it should return the specified response. Notice that the response body is described using a [DSL](#pact-content-dsl) specific for ComPact.
 ```c#
-builder.SetupInteraction(
-	new InteractionBuilder()
+builder.SetUp(
+	Pact.Interaction
         .UponReceiving("a request")
         .With(Pact.Request
             .WithHeader("Accept", "application/json")

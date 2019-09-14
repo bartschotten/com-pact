@@ -50,7 +50,7 @@ namespace ComPact.ConsumerTests
 
             var builder = new MessagePactBuilder("messageConsumer", "messageProvider", publisher);
 
-            await builder.SetupMessage(_messageBuilder
+            await builder.SetUp(_messageBuilder
                 .VerifyConsumer<RecipeAdded>(m => handler.Handle(m)))
                 .BuildAsync();
 
@@ -77,7 +77,7 @@ namespace ComPact.ConsumerTests
 
             var builder = new MessagePactBuilder("messageConsumer", "messageProvider");
 
-            builder.SetupMessage(_messageBuilder.VerifyConsumer(m => receivedMessage = m));
+            builder.SetUp(_messageBuilder.VerifyConsumer(m => receivedMessage = m));
 
             Assert.IsNotNull(receivedMessage);
             var deserializedMessage = JsonConvert.DeserializeObject<RecipeAdded>(receivedMessage);
@@ -91,7 +91,7 @@ namespace ComPact.ConsumerTests
 
             try
             {
-                builder.SetupMessage(_messageBuilder.VerifyConsumer(m => throw new NullReferenceException()));
+                builder.SetUp(_messageBuilder.VerifyConsumer(m => throw new NullReferenceException()));
             }
             catch (PactException e)
             {

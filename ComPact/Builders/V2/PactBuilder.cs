@@ -63,7 +63,11 @@ namespace ComPact.Builders.V2
             host.RunAsync(_cts.Token);
         }
 
-        public void SetupInteraction(InteractionBuilder interactionBuilder)
+        /// <summary>
+        /// Type Pact.Interaction...
+        /// </summary>
+        /// <param name="interactionBuilder"></param>
+        public void SetUp(InteractionBuilder interactionBuilder)
         {
             var interaction = interactionBuilder.Build();
             _interactions.Add(interaction);

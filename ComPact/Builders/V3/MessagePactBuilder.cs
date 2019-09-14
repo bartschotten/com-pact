@@ -37,7 +37,7 @@ namespace ComPact.Builders.V3
         /// Type Pact.Message...
         /// </summary>
         /// <param name="messageBuilder"></param>
-        public MessagePactBuilder SetupMessage(MessageBuilder messageBuilder)
+        public MessagePactBuilder SetUp(MessageBuilder messageBuilder)
         {
             _messages.Add(messageBuilder.Build());
             return this;
