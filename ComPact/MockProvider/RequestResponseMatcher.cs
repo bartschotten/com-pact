@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
@@ -12,9 +11,9 @@ namespace ComPact.MockProvider
 {
     internal class RequestResponseMatcher: IRequestResponseMatcher
     {
-        private readonly List<MatchableInteraction> _matchableInteractions;
+        private readonly MatchableInteractionList _matchableInteractions;
 
-        public RequestResponseMatcher(List<MatchableInteraction> interactions)
+        public RequestResponseMatcher(MatchableInteractionList interactions)
         {
             _matchableInteractions = interactions;
         }

@@ -34,6 +34,14 @@ namespace ComPact.Models.V3
             return null;
         }
 
+        internal bool ProviderStatesAndRequestCanBeDistinguishedFrom(Interaction otherInteraction)
+        {
+            var requestsCanBeDistinguished = !(Request.Match(otherInteraction.Request) && otherInteraction.Request.Match(Request));
+            var providerStatesCanBeDistinguished = JsonConvert.SerializeObject(ProviderStates) != JsonConvert.SerializeObject(otherInteraction.ProviderStates);
+
+            return requestsCanBeDistinguished || providerStatesCanBeDistinguished;
+        }
+
         internal void SetEmptyValuesToNull()
         {
             ProviderStates = ProviderStates?.FirstOrDefault() != null ? ProviderStates : null;

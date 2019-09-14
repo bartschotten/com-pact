@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <RootNamespace>ComPact</RootNamespace>
-    <Version>0.1.5</Version>
+    <Version>0.1.6</Version>
     <Authors>Bart Schotten</Authors>
     <Description>An alternative Pact implementation for .NET with support for Pact Specification v3.</Description>
     <Copyright></Copyright>

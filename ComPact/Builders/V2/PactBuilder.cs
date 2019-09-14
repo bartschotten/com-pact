@@ -20,7 +20,7 @@ namespace ComPact.Builders.V2
         private readonly CancellationTokenSource _cts;
         private readonly IRequestResponseMatcher _matcher;
         private List<Interaction> _interactions;
-        private List<MatchableInteraction> _matchableInteractions;
+        private MatchableInteractionList _matchableInteractions;
 
         /// <summary>
         /// Sets up a mock provider service, generates a V2 contract between a consumer and provider, 
@@ -46,7 +46,7 @@ namespace ComPact.Builders.V2
             _consumer = consumer ?? throw new System.ArgumentNullException(nameof(consumer));
             _provider = provider ?? throw new System.ArgumentNullException(nameof(provider));
             _interactions = new List<Interaction>();
-            _matchableInteractions = new List<MatchableInteraction>();
+            _matchableInteractions = new MatchableInteractionList();
 
             _matcher = new RequestResponseMatcher(_matchableInteractions);
 
@@ -70,14 +70,14 @@ namespace ComPact.Builders.V2
         public void SetUp(InteractionBuilder interactionBuilder)
         {
             var interaction = interactionBuilder.Build();
+            _matchableInteractions.AddUnique(new MatchableInteraction(new Models.V3.Interaction(interaction)));
             _interactions.Add(interaction);
-            _matchableInteractions.Add(new MatchableInteraction(new Models.V3.Interaction(interaction)));
         }
 
         public void ClearInteractions()
         {
             _interactions = new List<Interaction>();
-            _matchableInteractions = new List<MatchableInteraction>();
+            _matchableInteractions = new MatchableInteractionList();
         }
 
         public async Task BuildAsync()

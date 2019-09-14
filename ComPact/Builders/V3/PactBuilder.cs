@@ -4,7 +4,6 @@ using ComPact.Models.V3;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,7 +18,7 @@ namespace ComPact.Builders.V3
         private readonly PactPublisher _pactPublisher;
         private readonly CancellationTokenSource _cts;
         private readonly IRequestResponseMatcher _matcher;
-        private List<MatchableInteraction> _matchableInteractions;
+        private MatchableInteractionList _matchableInteractions;
 
         /// <summary>
         /// Sets up a mock provider service, generates a V3 contract between a consumer and provider, 
@@ -44,7 +43,7 @@ namespace ComPact.Builders.V3
 
             _consumer = consumer ?? throw new System.ArgumentNullException(nameof(consumer));
             _provider = provider ?? throw new System.ArgumentNullException(nameof(provider));
-            _matchableInteractions = new List<MatchableInteraction>();
+            _matchableInteractions = new MatchableInteractionList();
 
             _matcher = new RequestResponseMatcher(_matchableInteractions);
 
@@ -67,12 +66,12 @@ namespace ComPact.Builders.V3
         /// <param name="interactionBuilder"></param>
         public void SetUp(InteractionBuilder interactionBuilder)
         {
-            _matchableInteractions.Add(new MatchableInteraction(interactionBuilder.Build()));
+            _matchableInteractions.AddUnique(new MatchableInteraction(interactionBuilder.Build()));
         }
 
         public void ClearInteractions()
         {
-            _matchableInteractions = new List<MatchableInteraction>();
+            _matchableInteractions = new MatchableInteractionList();
         }
 
         public async Task BuildAsync()
