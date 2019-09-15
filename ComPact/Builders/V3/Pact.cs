@@ -12,7 +12,7 @@
     public static class Some
     {
         public static UnknownSimpleValue Element => new UnknownSimpleValue();
-        public static UnknownRegexString String => new UnknownRegexString();
+        public static UnknownString String => new UnknownString();
         public static UnknownObject Object => new UnknownObject();
         public static UnknownArray Array => new UnknownArray();
         public static UnknownInteger Integer => new UnknownInteger();

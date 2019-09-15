@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <RootNamespace>ComPact</RootNamespace>
-    <Version>0.1.6</Version>
+    <Version>0.1.7</Version>
     <Authors>Bart Schotten</Authors>
     <Description>An alternative Pact implementation for .NET with support for Pact Specification v3.</Description>
     <Copyright></Copyright>
@@ -11,7 +11,7 @@
     <PackageProjectUrl>https://github.com/bartschotten/com-pact</PackageProjectUrl>
     <RepositoryUrl>https://github.com/bartschotten/com-pact</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>Pact, Pact Broker, Message, Async, v3</PackageTags>
+    <PackageTags>Pact, PactBroker, Message, Async, v3</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>

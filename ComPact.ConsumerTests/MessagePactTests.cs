@@ -36,7 +36,7 @@ namespace ComPact.ConsumerTests
                     Some.Object.Named("recipe").With(
                         Some.Element.Named("name").Like("A Recipe"),
                         Some.Element.Named("instructions").Like("Mix it up"),
-                        Some.Array.Named("ingredients").InWhichEveryElementIsLike(ingredient)
+                        Some.Array.Named("ingredients").InWhichEveryElementIs(ingredient)
                     )));
         }
 

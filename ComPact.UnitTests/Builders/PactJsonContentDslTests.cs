@@ -60,5 +60,15 @@ namespace ComPact.UnitTests.Builders
 
             Assert.AreEqual(JsonConvert.SerializeObject(expectedObject), JsonConvert.SerializeObject(pactJsonBody));
         }
+
+        [TestMethod]
+        public void SimpleValueFromString()
+        {
+            var pactJsonBody = Pact.JsonContent.With(Some.String.Like("Hello world")).ToJToken();
+
+            var expectedObject = "Hello world";
+
+            Assert.AreEqual(JsonConvert.SerializeObject(expectedObject), JsonConvert.SerializeObject(pactJsonBody));
+        }
     }
 }

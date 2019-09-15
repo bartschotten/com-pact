@@ -63,7 +63,7 @@ namespace ComPact.UnitTests.Builders
         [TestMethod]
         public void Regex()
         {
-            var pactJsonBody = Pact.JsonContent.With(Some.String.Like("Hello world", "Hello.*"));
+            var pactJsonBody = Pact.JsonContent.With(Some.String.LikeRegex("Hello world", "Hello.*"));
 
             var matchingRules = pactJsonBody.CreateV2MatchingRules();
 
@@ -74,13 +74,23 @@ namespace ComPact.UnitTests.Builders
         [TestMethod]
         public void ArrayWithStar()
         {
-            var pactJsonBody = Pact.JsonContent.With(Some.Array.Named("anArray").InWhichEveryElementIsLike(Some.Element.Like("Hello world")));
+            var pactJsonBody = Pact.JsonContent.With(Some.Array.Named("anArray").InWhichEveryElementIs(Some.Element.Like("Hello world")));
 
             var matchingRules = pactJsonBody.CreateV2MatchingRules();
 
             Assert.AreEqual(2, matchingRules.Count);
             Assert.AreEqual(MatcherType.type, matchingRules["$.body.anArray[*]"].MatcherType);
             Assert.AreEqual(1, matchingRules["$.body.anArray"].Min);
+        }
+
+        [TestMethod]
+        public void SimpleString()
+        {
+            var pactJsonBody = Pact.JsonContent.With(Some.String.Like("Hello world").Named("greeting"));
+
+            var matchingRules = pactJsonBody.CreateV2MatchingRules();
+
+            Assert.AreEqual(MatcherType.type, matchingRules["$.body.greeting"].MatcherType);
         }
     }
 }

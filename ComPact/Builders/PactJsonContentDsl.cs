@@ -96,11 +96,12 @@ namespace ComPact.Builders
         public SimpleValue WithTheExactValue(object example) => new SimpleValue(example, MatcherType.equality);
     }
 
-    public class UnknownRegexString
+    public class UnknownString
     {
-        public RegexStringName Named(string name) => new RegexStringName(name);
-        public RegexString Like(string example, string regex) => new RegexString(example, regex);
-        public RegexString LikeGuid(string example) => new RegexString(example, "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$");
+        public StringName Named(string name) => new StringName(name);
+        public SimpleValue Like(string example) => new SimpleValue(example, MatcherType.type);
+        public String LikeRegex(string example, string regex) => new String(example, regex);
+        public String LikeGuid(string example) => new String(example, "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$");
     }
 
     public class UnknownObject
@@ -113,7 +114,7 @@ namespace ComPact.Builders
     {
         public ArrayName Named(string name) => new ArrayName(name);
         public Array Of(params Element[] elements) => new Array(elements);
-        public StarArray InWhichEveryElementIsLike(Element element) => (StarArray)(new StarArray(element).ContainingAtLeast(1));
+        public StarArray InWhichEveryElementIs(Element element) => (StarArray)(new StarArray(element).ContainingAtLeast(1));
     }
 
     public abstract class MemberName
@@ -133,11 +134,12 @@ namespace ComPact.Builders
         public Member WithTheExactValue(object example) => new Member(Name, new SimpleValue(example, MatcherType.equality));
     }
 
-    public class RegexStringName : MemberName
+    public class StringName : MemberName
     {
-        public RegexStringName(string name) : base(name) { }
-        public Member Like(string example, string regex) => new Member(Name, new RegexString(example, regex));
-        public Member LikeGuid(string example) => new Member(Name, new RegexString(example, "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"));
+        public StringName(string name) : base(name) { }
+        public Member Like(string example) => new Member(Name, new SimpleValue(example, MatcherType.type));
+        public Member LikeRegex(string example, string regex) => new Member(Name, new String(example, regex));
+        public Member LikeGuid(string example) => new Member(Name, new String(example, "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"));
     }
 
     public class ObjectName : MemberName
@@ -151,7 +153,7 @@ namespace ComPact.Builders
         private int Min { get; set; }
         public ArrayName(string name) : base(name) { }
         public Member Of(params Element[] elements) => new Member(Name, new Array(elements).ContainingAtLeast(Min));
-        public Member InWhichEveryElementIsLike(Element element) => new Member(Name, new StarArray(element).ContainingAtLeast(Min != 0 ? Min : 1));
+        public Member InWhichEveryElementIs(Element element) => new Member(Name, new StarArray(element).ContainingAtLeast(Min != 0 ? Min : 1));
         public ArrayName ContainingAtLeast(int numberOfElements)
         {
             Min = numberOfElements;
@@ -199,11 +201,11 @@ namespace ComPact.Builders
         }
     }
 
-    public class RegexString : Element
+    public class String : Element
     {
         public string Example { get; set; }
 
-        public RegexString(string example, string regex)
+        public String(string example, string regex)
         {
             if (!System.Text.RegularExpressions.Regex.IsMatch(example, regex))
             {
