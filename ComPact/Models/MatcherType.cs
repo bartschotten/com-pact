@@ -2,8 +2,8 @@
 {
     public enum MatcherType
     {
-        equality,
         type,
+        equality,
         regex,
         integer,
         @decimal,

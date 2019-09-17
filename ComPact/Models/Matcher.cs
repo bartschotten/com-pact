@@ -1,17 +1,15 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿using ComPact.JsonConverters;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Threading;
 
 namespace ComPact.Models
 {
     internal class Matcher
     {
         [JsonProperty("match")]
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonConverter(typeof(StringEnumWithDefaultConverter))]
         internal MatcherType MatcherType { get; set; }
         [JsonProperty("min")]
         internal int? Min { get; set; }

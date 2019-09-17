@@ -132,9 +132,9 @@ namespace ComPact.Verifier
                     throw new PactException("Pact specification version is not supported.");
                 }
             }
-            catch
+            catch (Exception e)
             {
-                throw new PactException("File was not recognized as a valid Pact contract.");
+                throw new PactException($"File was not recognized as a valid Pact contract: {e.Message}");
             }
             return null;
         }
