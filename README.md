@@ -92,3 +92,24 @@ If the interactions defined in the Pact include Provider States, the PactVerifie
 
 ## Pact Content DSL
 To describe the contents of a message or the body of a response, ComPact uses a domain specific language via a fluent interface. The purpose of this is to make it easy to create a correct and useful Pact contract.
+
+To define some JSON content with the accompanying matching rules, start by typing `Pact.JsonContent.With(...`
+
+Then describe which elements the content consists of. For example, if the content is just a single string (yes, this is valid JSON) it would look like this: `Some.Element.Like("Hello world!")`. By using `Like()` a *"type" matching rule* will get generated, which means that you consider any string to be a valid response, and "Hello world!" is just an example.
+
+To describe a JSON member (or name-value pair), you can use either `Some.Element.Named("greeting").Like("Hello world!")` or `Some.Element.Like("Hello world!").Named("greeting")`. This will result in the following JSON: `{ "greeting": "Hello world!" }`.
+
+`Pact.JsonContent.With()`                                                                                  | JSON                               | Matching Rules                          
+-----------------------------------------------------------------------------------------------------------|------------------------------------|----------------------------
+`Some.Element.Like("Hello world!")`                                                                        | `"Hello world"`                    | `$` -> `{ "match": "type" }`
+`Some.Element.Named("greeting").Like("Hello world!")`                                                      | `{ "greeting": "Hello world!" }`   | `$.greeting` -> `{ "match": "type" }`
+`Some.Element.WithTheExactValue("Hello world!")`                                                           | `"Hello world"`                    | -
+`Some.String.LikeRegex("Hello world", "Hello.*")`                                                          | `"Hello world"`                    | `$` -> `{ "match": "regex", "regex": "Hello.*" }`
+`Some.String.LikeGuid("f3b5978d-944d-46f2-8663-0c81f27bc4da")`                                             | `"f3b5978d-944d-46f2-8663-0c81f27bc4da"`                  | `$` -> `{ "match": "regex", "regex": ""[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}"" }`
+`Some.Array.Named("anArray").Of(Some.Element.Like("Hello world"))`                                         | `{ "anArray": [ "Hello world! ] }` | `$.anArray[0]` -> `{ "match": "type" }`
+`Some.Array.Named("anArray").InWhichEveryElementIs(Some.Element.Like("Hello world"))`                      | `{ "anArray": [ "Hello world! ] }` | `$.anArray` -> `{ "match": "type", "min": 1 }`, `$.anArray[*]` -> `{ "match": "type" }`
+`Some.Array.Named("anArray").ContainingAtLeast(2).Of(Some.Element.Like("Hello world"))`                    | `{ "anArray": [ "Hello world! ] }` | `$.anArray` -> `{ "match": "type", "min": 2 }`, `$.anArray[0]` -> `{ "match": "type" }`
+`Some.Array.Named("anArray").ContainingAtLeast(2).InWhichEveryElementIs(Some.Element.Like("Hello world"))` | `{ "anArray": [ "Hello world! ] }` | `$.anArray` -> `{ "match": "type", "min": 2 }`, `$.anArray[*]` -> `{ "match": "type" }`
+`Some.Object.Named("anObject").With(Some.Element.Named("aNumber").Like(1)))`                               | `{ "anObject": { "aNumber": 1 } }` | `$.anObject.aNumber` -> `{ "match": "type" }` 
+`Some.Integer.Like(1)`                                                                                     | `1`                                | `$` -> `{ "match": "integer" }` 
+`Some.Decimal.Like(1.1)`                                                                                   | `1.1`                              | `$` -> `{ "match": "decimal" }`
