@@ -1,4 +1,5 @@
-﻿using ComPact.Models.V3;
+﻿using ComPact.Exceptions;
+using ComPact.Models.V3;
 using ComPact.Tests.Shared;
 using ComPact.Verifier;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Text;
 using Newtonsoft.Json.Linq;
+using ComPact.Exceptions;
 
 namespace ComPact.Verifier
 {
@@ -57,7 +58,7 @@ namespace ComPact.Verifier
 
             if (failedInteractions.Any())
             {
-                throw new PactException(string.Join(Environment.NewLine, failedInteractions.Select(f => f.ToTestMessageString())));
+                throw new PactVerificationException(string.Join(Environment.NewLine, failedInteractions.Select(f => f.ToTestMessageString())));
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using ComPact.MockProvider;
+﻿using ComPact.Exceptions;
+using ComPact.MockProvider;
 using ComPact.Models;
 using ComPact.Models.V3;
 using Microsoft.AspNetCore;

@@ -1,4 +1,5 @@
-﻿using ComPact.Models;
+﻿using ComPact.Exceptions;
+using ComPact.Models;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;

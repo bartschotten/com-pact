@@ -1,6 +1,7 @@
 using ComPact.Builders;
 using ComPact.Builders.V2;
 using ComPact.ConsumerTests.TestSupport;
+using ComPact.Exceptions;
 using ComPact.Models;
 using ComPact.Tests.Shared;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

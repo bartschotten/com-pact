@@ -2,6 +2,7 @@
 using ComPact.Builders.V3;
 using ComPact.ConsumerTests.Handler;
 using ComPact.ConsumerTests.TestSupport;
+using ComPact.Exceptions;
 using ComPact.Models;
 using ComPact.Tests.Shared;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

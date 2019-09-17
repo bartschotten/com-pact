@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using ComPact.Exceptions;
 using ComPact.ProviderTests.TestSupport;
 using ComPact.Tests.Shared;
 using ComPact.Verifier;
@@ -75,7 +76,7 @@ namespace ComPact.ProviderTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(PactException))]
+        [ExpectedException(typeof(PactVerificationException))]
         public async Task VerificationForMessagePactShouldFailWhenWrongMessageIsReturned()
         {
             var config = new PactVerifierConfig
@@ -91,7 +92,7 @@ namespace ComPact.ProviderTests
             {
                 await pactVerifier.VerifyPactAsync(pactDir + "messageConsumer-messageProvider.json");
             }
-            catch (PactException e)
+            catch (PactVerificationException e)
             {
                 Assert.IsTrue(e.Message.Contains("Expected body or contents to be present, but was not"));
                 throw;

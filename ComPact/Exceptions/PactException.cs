@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ComPact
+namespace ComPact.Exceptions
 {
     public class PactException: Exception
     {

@@ -1,4 +1,5 @@
 ﻿using ComPact.Builders;
+using ComPact.Exceptions;
 using ComPact.Models;
 using ComPact.Models.V3;
 using ComPact.Tests.Shared;
