@@ -35,7 +35,19 @@ namespace ComPact.Verifier
         /// <returns></returns>
         public async Task VerifyPactAsync(string path)
         {
-            var pactContent = await RetrievePactContent(path);
+            string pactContent = null;
+            string publishVerificationResultsUrl = null;
+
+            if (_config.PactBrokerClient != null)
+            {
+                var pactBrokerResults = await GetPactFromBroker(_config.PactBrokerClient, path);
+                pactContent = pactBrokerResults.PactContent;
+                publishVerificationResultsUrl = pactBrokerResults.PublishVerificationResultsUrl;
+            }
+            else
+            {
+                pactContent = ReadPactFile(path);
+            }
 
             Contract pact = DeserializePactContent(pactContent);
 
@@ -43,17 +55,17 @@ namespace ComPact.Verifier
 
             if (pact.Interactions != null)
             {
-                tests.AddRange(VerifyInteractions(pact.Interactions));
+                tests.AddRange(VerifyInteractions(pact.Interactions, _config.ProviderBaseUrl, _config.ProviderStateHandler));
             }
 
             if (pact.Messages != null)
             {
-                tests.AddRange(VerifyMessages(pact.Messages));
+                tests.AddRange(VerifyMessages(pact.Messages, _config.ProviderStateHandler, _config.MessageProducer));
             }
 
             if (_config.PublishVerificationResults)
             {
-                await PublishVerificationResultsAsync(pact, tests);
+                await PublishVerificationResultsAsync(pact, tests, _config.ProviderVersion, _config.PactBrokerClient, publishVerificationResultsUrl);
             }
 
             if (tests.Any(t => t.Status == "failed"))
@@ -62,21 +74,9 @@ namespace ComPact.Verifier
             }
         }
 
-        internal async Task<string> RetrievePactContent(string path)
+        internal static async Task<PactBrokerResults> GetPactFromBroker(HttpClient pactBrokerClient, string path)
         {
-            if (_config.PactBrokerClient != null)
-            {
-                return await GetPactFromBroker(path);
-            }
-            else
-            {
-                return ReadPactFile(path);
-            }
-        }
-
-        internal async Task<string> GetPactFromBroker(string path)
-        {
-            if (_config.PactBrokerClient.BaseAddress == null)
+            if (pactBrokerClient.BaseAddress == null)
             {
                 throw new PactException("A PactBrokerClient with at least a BaseAddress should be configured to be able to retrieve contracts.");
             }
@@ -84,7 +84,7 @@ namespace ComPact.Verifier
             HttpResponseMessage response;
             try
             {
-                response = await _config.PactBrokerClient.GetAsync(path);
+                response = await pactBrokerClient.GetAsync(path);
             }
             catch (Exception e)
             {
@@ -97,12 +97,16 @@ namespace ComPact.Verifier
 
             var stringContent = await response.Content.ReadAsStringAsync();
             var pactJObject = JObject.Parse(stringContent);
-            _publishVerificationResultsPath = pactJObject.SelectToken("_links.pb:publish-verification-results.href").Value<string>();
+            var publishVerificationResultsUrl = pactJObject.SelectToken("_links.pb:publish-verification-results.href").Value<string>();
 
-            return stringContent;
+            return new PactBrokerResults
+            {
+                PactContent = stringContent,
+                PublishVerificationResultsUrl = publishVerificationResultsUrl
+            };
         }
 
-        internal string ReadPactFile(string filePath)
+        internal static string ReadPactFile(string filePath)
         {
             try
             {
@@ -114,7 +118,7 @@ namespace ComPact.Verifier
             }
         }
 
-        internal Contract DeserializePactContent(string pactContent)
+        internal static Contract DeserializePactContent(string pactContent)
         {
             try
             {
@@ -140,19 +144,19 @@ namespace ComPact.Verifier
             return null;
         }
 
-        internal List<Test> VerifyInteractions(List<Interaction> interactions)
+        internal static List<Test> VerifyInteractions(List<Interaction> interactions, string providerBaseUrl, Action<ProviderState> providerStateHandler)
         {
             var tests = new List<Test>();
 
-            if (_config.ProviderBaseUrl == null)
+            if (providerBaseUrl == null)
             {
                 throw new PactException("Could not verify pacts. Please configure a ProviderBaseUrl.");
             }
-            var client = new RestClient(_config.ProviderBaseUrl);
+            var client = new RestClient(providerBaseUrl);
             foreach (var interaction in interactions)
             {
                 var test = new Test { Description = interaction.Description };
-                var verificationMessages = InvokeProviderStateHandler(interaction.ProviderStates);
+                var verificationMessages = InvokeProviderStateHandler(interaction.ProviderStates, providerStateHandler);
                 if (verificationMessages.Any())
                 {
                     test.Issues = verificationMessages;
@@ -173,14 +177,14 @@ namespace ComPact.Verifier
             return tests;
         }
 
-        internal List<Test> VerifyMessages(List<Message> messages)
+        internal static List<Test> VerifyMessages(List<Message> messages, Action<ProviderState> providerStateHandler, Func<string, object> messageProducer)
         {
             var tests = new List<Test>();
 
             foreach (var message in messages)
             {
                 var test = new Test { Description = message.Description };
-                var verificationMessages = InvokeProviderStateHandler(message.ProviderStates);
+                var verificationMessages = InvokeProviderStateHandler(message.ProviderStates, providerStateHandler);
                 if (verificationMessages.Any())
                 {
                     test.Issues = verificationMessages;
@@ -190,7 +194,7 @@ namespace ComPact.Verifier
                     object providedMessage = null;
                     try
                     {
-                        providedMessage = _config.MessageProducer.Invoke(message.Description);
+                        providedMessage = messageProducer.Invoke(message.Description);
                     }
                     catch (PactVerificationException e)
                     {
@@ -223,7 +227,7 @@ namespace ComPact.Verifier
             return tests;
         }
 
-        internal List<string> InvokeProviderStateHandler(List<ProviderState> providerStates)
+        internal static List<string> InvokeProviderStateHandler(List<ProviderState> providerStates, Action<ProviderState> providerStateHandler)
         {
             var verificationMessages = new List<string>();
 
@@ -232,7 +236,7 @@ namespace ComPact.Verifier
                 return verificationMessages;
             }
 
-            if (_config.ProviderStateHandler == null)
+            if (providerStateHandler == null)
             {
                 throw new PactException("Cannot verify this Pact contract because a ProviderStateHandler was not configured.");
             }
@@ -241,7 +245,7 @@ namespace ComPact.Verifier
             {
                 try
                 {
-                    _config.ProviderStateHandler.Invoke(providerState);
+                    providerStateHandler.Invoke(providerState);
                 }
                 catch (PactVerificationException e)
                 {
@@ -256,9 +260,9 @@ namespace ComPact.Verifier
             return verificationMessages;
         }
 
-        internal async Task PublishVerificationResultsAsync(Contract pact, List<Test> tests)
+        internal static async Task PublishVerificationResultsAsync(Contract pact, List<Test> tests, string providerVersion, HttpClient pactBrokerClient, string publishVerificationResultsUrl)
         {
-            if (string.IsNullOrWhiteSpace(_config.ProviderVersion))
+            if (string.IsNullOrWhiteSpace(providerVersion))
             {
                 throw new PactException("ProviderVersion should be configured to be able to publish verification results.");
             }
@@ -274,18 +278,24 @@ namespace ComPact.Verifier
             var verificationResults = new VerificationResults
             {
                 ProviderName = pact.Provider.Name,
-                ProviderApplicationVersion = _config.ProviderVersion,
+                ProviderApplicationVersion = providerVersion,
                 Success = failureCount == 0,
                 VerificationDate = DateTime.UtcNow.ToString("u"),
                 TestResults = testResults
             };
             var content = new StringContent(JsonConvert.SerializeObject(verificationResults), Encoding.UTF8, "application/json");
 
-            var response = await _config.PactBrokerClient.PostAsync(_publishVerificationResultsPath, content);
+            var response = await pactBrokerClient.PostAsync(publishVerificationResultsUrl, content);
             if (!response.IsSuccessStatusCode)
             {
                 throw new PactException("Publishing verification results failed. Pact Broker returned " + response.StatusCode);
             }
         }
+    }
+
+    internal class PactBrokerResults
+    {
+        internal string PactContent { get; set; }
+        internal string PublishVerificationResultsUrl { get; set; }
     }
 }

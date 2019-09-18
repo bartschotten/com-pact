@@ -16,10 +16,9 @@ namespace ComPact.UnitTests.Verifier
         {
             var invocations = new List<string>();
 
-            var config = new PactVerifierConfig { ProviderStateHandler = (p) => invocations.Add(p.Name) };
-
-            var verifier = new PactVerifier(config);
-            verifier.InvokeProviderStateHandler(new List<ProviderState> { new ProviderState { Name = "ps1" }, new ProviderState { Name = "ps2" } });
+            PactVerifier.InvokeProviderStateHandler(
+                new List<ProviderState> { new ProviderState { Name = "ps1" }, new ProviderState { Name = "ps2" } },
+                (p) => invocations.Add(p.Name));
 
             Assert.AreEqual(2, invocations.Count);
         }
@@ -28,10 +27,9 @@ namespace ComPact.UnitTests.Verifier
         [ExpectedException(typeof(PactException))]
         public void ShouldThrowPactExceptionWhenProviderStateHandlerIsNotConfigured()
         {
-            var verifier = new PactVerifier(new PactVerifierConfig());
             try
             {
-                verifier.InvokeProviderStateHandler(new List<ProviderState> { new ProviderState { Name = "ps1" } });
+                PactVerifier.InvokeProviderStateHandler(new List<ProviderState> { new ProviderState { Name = "ps1" } }, null);
             }
             catch (PactException e)
             {
@@ -43,9 +41,9 @@ namespace ComPact.UnitTests.Verifier
         [TestMethod]
         public void ShouldReturnVerificationMessagesWhenHandlerThrowsPactVerificationException()
         {
-            var verifier = new PactVerifier(new PactVerifierConfig { ProviderStateHandler = (p) => throw new PactVerificationException("Unknown provider state.") });
-
-            var verificationMessages = verifier.InvokeProviderStateHandler(new List<ProviderState> { new ProviderState { Name = "ps1" } });
+            var verificationMessages = PactVerifier.InvokeProviderStateHandler(
+                new List<ProviderState> { new ProviderState { Name = "ps1" } },
+                (p) => throw new PactVerificationException("Unknown provider state."));
 
             Assert.AreEqual($"Provider could not handle provider state \"ps1\": Unknown provider state.", verificationMessages.First());
         }
@@ -54,10 +52,9 @@ namespace ComPact.UnitTests.Verifier
         [ExpectedException(typeof(PactException))]
         public void ShouldThrowPactExceptionWhenProviderStateHandlerThrowsAnyOtherException()
         {
-            var verifier = new PactVerifier(new PactVerifierConfig { ProviderStateHandler = (p) => throw new ArgumentNullException() });
             try
             {
-                verifier.InvokeProviderStateHandler(new List<ProviderState> { new ProviderState { Name = "ps1" } });
+                PactVerifier.InvokeProviderStateHandler(new List<ProviderState> { new ProviderState { Name = "ps1" } }, (p) => throw new ArgumentNullException());
             }
             catch (PactException e)
             {

@@ -23,18 +23,16 @@ namespace ComPact.UnitTests.Verifier
         {
             var fakeHttpMessageHandler = new FakePactBrokerMessageHandler();
 
-            var config = new PactVerifierConfig
-            {
-                ProviderVersion = "1.0",
-                PactBrokerClient = new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://local-pact-broker") }
-            };
-            var pactVerifier = new PactVerifier(config);
-
-            await pactVerifier.PublishVerificationResultsAsync(_pact, new List<Test> { new Test { Description = "test1" } });
+            await PactVerifier.PublishVerificationResultsAsync(
+                _pact, 
+                new List<Test> { new Test { Description = "test1" } },
+                "1.0",
+                new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://local-pact-broker") },
+                "http://publish");
 
             var sentVerificationResults = JsonConvert.DeserializeObject<VerificationResults>(fakeHttpMessageHandler.SentRequestContents.First().Value);
             Assert.IsTrue(sentVerificationResults.Success);
-            Assert.AreEqual(config.ProviderVersion, sentVerificationResults.ProviderApplicationVersion);
+            Assert.AreEqual("1.0", sentVerificationResults.ProviderApplicationVersion);
             Assert.AreEqual(_pact.Provider.Name, sentVerificationResults.ProviderName);
             Assert.AreEqual(1, sentVerificationResults.TestResults.Summary.TestCount);
             Assert.AreEqual(0, sentVerificationResults.TestResults.Summary.FailureCount);
@@ -47,22 +45,19 @@ namespace ComPact.UnitTests.Verifier
         {
             var fakeHttpMessageHandler = new FakePactBrokerMessageHandler();
 
-            var config = new PactVerifierConfig
-            {
-                ProviderVersion = "1.0",
-                PactBrokerClient = new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://local-pact-broker") }
-            };
-            var pactVerifier = new PactVerifier(config);
-
-            await pactVerifier.PublishVerificationResultsAsync(_pact, new List<Test>
-            {
-                new Test { Description = "test1" },
-                new Test { Description = "test2", Issues = new List<string> { "Something failed" } }
-            });
+            await PactVerifier.PublishVerificationResultsAsync(
+                _pact,
+                new List<Test> {
+                    new Test { Description = "test1" },
+                    new Test { Description = "test2", Issues = new List<string> { "Something failed" } }
+                },
+                "1.0",
+                new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://local-pact-broker") },
+                "http://publish");
 
             var sentVerificationResults = JsonConvert.DeserializeObject<VerificationResults>(fakeHttpMessageHandler.SentRequestContents.First().Value);
             Assert.IsFalse(sentVerificationResults.Success);
-            Assert.AreEqual(config.ProviderVersion, sentVerificationResults.ProviderApplicationVersion);
+            Assert.AreEqual("1.0", sentVerificationResults.ProviderApplicationVersion);
             Assert.AreEqual(_pact.Provider.Name, sentVerificationResults.ProviderName);
             Assert.AreEqual(2, sentVerificationResults.TestResults.Summary.TestCount);
             Assert.AreEqual(1, sentVerificationResults.TestResults.Summary.FailureCount);
@@ -77,16 +72,14 @@ namespace ComPact.UnitTests.Verifier
         {
             var fakeHttpMessageHandler = new FakePactBrokerMessageHandler { StatusCodeToReturn = System.Net.HttpStatusCode.NotFound };
 
-            var config = new PactVerifierConfig
-            {
-                ProviderVersion = "1.0",
-                PactBrokerClient = new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://local-pact-broker") }
-            };
-            var pactVerifier = new PactVerifier(config);
-
             try
             {
-                await pactVerifier.PublishVerificationResultsAsync(_pact, new List<Test>());
+                await PactVerifier.PublishVerificationResultsAsync(
+                _pact,
+                new List<Test>(),
+                "1.0",
+                new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://local-pact-broker") },
+                "http://publish");
             }
             catch (PactException e)
             {

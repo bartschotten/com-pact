@@ -4,6 +4,8 @@ using ComPact.Tests.Shared;
 using ComPact.Verifier;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -21,17 +23,11 @@ namespace ComPact.UnitTests.Verifier
                 ObjectToReturn = new Contract()
             };
 
-            var config = new PactVerifierConfig
-            {
-                PactBrokerClient = new HttpClient(fakePactBrokerMessageHandler) { BaseAddress = new Uri("http://localhost:9292") }
-            };
+            var pactBrokerResults = await PactVerifier.GetPactFromBroker(new HttpClient(fakePactBrokerMessageHandler) { BaseAddress = new Uri("http://localhost:9292") }, "some/path");
 
-            var mockConsumer = new PactVerifier(config);
-
-            var stringContent = await mockConsumer.GetPactFromBroker("some/path");
-
-            Assert.IsNotNull(stringContent);
-            Assert.IsNotNull(JsonConvert.DeserializeObject<Contract>(stringContent));
+            Assert.IsNotNull(pactBrokerResults);
+            Assert.IsNotNull(JsonConvert.DeserializeObject<Contract>(pactBrokerResults.PactContent));
+            Assert.IsNotNull(pactBrokerResults.PublishVerificationResultsUrl);
         }
 
         [TestMethod]
@@ -44,16 +40,9 @@ namespace ComPact.UnitTests.Verifier
                 StatusCodeToReturn = System.Net.HttpStatusCode.BadRequest
             };
 
-            var config = new PactVerifierConfig
-            {
-                PactBrokerClient = new HttpClient(fakePactBrokerMessageHandler) { BaseAddress = new Uri("http://localhost:9292") }
-            };
-
-            var mockConsumer = new PactVerifier(config);
-
             try
             {
-                await mockConsumer.GetPactFromBroker("some/path");
+                await PactVerifier.GetPactFromBroker(new HttpClient(fakePactBrokerMessageHandler) { BaseAddress = new Uri("http://localhost:9292") }, "some/path");
             }
             catch (PactException e)
             {
@@ -71,16 +60,9 @@ namespace ComPact.UnitTests.Verifier
                 ObjectToReturn = new Contract(),
             };
 
-            var config = new PactVerifierConfig
-            {
-                PactBrokerClient = new HttpClient(fakePactBrokerMessageHandler)
-            };
-
-            var mockConsumer = new PactVerifier(config);
-
             try
             {
-                await mockConsumer.GetPactFromBroker("some/path");
+                await PactVerifier.GetPactFromBroker(new HttpClient(fakePactBrokerMessageHandler), "some/path");
             }
             catch (PactException e)
             {
@@ -99,16 +81,9 @@ namespace ComPact.UnitTests.Verifier
                 ExceptionToThrow = new HttpRequestException("Something went wrong.")
             };
 
-            var config = new PactVerifierConfig
-            {
-                PactBrokerClient = new HttpClient(fakePactBrokerMessageHandler) { BaseAddress = new Uri("http://localhost:9292") }
-            };
-
-            var mockConsumer = new PactVerifier(config);
-
             try
             {
-                await mockConsumer.GetPactFromBroker("some/path");
+                await PactVerifier.GetPactFromBroker(new HttpClient(fakePactBrokerMessageHandler) { BaseAddress = new Uri("http://localhost:9292") }, "some/path");
             }
             catch (PactException e)
             {
