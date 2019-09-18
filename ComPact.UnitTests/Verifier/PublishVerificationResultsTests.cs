@@ -28,15 +28,47 @@ namespace ComPact.UnitTests.Verifier
                 ProviderVersion = "1.0",
                 PactBrokerClient = new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://local-pact-broker") }
             };
-            var mockConsumer = new PactVerifier(config);
+            var pactVerifier = new PactVerifier(config);
 
-            await mockConsumer.PublishVerificationResultsAsync(_pact, new List<FailedInteraction>());
+            await pactVerifier.PublishVerificationResultsAsync(_pact, new List<Test> { new Test { Description = "test1" } });
 
             var sentVerificationResults = JsonConvert.DeserializeObject<VerificationResults>(fakeHttpMessageHandler.SentRequestContents.First().Value);
             Assert.IsTrue(sentVerificationResults.Success);
             Assert.AreEqual(config.ProviderVersion, sentVerificationResults.ProviderApplicationVersion);
             Assert.AreEqual(_pact.Provider.Name, sentVerificationResults.ProviderName);
-            Assert.IsFalse(sentVerificationResults.FailedInteractions.Any());
+            Assert.AreEqual(1, sentVerificationResults.TestResults.Summary.TestCount);
+            Assert.AreEqual(0, sentVerificationResults.TestResults.Summary.FailureCount);
+            Assert.AreEqual("test1", sentVerificationResults.TestResults.Tests.First().Description);
+            Assert.AreEqual("passed", sentVerificationResults.TestResults.Tests.First().Status);
+        }
+
+        [TestMethod]
+        public async Task PublishingFailedTests()
+        {
+            var fakeHttpMessageHandler = new FakePactBrokerMessageHandler();
+
+            var config = new PactVerifierConfig
+            {
+                ProviderVersion = "1.0",
+                PactBrokerClient = new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://local-pact-broker") }
+            };
+            var pactVerifier = new PactVerifier(config);
+
+            await pactVerifier.PublishVerificationResultsAsync(_pact, new List<Test>
+            {
+                new Test { Description = "test1" },
+                new Test { Description = "test2", Issues = new List<string> { "Something failed" } }
+            });
+
+            var sentVerificationResults = JsonConvert.DeserializeObject<VerificationResults>(fakeHttpMessageHandler.SentRequestContents.First().Value);
+            Assert.IsFalse(sentVerificationResults.Success);
+            Assert.AreEqual(config.ProviderVersion, sentVerificationResults.ProviderApplicationVersion);
+            Assert.AreEqual(_pact.Provider.Name, sentVerificationResults.ProviderName);
+            Assert.AreEqual(2, sentVerificationResults.TestResults.Summary.TestCount);
+            Assert.AreEqual(1, sentVerificationResults.TestResults.Summary.FailureCount);
+            Assert.AreEqual("passed", sentVerificationResults.TestResults.Tests.First(t => t.Description == "test1").Status);
+            Assert.AreEqual("failed", sentVerificationResults.TestResults.Tests.First(t => t.Description == "test2").Status);
+            Assert.AreEqual("Something failed", sentVerificationResults.TestResults.Tests.First(t => t.Description == "test2").Issues.First());
         }
 
         [TestMethod]
@@ -50,11 +82,11 @@ namespace ComPact.UnitTests.Verifier
                 ProviderVersion = "1.0",
                 PactBrokerClient = new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://local-pact-broker") }
             };
-            var mockConsumer = new PactVerifier(config);
+            var pactVerifier = new PactVerifier(config);
 
             try
             {
-                await mockConsumer.PublishVerificationResultsAsync(_pact, new List<FailedInteraction>());
+                await pactVerifier.PublishVerificationResultsAsync(_pact, new List<Test>());
             }
             catch (PactException e)
             {

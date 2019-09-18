@@ -79,15 +79,19 @@ At the end of your test, clean up your hosted API.
 cts.Cancel();
 await hostTask;
 ```
-If the interactions defined in the Pact include Provider States, the PactVerifier will first call your API at the /provider-states endpoint, so you have to expose this endpoint to be able set up the correct test data. This can be done by including a specific piece of middleware or a controller when hosting your API in a test setup. Such a controller may look like this:
+If the interactions defined in the Pact include Provider States, the PactVerifier will first, for each provider state, invoke a ProviderStateHandler that you should provide to the PactVerifierConfig. In your ProviderStateHandler you should do everything that is necessary to set up the correct test data.
+
+The handler could look something like this:
 ```c#
-[Route("provider-states")]
-    [ApiController]
-    public class ProviderStatesontroller : ControllerBase
+public class ProviderStateHandler
     {
-        [HttpPost]
-        public ActionResult Post(IEnumerable<ProviderState> providerStates)
-        ...
+        public void Handle(ProviderState providerState)
+        {
+            ...
+```
+Which would be then be passed to PactVerifierConfig like this:
+```c#
+new PactVerifierConfig { ProviderBaseUrl = url, ProviderStateHandler = ProviderStateHandler.Handle }
 ```
 
 ## Pact Content DSL

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace ComPact.Verifier
@@ -16,25 +17,47 @@ namespace ComPact.Verifier
         [JsonProperty("verificationDate")]
         public string VerificationDate { get; set; }
         [JsonProperty("testResults")]
-        public List<FailedInteraction> FailedInteractions { get; set; }
+        public TestResults TestResults { get; set; }
     }
 
-    public class FailedInteraction
+    public class TestResults
     {
-        [JsonProperty("description")]
+        [JsonProperty("summary")]
+        public Summary Summary { get; set; }
+        [JsonProperty("tests")]
+        public List<Test> Tests { get; set; }
+    }
+
+    public class Summary
+    {
+        [JsonProperty("testCount")]
+        public int TestCount { get; set; }
+        [JsonProperty("failureCount")]
+        public int FailureCount { get; set; }
+    }
+
+    public class Test
+    {
+        [JsonProperty("testDescription")]
         public string Description { get; set; }
-        [JsonProperty("differences")]
-        public List<string> Differences { get; set; }
+        [JsonProperty("success")]
+        public string Status => Issues.Any() ? "failed" : "passed";
+        [JsonProperty("issues")]
+        public List<string> Issues { get; set; } = new List<string>();
 
         public string ToTestMessageString()
         {
             var stringBuilder = new StringBuilder(Description);
-            stringBuilder.Append(":");
-            foreach (var difference in Differences)
+            stringBuilder.Append($" ({Status})");
+            if (Status == "failed")
             {
-                stringBuilder.Append(Environment.NewLine);
-                stringBuilder.Append("- ");
-                stringBuilder.Append(difference);
+                stringBuilder.Append(":");
+                foreach (var issues in Issues)
+                {
+                    stringBuilder.Append(Environment.NewLine);
+                    stringBuilder.Append("- ");
+                    stringBuilder.Append(issues);
+                }
             }
             return stringBuilder.ToString();
         }

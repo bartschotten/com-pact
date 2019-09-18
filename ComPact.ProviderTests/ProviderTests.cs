@@ -10,6 +10,7 @@ using ComPact.Tests.Shared;
 using ComPact.Verifier;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
@@ -23,13 +24,20 @@ namespace ComPact.ProviderTests
         {
             var baseUrl = "http://localhost:9494";
 
-            var pactVerifier = new PactVerifier(new PactVerifierConfig { ProviderBaseUrl = baseUrl });
+            var recipeRepository = new FakeRecipeRepository();
+            var providerStateHandler = new ProviderStateHandler(recipeRepository);
+
+            var pactVerifier = new PactVerifier(new PactVerifierConfig { ProviderBaseUrl = baseUrl, ProviderStateHandler = providerStateHandler.Handle });
 
             var cts = new CancellationTokenSource();
 
             var hostTask = WebHost.CreateDefaultBuilder()
                 .UseKestrel()
                 .UseUrls(baseUrl)
+                .ConfigureServices(services =>
+                {
+                    services.Add(new ServiceDescriptor(typeof(IRecipeRepository), recipeRepository));
+                })
                 .UseStartup<TestStartup>()
                 .Build().RunAsync(cts.Token);
 
@@ -44,10 +52,13 @@ namespace ComPact.ProviderTests
         [TestMethod]
         public async Task ShouldVerifyMessagePact()
         {
-            var messageSender = new MessageSender();
+            var recipeRepository = new FakeRecipeRepository();
+            var providerStateHandler = new ProviderStateHandler(recipeRepository);
+            var messageSender = new MessageSender(recipeRepository);
 
             var config = new PactVerifierConfig
             {
+                ProviderStateHandler = providerStateHandler.Handle,
                 MessageProducer = messageSender.Send
             };
 
@@ -61,11 +72,14 @@ namespace ComPact.ProviderTests
         [TestMethod]
         public async Task ShouldVerifyMessagePactWhenSerializedJsonIsReturned()
         {
-            var messageSender = new MessageSender();
+            var recipeRepository = new FakeRecipeRepository();
+            var providerStateHandler = new ProviderStateHandler(recipeRepository);
+            var messageSender = new MessageSender(recipeRepository);
 
             var config = new PactVerifierConfig
             {
-                MessageProducer = (p, d) => JsonConvert.SerializeObject(messageSender.Send(p, d))
+                ProviderStateHandler = providerStateHandler.Handle,
+                MessageProducer = (d) => JsonConvert.SerializeObject(messageSender.Send(d))
             };
 
             var pactVerifier = new PactVerifier(config);
@@ -79,9 +93,13 @@ namespace ComPact.ProviderTests
         [ExpectedException(typeof(PactVerificationException))]
         public async Task VerificationForMessagePactShouldFailWhenWrongMessageIsReturned()
         {
+            var recipeRepository = new FakeRecipeRepository();
+            var providerStateHandler = new ProviderStateHandler(recipeRepository);
+
             var config = new PactVerifierConfig
             {
-                MessageProducer = (p, d) => null
+                ProviderStateHandler = providerStateHandler.Handle,
+                MessageProducer = (d) => null
             };
 
             var pactVerifier = new PactVerifier(config);
@@ -110,10 +128,13 @@ namespace ComPact.ProviderTests
                 ObjectToReturn = JsonConvert.DeserializeObject(pactFileToReturn)
             };
 
-            var messageSender = new MessageSender();
+            var recipeRepository = new FakeRecipeRepository();
+            var providerStateHandler = new ProviderStateHandler(recipeRepository);
+            var messageSender = new MessageSender(recipeRepository);
 
             var config = new PactVerifierConfig
             {
+                ProviderStateHandler = providerStateHandler.Handle,
                 MessageProducer = messageSender.Send,
                 ProviderVersion = "1.0",
                 PublishVerificationResults = true,
@@ -126,6 +147,8 @@ namespace ComPact.ProviderTests
 
             var sentVerificationResults = JsonConvert.DeserializeObject<VerificationResults>(fakePactBrokerMessageHandler.SentRequestContents.First().Value);
             Assert.IsTrue(sentVerificationResults.Success);
+            Assert.AreEqual(1, sentVerificationResults.TestResults.Summary.TestCount);
+            Assert.AreEqual(0, sentVerificationResults.TestResults.Summary.FailureCount);
         }
     }
 }

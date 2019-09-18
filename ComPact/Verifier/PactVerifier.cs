@@ -39,26 +39,26 @@ namespace ComPact.Verifier
 
             Contract pact = DeserializePactContent(pactContent);
 
-            var failedInteractions = new List<FailedInteraction>();
+            var tests = new List<Test>();
 
             if (pact.Interactions != null)
             {
-                failedInteractions.AddRange(VerifyInteractions(pact.Interactions));
+                tests.AddRange(VerifyInteractions(pact.Interactions));
             }
 
             if (pact.Messages != null)
             {
-                failedInteractions.AddRange(VerifyMessages(pact.Messages));
+                tests.AddRange(VerifyMessages(pact.Messages));
             }
 
             if (_config.PublishVerificationResults)
             {
-                await PublishVerificationResultsAsync(pact, failedInteractions);
+                await PublishVerificationResultsAsync(pact, tests);
             }
 
-            if (failedInteractions.Any())
+            if (tests.Any(t => t.Status == "failed"))
             {
-                throw new PactVerificationException(string.Join(Environment.NewLine, failedInteractions.Select(f => f.ToTestMessageString())));
+                throw new PactVerificationException(string.Join(Environment.NewLine, tests.Select(f => f.ToTestMessageString())));
             }
         }
 
@@ -140,9 +140,9 @@ namespace ComPact.Verifier
             return null;
         }
 
-        internal List<FailedInteraction> VerifyInteractions(List<Interaction> interactions)
+        internal List<Test> VerifyInteractions(List<Interaction> interactions)
         {
-            var failedInteractions = new List<FailedInteraction>();
+            var tests = new List<Test>();
 
             if (_config.ProviderBaseUrl == null)
             {
@@ -151,76 +151,133 @@ namespace ComPact.Verifier
             var client = new RestClient(_config.ProviderBaseUrl);
             foreach (var interaction in interactions)
             {
-                if (interaction.ProviderStates != null)
+                var test = new Test { Description = interaction.Description };
+                var verificationMessages = InvokeProviderStateHandler(interaction.ProviderStates);
+                if (verificationMessages.Any())
                 {
-                    var providerStatesRequest = new RestRequest("provider-states", RestSharp.Method.POST).AddJsonBody(interaction.ProviderStates);
-                    var providerStateResponse = client.Execute(providerStatesRequest);
-                    if (!providerStateResponse.IsSuccessful)
-                    {
-                        throw new PactException($"Could not set providerState '{interaction.ProviderStates}'. Got a {providerStateResponse.StatusCode} response.");
-                    }
-                }
-
-                var restRequest = interaction.Request.ToRestRequest();
-                var actualResponse = client.Execute(restRequest);
-                var differences = interaction.Response.Match(new Response(actualResponse));
-                if (differences.Any())
-                {
-                    failedInteractions.Add(new FailedInteraction { Description = interaction.Description, Differences = differences });
-                }
-            }
-
-            return failedInteractions;
-        }
-
-        internal List<FailedInteraction> VerifyMessages(List<Message> messages)
-        {
-            var failedInteractions = new List<FailedInteraction>();
-
-            foreach (var message in messages)
-            {
-                object providedMessage = null;
-                try
-                {
-                    providedMessage = _config.MessageProducer.Invoke(message.ProviderStates, message.Description);
-                }
-                catch
-                {
-                    throw new PactException("Exception occured while invoking MessageProducer.");
-                }
-
-                if (providedMessage is string messageString)
-                {
-                    providedMessage = JsonConvert.DeserializeObject<dynamic>(messageString);
+                    test.Issues = verificationMessages;
                 }
                 else
                 {
-                    providedMessage = JsonConvert.DeserializeObject<dynamic>(JsonConvert.SerializeObject(providedMessage));
+                    var restRequest = interaction.Request.ToRestRequest();
+                    var actualResponse = client.Execute(restRequest);
+                    var differences = interaction.Response.Match(new Response(actualResponse));
+                    if (differences.Any())
+                    {
+                        test.Issues = differences;
+                    }
                 }
-                var differences = message.Match(providedMessage);
-                if (differences.Any())
+                tests.Add(test);
+            }
+
+            return tests;
+        }
+
+        internal List<Test> VerifyMessages(List<Message> messages)
+        {
+            var tests = new List<Test>();
+
+            foreach (var message in messages)
+            {
+                var test = new Test { Description = message.Description };
+                var verificationMessages = InvokeProviderStateHandler(message.ProviderStates);
+                if (verificationMessages.Any())
                 {
-                    failedInteractions.Add(new FailedInteraction { Description = message.Description, Differences = differences });
+                    test.Issues = verificationMessages;
+                }
+                else
+                {
+                    object providedMessage = null;
+                    try
+                    {
+                        providedMessage = _config.MessageProducer.Invoke(message.Description);
+                    }
+                    catch (PactVerificationException e)
+                    {
+                        test.Issues = new List<string> { $"Provider could not produce message {message.Description}: {e.Message}" };
+                        tests.Add(test);
+                        continue;
+                    }
+                    catch
+                    {
+                        throw new PactException("Exception occured while invoking MessageProducer.");
+                    }
+
+                    if (providedMessage is string messageString)
+                    {
+                        providedMessage = JsonConvert.DeserializeObject<dynamic>(messageString);
+                    }
+                    else
+                    {
+                        providedMessage = JsonConvert.DeserializeObject<dynamic>(JsonConvert.SerializeObject(providedMessage));
+                    }
+                    var differences = message.Match(providedMessage);
+                    if (differences.Any())
+                    {
+                        test.Issues = differences;
+                    }
+                }
+                tests.Add(test);
+            }
+
+            return tests;
+        }
+
+        internal List<string> InvokeProviderStateHandler(List<ProviderState> providerStates)
+        {
+            var verificationMessages = new List<string>();
+
+            if (providerStates == null)
+            {
+                return verificationMessages;
+            }
+
+            if (_config.ProviderStateHandler == null)
+            {
+                throw new PactException("Cannot verify this Pact contract because a ProviderStateHandler was not configured.");
+            }
+
+            foreach (var providerState in providerStates)
+            {
+                try
+                {
+                    _config.ProviderStateHandler.Invoke(providerState);
+                }
+                catch (PactVerificationException e)
+                {
+                    verificationMessages.Add($"Provider could not handle provider state \"{providerState.Name}\": {e.Message}");
+                }
+                catch
+                {
+                    throw new PactException("Exception occured while invoking ProviderStateHandler.");
                 }
             }
 
-            return failedInteractions;
+            return verificationMessages;
         }
 
-        internal async Task PublishVerificationResultsAsync(Contract pact, List<FailedInteraction> failedInteractions)
+        internal async Task PublishVerificationResultsAsync(Contract pact, List<Test> tests)
         {
             if (string.IsNullOrWhiteSpace(_config.ProviderVersion))
             {
                 throw new PactException("ProviderVersion should be configured to be able to publish verification results.");
             }
 
+            var failureCount = tests.Count(t => t.Status == "failed");
+
+            var testResults = new TestResults
+            {
+                Summary = new Summary { TestCount = tests.Count(), FailureCount = failureCount },
+                Tests = tests
+            };
+
             var verificationResults = new VerificationResults
             {
                 ProviderName = pact.Provider.Name,
                 ProviderApplicationVersion = _config.ProviderVersion,
-                Success = !failedInteractions.Any(),
+                Success = failureCount == 0,
                 VerificationDate = DateTime.UtcNow.ToString("u"),
-                FailedInteractions = failedInteractions
+                TestResults = testResults
             };
             var content = new StringContent(JsonConvert.SerializeObject(verificationResults), Encoding.UTF8, "application/json");
 
