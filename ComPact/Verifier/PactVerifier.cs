@@ -17,7 +17,6 @@ namespace ComPact.Verifier
     public class PactVerifier
     {
         private readonly PactVerifierConfig _config;
-        private string _publishVerificationResultsPath;
 
         /// <summary>
         /// Set up a mock consumer that will call your code based on the defined interactions or messages in a supplied Pact contract.
@@ -55,7 +54,12 @@ namespace ComPact.Verifier
 
             if (pact.Interactions != null)
             {
-                tests.AddRange(VerifyInteractions(pact.Interactions, _config.ProviderBaseUrl, _config.ProviderStateHandler));
+                if (_config.ProviderBaseUrl == null)
+                {
+                    throw new PactException("Could not verify pacts. Please configure a ProviderBaseUrl.");
+                }
+                var client = new RestClient(_config.ProviderBaseUrl);
+                tests.AddRange(VerifyInteractions(pact.Interactions, client.Execute, _config.ProviderStateHandler));
             }
 
             if (pact.Messages != null)
@@ -144,15 +148,10 @@ namespace ComPact.Verifier
             return null;
         }
 
-        internal static List<Test> VerifyInteractions(List<Interaction> interactions, string providerBaseUrl, Action<ProviderState> providerStateHandler)
+        internal static List<Test> VerifyInteractions(List<Interaction> interactions, Func<IRestRequest, IRestResponse> providerClient, Action<ProviderState> providerStateHandler)
         {
             var tests = new List<Test>();
 
-            if (providerBaseUrl == null)
-            {
-                throw new PactException("Could not verify pacts. Please configure a ProviderBaseUrl.");
-            }
-            var client = new RestClient(providerBaseUrl);
             foreach (var interaction in interactions)
             {
                 var test = new Test { Description = interaction.Description };
@@ -164,7 +163,7 @@ namespace ComPact.Verifier
                 else
                 {
                     var restRequest = interaction.Request.ToRestRequest();
-                    var actualResponse = client.Execute(restRequest);
+                    var actualResponse = providerClient.Invoke(restRequest);
                     var differences = interaction.Response.Match(new Response(actualResponse));
                     if (differences.Any())
                     {
