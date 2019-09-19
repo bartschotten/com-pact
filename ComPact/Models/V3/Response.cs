@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
-using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 
 namespace ComPact.Models.V3
 {
@@ -35,16 +35,16 @@ namespace ComPact.Models.V3
             }
         }
 
-        internal Response(IRestResponse restResponse)
+        internal Response(HttpResponseMessage response)
         {
-            if (restResponse == null)
+            if (response == null)
             {
-                throw new ArgumentNullException(nameof(restResponse));
+                throw new ArgumentNullException(nameof(response));
             }
 
-            Status = (int)restResponse?.StatusCode;
-            Headers = new Headers(restResponse.Headers);
-            Body = JsonConvert.DeserializeObject(restResponse.Content);
+            Status = (int)response?.StatusCode;
+            Headers = new Headers(response);
+            Body = JsonConvert.DeserializeObject(response.Content?.ReadAsStringAsync().Result ?? string.Empty);
         }
 
         internal List<string> Match(Response actualResponse)

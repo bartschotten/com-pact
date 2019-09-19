@@ -1,5 +1,4 @@
 ﻿using System;
-using RestSharp;
 using System.IO;
 using Newtonsoft.Json;
 using System.Linq;
@@ -58,8 +57,10 @@ namespace ComPact.Verifier
                 {
                     throw new PactException("Could not verify pacts. Please configure a ProviderBaseUrl.");
                 }
-                var client = new RestClient(_config.ProviderBaseUrl);
-                tests.AddRange(VerifyInteractions(pact.Interactions, client.Execute, _config.ProviderStateHandler));
+                using (var client = new HttpClient())
+                {
+                    tests.AddRange(await VerifyInteractions(pact.Interactions, _config.ProviderBaseUrl, client.SendAsync, _config.ProviderStateHandler));
+                }
             }
 
             if (pact.Messages != null)
@@ -148,7 +149,7 @@ namespace ComPact.Verifier
             return null;
         }
 
-        internal static List<Test> VerifyInteractions(List<Interaction> interactions, Func<IRestRequest, IRestResponse> providerClient, Action<ProviderState> providerStateHandler)
+        internal async static Task<List<Test>> VerifyInteractions(List<Interaction> interactions, string baseUrl, Func<HttpRequestMessage, Task<HttpResponseMessage>> providerClient, Action<ProviderState> providerStateHandler)
         {
             var tests = new List<Test>();
 
@@ -162,8 +163,8 @@ namespace ComPact.Verifier
                 }
                 else
                 {
-                    var restRequest = interaction.Request.ToRestRequest();
-                    var actualResponse = providerClient.Invoke(restRequest);
+                    var httpRequestMessage = interaction.Request.ToHttpRequestMessage(baseUrl);
+                    var actualResponse = await providerClient.Invoke(httpRequestMessage);
                     var differences = interaction.Response.Match(new Response(actualResponse));
                     if (differences.Any())
                     {

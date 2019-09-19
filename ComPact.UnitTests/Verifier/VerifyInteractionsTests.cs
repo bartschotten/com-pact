@@ -2,10 +2,11 @@
 using ComPact.Models.V3;
 using ComPact.Verifier;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RestSharp;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace ComPact.UnitTests.Verifier
 {
@@ -48,9 +49,9 @@ namespace ComPact.UnitTests.Verifier
         }
 
         [TestMethod]
-        public void ShouldReturnSuccessfulTest()
+        public async Task ShouldReturnSuccessfulTest()
         {
-            var tests = PactVerifier.VerifyInteractions(_interactions, (req) => new RestResponse { StatusCode = HttpStatusCode.OK }, (p) => { });
+            var tests = await PactVerifier.VerifyInteractions(_interactions, "http://base", (req) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)), (p) => { });
 
             Assert.AreEqual(2, tests.Count);
             Assert.AreEqual("passed", tests.First().Status);
@@ -58,9 +59,9 @@ namespace ComPact.UnitTests.Verifier
         }
 
         [TestMethod]
-        public void ShouldReturnFailedTestWhenResponsesDoNotMatch()
+        public async Task ShouldReturnFailedTestWhenResponsesDoNotMatch()
         {
-            var tests = PactVerifier.VerifyInteractions(_interactions, (req) => new RestResponse { StatusCode = HttpStatusCode.NotFound }, (p) => { });
+            var tests = await PactVerifier.VerifyInteractions(_interactions, "http://base", (req) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound)), (p) => { });
 
             Assert.AreEqual(2, tests.Count);
             Assert.AreEqual("failed", tests.First().Status);
@@ -68,9 +69,9 @@ namespace ComPact.UnitTests.Verifier
         }
 
         [TestMethod]
-        public void ShouldReturnFailedTestWhenHandlerThrowsPactVerificationException()
+        public async Task ShouldReturnFailedTestWhenHandlerThrowsPactVerificationException()
         {
-            var tests = PactVerifier.VerifyInteractions(_interactions, (req) => new RestResponse { StatusCode = HttpStatusCode.OK }, 
+            var tests = await PactVerifier.VerifyInteractions(_interactions, "http://base", (req) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)), 
                 (p) => throw new PactVerificationException("Unknown provider state."));
 
             Assert.AreEqual(2, tests.Count);

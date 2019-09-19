@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
-using RestSharp;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 
 namespace ComPact.Models
 {
@@ -22,20 +22,15 @@ namespace ComPact.Models
             }
         }
 
-        internal Headers(IList<Parameter> headers)
+        internal Headers(HttpResponseMessage response)
         {
-            if (headers == null)
+            if (response == null)
             {
-                throw new System.ArgumentNullException(nameof(headers));
+                throw new System.ArgumentNullException(nameof(response));
             }
 
-            foreach (var header in headers)
-            {
-                if (header.Value is string stringValue)
-                {
-                    Add(header.Name, stringValue);
-                }
-            }
+            response.Headers.ToList().ForEach(h => Add(h.Key, string.Join(",", h.Value)));
+            response.Content?.Headers.ToList().ForEach(h => Add(h.Key, string.Join(",", h.Value)));
         }
 
         internal bool Match(Headers actualHeaders)

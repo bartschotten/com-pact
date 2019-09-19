@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using RestSharp;
 using System;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 
 namespace ComPact.Models.V3
@@ -57,20 +57,23 @@ namespace ComPact.Models.V3
             }
         }
 
-        public RestRequest ToRestRequest()
+        public HttpRequestMessage ToHttpRequestMessage(string baseUrl)
         {
-            var method = (RestSharp.Method)Enum.Parse(typeof(RestSharp.Method), Method.ToString());
-            var path = Path;
-            if (Query != null)
+            var method = new HttpMethod(Method.ToString());
+            var uri = baseUrl + Path;
+            if (Query.Any())
             {
-                path += ("?" + Query.ToQueryString());
+                uri += ("?" + Query.ToQueryString());
             }
-            var request = new RestRequest(path, method);
+            var request = new HttpRequestMessage(method, uri);
             foreach (var header in Headers)
             {
-                request.AddHeader(header.Key, header.Value);
+                request.Headers.Add(header.Key, header.Value);
             }
-            request.AddJsonBody(Body);
+            if (Body != null)
+            {
+                request.Content = new StringContent(JsonConvert.SerializeObject(Body), Encoding.UTF8, "application/json");
+            }
 
             return request;
         }
