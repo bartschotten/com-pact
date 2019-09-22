@@ -2,9 +2,6 @@
 using ComPact.MockProvider;
 using ComPact.Models;
 using ComPact.Models.V2;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -19,7 +16,7 @@ namespace ComPact.Builders.V2
         private readonly string _pactDir;
         private readonly PactPublisher _pactPublisher;
         private readonly CancellationTokenSource _cts;
-        private readonly IRequestResponseMatcher _matcher;
+        private readonly RequestResponseMatcher _matcher;
         private List<Interaction> _interactions;
         private MatchableInteractionList _matchableInteractions;
 
@@ -51,17 +48,7 @@ namespace ComPact.Builders.V2
 
             _matcher = new RequestResponseMatcher(_matchableInteractions);
 
-            var host = WebHost.CreateDefaultBuilder()
-                .UseKestrel()
-                .UseUrls(mockProviderServiceBaseUri)
-                .ConfigureServices(serviceCollection =>
-                {
-                    serviceCollection.AddSingleton(_matcher);
-                })
-                .UseStartup<MockProviderServiceStartup>()
-                .Build();
-
-            host.RunAsync(_cts.Token);
+            ProviderWebHost.Run(mockProviderServiceBaseUri, _matcher, _cts);
         }
 
         /// <summary>

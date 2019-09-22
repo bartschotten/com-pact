@@ -54,7 +54,6 @@ namespace ComPact.ConsumerTests
             {
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
                 var response = await client.GetAsync($"api/recipes/{recipeId}");
-
                 Assert.IsTrue(response.IsSuccessStatusCode);
             }
 

@@ -83,12 +83,12 @@ namespace ComPact.Models
 
         private List<string> SplitValueIntoParts(string value)
         {
-            return value.Split(";").Select(p => p.Trim()).ToList();
+            return value.Split(';').Select(p => p.Trim()).ToList();
         }
 
         private string RemoveWhiteSpaceAfterCommas(string value)
         {
-            return string.Join(',', value.Split(',').Select(x => x.Trim()));
+            return string.Join(",", value.Split(',').Select(x => x.Trim()));
         }
     }
 }

@@ -12,11 +12,11 @@ namespace ComPact.Models.V3
         {
             if (!string.IsNullOrWhiteSpace(queryString))
             {
-                var parameters = queryString.Split("&");
+                var parameters = queryString.Split('&');
                 foreach (var param in parameters)
                 {
-                    var splitParam = param.Split("=");
-                    var valuesToAdd = splitParam[1].Split(",").ToList();
+                    var splitParam = param.Split('=');
+                    var valuesToAdd = splitParam[1].Split(',').ToList();
                     if (TryGetValue(splitParam[0], out var existingValues))
                     {
                         Remove(splitParam[0]);
@@ -49,7 +49,7 @@ namespace ComPact.Models.V3
                 {
                     return false;
                 }
-                if (string.Join(',', expectedParam.Value) != string.Join(',', actualValues))
+                if (string.Join(",", expectedParam.Value) != string.Join(",", actualValues))
                 {
                     return false;
                 }

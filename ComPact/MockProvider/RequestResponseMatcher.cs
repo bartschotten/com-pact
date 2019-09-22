@@ -9,7 +9,7 @@ using ComPact.Models.V3;
 
 namespace ComPact.MockProvider
 {
-    internal class RequestResponseMatcher: IRequestResponseMatcher
+    internal class RequestResponseMatcher
     {
         private readonly MatchableInteractionList _matchableInteractions;
 
@@ -29,6 +29,7 @@ namespace ComPact.MockProvider
 
             var response = _matchableInteractions.Select(m => m.Match(request)).Where(r => r != null).LastOrDefault();
 
+            string stringToReturn;
             if (response != null)
             {
                 httpResponseToReturn.StatusCode = response.Status;
@@ -36,7 +37,7 @@ namespace ComPact.MockProvider
                 {
                     httpResponseToReturn.Headers.Add(header.Key, new StringValues((string)header.Value));
                 }
-                await httpResponseToReturn.Body.WriteAsync(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response.Body)));
+                stringToReturn = JsonConvert.SerializeObject(response.Body);
             }
             else
             {
@@ -47,9 +48,9 @@ namespace ComPact.MockProvider
                     Message = "No matching response set up for this request."
                 };
                 httpResponseToReturn.StatusCode = 400;
-                var stringToReturn = JsonConvert.SerializeObject(errorResponse);
-                await httpResponseToReturn.Body.WriteAsync(Encoding.UTF8.GetBytes(stringToReturn));
+                stringToReturn = JsonConvert.SerializeObject(errorResponse);
             }
+            await httpResponseToReturn.Body.WriteAsync(Encoding.UTF8.GetBytes(stringToReturn), 0, Encoding.UTF8.GetByteCount(stringToReturn));
         }
 
         public bool AllHaveBeenMatched()
