@@ -1,3 +1,8 @@
+</p>
+    <a href="https://www.nuget.org/packages/ComPact" alt="https://www.nuget.org/packages/ComPact">
+        <img src="https://img.shields.io/nuget/v/ComPact?color=green" /></a>
+</p>
+
 # ComPact
 An alternative Pact implementation for .NET with support for Pact Specification v3.
 ## Introduction
