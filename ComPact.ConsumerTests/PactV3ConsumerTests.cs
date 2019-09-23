@@ -157,5 +157,37 @@ namespace ComPact.ConsumerTests
                 throw;
             }
         }
+
+        [TestMethod]
+        public async Task ShouldWorkWithEmptyResponse()
+        {
+            var url = "http://localhost:9393";
+
+            var builder = new PactBuilder("V3-consumer", "V3-provider", url);
+
+            builder.SetUp(Pact.Interaction
+                .UponReceiving("too many requests")
+                .With(Pact.Request
+                    .WithMethod(Method.GET)
+                    .WithPath($"/test"))
+                .WillRespondWith(Pact.Response
+                    .WithStatus(429)
+                    ));
+
+            using (var client = new HttpClient { BaseAddress = new Uri(url) })
+            {
+                var response = await client.GetAsync($"test");
+                Assert.AreEqual(System.Net.HttpStatusCode.TooManyRequests, response.StatusCode);
+            }
+
+            await builder.BuildAsync();
+
+            // Check if pact has been written to project directory.
+            var buildDirectory = AppContext.BaseDirectory;
+            var pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
+            var pactFile = File.ReadAllText(pactDir + "V3-consumer-V3-provider.json");
+            Assert.AreEqual("V3-consumer", JsonConvert.DeserializeObject<Contract>(pactFile).Consumer.Name);
+            File.Delete(pactDir + "V3-consumer-V3-provider.json");
+        }
     }
 }

@@ -15,6 +15,11 @@ namespace ComPact.Builders.V3
 
         public ResponseBuilder WithStatus(int status)
         {
+            if (status < 100 || status > 599)
+            {
+                throw new ArgumentOutOfRangeException("Status should be between 100 and 599.");
+            }
+
             _response.Status = status;
             return this;
         }

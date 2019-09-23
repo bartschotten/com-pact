@@ -9,7 +9,7 @@ namespace ComPact.Models.V3
     internal class Response
     {
         [JsonProperty("status")]
-        public int Status { get; set; }
+        public int Status { get; set; } = 200;
         [JsonProperty("headers")]
         public Headers Headers { get; set; } = new Headers();
         [JsonProperty("body")]
