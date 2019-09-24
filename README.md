@@ -99,6 +99,49 @@ Which would be then be passed to PactVerifierConfig like this:
 new PactVerifierConfig { ProviderBaseUrl = url, ProviderStateHandler = ProviderStateHandler.Handle }
 ```
 
+### As a Message consumer
+Because Message Pacts are only supported in V3, start with:
+```c#
+using ComPact.Builders.V3;
+```
+Create a builder. You don't have to provide a URL because there is no HTTP communication involved:
+```c#
+var builder = new MessagePactBuilder("test-consumer", "test-provider");
+```
+Set up a message and verify it by calling VerifyConsumer. You have to provide the VerifyConsumer method with the type of the message you expect as well the code that should handle it. ComPact will only check that the message you set up can actually be deserialized to the provided message type, and that the handling code doesn't throw an exception. Anything else that you want to verify is up to you.
+```c#
+builder.SetUp(
+	Pact.Message
+        .Given(new ProviderState { 
+            Name = "A new recipe has been added.",
+            Params = new Dictionary<string, string> { { "recipeId", "7169de6d-df9b-4cf5-8cdc-2654062e5cdc" } } 
+            })
+        .ShouldSend("a RecipeAdded event.")
+        .With(Pact.JsonContent.With(
+            Some.String.Named("eventId").LikeGuid("f84fe18f-d871-4dad-9723-65b6dc9b0578"),
+            Some.Object.Named("recipe").With(
+                Some.Element.Named("name").Like("A Recipe"),
+                Some.Element.Named("instructions").Like("Mix it up"),
+                Some.Array.Named("ingredients").InWhichEveryElementIs(ingredient)
+            )));
+        .VerifyConsumer<RecipeAdded>(m => handler.Handle(m)))
+```
+Set up any number of messages and verify them. Finally, when you're done with your tests, create the pact contract:
+```c#
+await builder.BuildAsync();
+```
+
+### As a Message provider
+Verifying a Message Pact is very similar to verifying an API Pact, but instead of connecting to your API, ComPact will instead invoke a function that you supply in the PactVerifierConfig:
+```c#
+var config = new PactVerifierConfig
+{
+    ProviderStateHandler = providerStateHandler.Handle,
+    MessageProducer = messageSender.Send
+};
+```
+This function should receive the description of the message as a parameter, and based on that description (and possibly the Provider State) it should return the actual message that your application produces. ComPact will compare this message with the expected message as defined by the contract.
+
 ## Pact Content DSL
 To describe the contents of a message or the body of a response, ComPact uses a domain specific language via a fluent interface. The purpose of this is to make it easy to create a correct and useful Pact contract.
 
@@ -115,10 +158,10 @@ To describe a JSON member (or name-value pair), you can use either `Some.Element
 `Some.Element.WithTheExactValue("Hello world!")`                                                           | `"Hello world"`                    | -
 `Some.String.LikeRegex("Hello world", "Hello.*")`                                                          | `"Hello world"`                    | `$` -> `{ "match": "regex", "regex": "Hello.*" }`
 `Some.String.LikeGuid("f3b5978d-944d-46f2-8663-0c81f27bc4da")`                                             | `"f3b5978d-944d-46f2-8663-0c81f27bc4da"` | `$` -> `{ "match": "regex", "regex": ""[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}"" }`
-`Some.Array.Named("anArray") .Of(Some.Element.Like("Hello world"))`                                         | `{ "anArray": [ "Hello world! ] }` | `$.anArray[0]` -> `{ "match": "type" }`
-`Some.Array.Named("anArray") .InWhichEveryElementIs(Some.Element.Like("Hello world"))`                      | `{ "anArray": [ "Hello world! ] }` | `$.anArray` -> `{ "match": "type", "min": 1 }`, `$.anArray[*]` -> `{ "match": "type" }`
-`Some.Array.Named("anArray").ContainingAtLeast(2) .Of(Some.Element.Like("Hello world"))`                    | `{ "anArray": [ "Hello world! ] }` | `$.anArray` -> `{ "match": "type", "min": 2 }`, `$.anArray[0]` -> `{ "match": "type" }`
-`Some.Array.Named("anArray").ContainingAtLeast(2) .InWhichEveryElementIs(Some.Element.Like("Hello world"))` | `{ "anArray": [ "Hello world! ] }` | `$.anArray` -> `{ "match": "type", "min": 2 }`, `$.anArray[*]` -> `{ "match": "type" }`
+`Some.Array.Named("anArray") .Of(Some.Element.Like("Hello world"))`                                         | `{ "anArray": [ "Hello world!" ] }` | `$.anArray[0]` -> `{ "match": "type" }`
+`Some.Array.Named("anArray") .InWhichEveryElementIs(Some.Element.Like("Hello world"))`                      | `{ "anArray": [ "Hello world!" ] }` | `$.anArray` -> `{ "match": "type", "min": 1 }`, `$.anArray[*]` -> `{ "match": "type" }`
+`Some.Array.Named("anArray").ContainingAtLeast(2) .Of(Some.Element.Like("Hello world"))`                    | `{ "anArray": [ "Hello world!" ] }` | `$.anArray` -> `{ "match": "type", "min": 2 }`, `$.anArray[0]` -> `{ "match": "type" }`
+`Some.Array.Named("anArray").ContainingAtLeast(2) .InWhichEveryElementIs(Some.Element.Like("Hello world"))` | `{ "anArray": [ "Hello world!" ] }` | `$.anArray` -> `{ "match": "type", "min": 2 }`, `$.anArray[*]` -> `{ "match": "type" }`
 `Some.Object.Named("anObject") .With(Some.Element.Named("aNumber").Like(1)))`                               | `{ "anObject": { "aNumber": 1 } }` | `$.anObject.aNumber` -> `{ "match": "type" }` 
 `Some.Integer.Like(1)`                                                                                     | `1`                                | `$` -> `{ "match": "integer" }` 
 `Some.Decimal.Like(1.1)`                                                                                   | `1.1`                              | `$` -> `{ "match": "decimal" }`
