@@ -132,7 +132,7 @@ await builder.BuildAsync();
 ```
 
 ### As a Message provider
-Verifying a Message Pact is very similar to verifying an API Pact, but instead of connecting to your API, ComPact will instead invoke a function that you supply in the PactVerifierConfig:
+Verifying a Message Pact is very similar to verifying an API Pact, but instead of connecting to your API, ComPact will instead invoke a MessageProducer function that you supply in the PactVerifierConfig:
 ```c#
 var config = new PactVerifierConfig
 {
@@ -141,6 +141,29 @@ var config = new PactVerifierConfig
 };
 ```
 This function should receive the description of the message as a parameter, and based on that description (and possibly the Provider State) it should return the actual message that your application produces. ComPact will compare this message with the expected message as defined by the contract.
+
+## Pact Broker integration
+It is highly recommended that you share Pact contracts using the [Pact Broker](https://github.com/pact-foundation/pact_broker). As a consumer ComPact allows you to publish the contracts you create, and as a provider ComPact allows you to publish the verification results.
+
+To publish contract to the Pact Broker, you should provide a PactPublisher to the PactBuilder. To allow you maximum flexibility how to connect to your own Pact Broker, it's up to you to provide a HttpClient that can be used by ComPact. You should also configure the version of your consumer application and optionally a tag for this version:
+```c#
+var publisher = new PactPublisher(new HttpClient() { BaseAddress = new Uri("http://your-pact-broker") }, "1.0", "local");
+
+var builder = new MessagePactBuilder("messageConsumer", "messageProvider", publisher);
+```
+To publish the verification results as a provider, a similar configuration can be added to the PactVerifierConfig:
+```c#
+var config = new PactVerifierConfig
+{
+    ProviderVersion = "1.0",
+    PublishVerificationResults = true,
+    PactBrokerClient = new HttpClient() { BaseAddress = new Uri("http://your-pact-broker")}
+};
+```
+Please note that once you configure a PactBrokerClient, ComPact will no longer try to read Pact files from your local disk, but will instead try to retrieve them from the Pact Broker, so you should provide the path as a parameter to VerifyPactAsync:
+```c#
+await pactVerifier.VerifyPactAsync("pacts/provider/messageProvider/consumer/messageConsumer/latest");
+```
 
 ## Pact Content DSL
 To describe the contents of a message or the body of a response, ComPact uses a domain specific language via a fluent interface. The purpose of this is to make it easy to create a correct and useful Pact contract.
