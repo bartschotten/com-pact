@@ -13,8 +13,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComPact.ProviderTests", "Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComPact.Tests.Shared", "ComPact.Tests.Shared\ComPact.Tests.Shared.csproj", "{E97B3FF9-B6F6-451D-95CE-E650871C0173}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComPact.NETFrameworkConsumerTests", "ComPact.NETFrameworkConsumerTests\ComPact.NETFrameworkConsumerTests.csproj", "{A9A949E6-A1C9-433D-8142-37BAABD77474}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,10 +39,6 @@ Global
 		{E97B3FF9-B6F6-451D-95CE-E650871C0173}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E97B3FF9-B6F6-451D-95CE-E650871C0173}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E97B3FF9-B6F6-451D-95CE-E650871C0173}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A9A949E6-A1C9-433D-8142-37BAABD77474}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A9A949E6-A1C9-433D-8142-37BAABD77474}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A9A949E6-A1C9-433D-8142-37BAABD77474}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A9A949E6-A1C9-433D-8142-37BAABD77474}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
