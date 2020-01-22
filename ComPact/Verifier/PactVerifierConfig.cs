@@ -1,6 +1,5 @@
 ﻿using ComPact.Models;
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 
 namespace ComPact.Verifier
@@ -11,6 +10,12 @@ namespace ComPact.Verifier
         /// The base url where to call your actual provider service. To set up provider states, {base-url}/provider-states will be called.
         /// </summary>
         public string ProviderBaseUrl { get; set; }
+
+        /// <summary>
+        /// Optional HttpClient for the provider in case you want to supply your own preconfigured instance.
+        /// </summary>
+        public HttpClient ProviderHttpClient { get; set; }
+
         /// <summary>
         /// An action that will be invoked for every provider state in a (message) interaction. Use this to set up any necessary test data.
         /// If you cannot handle a specific provider state, throw a PactVerificationException to make the issue show up in the test results
