@@ -58,28 +58,8 @@ namespace ComPact.Verifier
                     throw new PactException("Could not verify pacts. Please configure a ProviderBaseUrl or a pre-configured ProviderHttpClient.");
                 }
 
-                var existingClient = _config.ProviderHttpClient != null;
-
-                try
-                {
-                    if (!existingClient)
-                    {
-                        _config.ProviderHttpClient = new HttpClient();
-                    }
-
-                    tests.AddRange(await VerifyInteractions(pact.Interactions, _config.ProviderBaseUrl, _config.ProviderHttpClient.SendAsync, _config.ProviderStateHandler));
-                }
-                finally
-                {
-                    if (!existingClient)
-                    {
-                        if (_config.ProviderHttpClient != null)
-                        {
-                            _config.ProviderHttpClient.Dispose();
-                            _config.ProviderHttpClient = null;
-                        }
-                    }
-                }
+                var client = _config.ProviderHttpClient ?? new HttpClient();
+                tests.AddRange(await VerifyInteractions(pact.Interactions, _config.ProviderBaseUrl, client.SendAsync, _config.ProviderStateHandler));
             }
 
             if (pact.Messages != null)
