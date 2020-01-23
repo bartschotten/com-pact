@@ -58,8 +58,8 @@ namespace ComPact.Verifier
                     throw new PactException("Could not verify pacts. Please configure a ProviderBaseUrl or a pre-configured ProviderHttpClient.");
                 }
 
-                var client = _config.ProviderHttpClient ?? new HttpClient();
-                tests.AddRange(await VerifyInteractions(pact.Interactions, _config.ProviderBaseUrl, client.SendAsync, _config.ProviderStateHandler));
+                var client = _config.ProviderHttpClient ?? new HttpClient {BaseAddress = new Uri(_config.ProviderBaseUrl) };
+                tests.AddRange(await VerifyInteractions(pact.Interactions, client.SendAsync, _config.ProviderStateHandler));
             }
 
             if (pact.Messages != null)
@@ -148,7 +148,7 @@ namespace ComPact.Verifier
             return null;
         }
 
-        internal async static Task<List<Test>> VerifyInteractions(List<Interaction> interactions, string baseUrl, Func<HttpRequestMessage, Task<HttpResponseMessage>> providerClient, Action<ProviderState> providerStateHandler)
+        internal async static Task<List<Test>> VerifyInteractions(List<Interaction> interactions, Func<HttpRequestMessage, Task<HttpResponseMessage>> providerClient, Action<ProviderState> providerStateHandler)
         {
             var tests = new List<Test>();
 
@@ -162,7 +162,7 @@ namespace ComPact.Verifier
                 }
                 else
                 {
-                    var httpRequestMessage = interaction.Request.ToHttpRequestMessage(baseUrl);
+                    var httpRequestMessage = interaction.Request.ToHttpRequestMessage();
                     var actualResponse = await providerClient.Invoke(httpRequestMessage);
                     var differences = interaction.Response.Match(new Response(actualResponse));
                     if (differences.Any())

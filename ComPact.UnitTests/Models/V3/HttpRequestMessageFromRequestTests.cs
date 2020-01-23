@@ -11,8 +11,6 @@ namespace ComPact.UnitTests.Models.V3
         [TestMethod]
         public void ShouldCreateHttpRequestMessageFromRequest()
         {
-            var baseUrl = "http://base";
-
             var request = new Request
             {
                 Method = Method.POST,
@@ -25,10 +23,10 @@ namespace ComPact.UnitTests.Models.V3
                 }
             };
 
-            var httpRequestMessage = request.ToHttpRequestMessage(baseUrl);
+            var httpRequestMessage = request.ToHttpRequestMessage();
 
             Assert.AreEqual(request.Method.ToString(), httpRequestMessage.Method.ToString());
-            Assert.AreEqual(baseUrl + request.Path + "?" + request.Query.ToQueryString(), httpRequestMessage.RequestUri.ToString());
+            Assert.AreEqual(request.Path + "?" + request.Query.ToQueryString(), httpRequestMessage.RequestUri.ToString());
             Assert.AreEqual("application/json", httpRequestMessage.Headers.First().Value.First());
             Assert.AreEqual("{\"text\":\"Hello World!\"}", httpRequestMessage.Content.ReadAsStringAsync().Result);
         }
@@ -36,18 +34,16 @@ namespace ComPact.UnitTests.Models.V3
         [TestMethod]
         public void ShouldCreateHttpRequestMessageFromMinimalRequest()
         {
-            var baseUrl = "http://base";
-
             var request = new Request
             {
                 Method = Method.GET,
                 Path = "/test",
             };
 
-            var httpRequestMessage = request.ToHttpRequestMessage(baseUrl);
+            var httpRequestMessage = request.ToHttpRequestMessage();
 
             Assert.AreEqual(request.Method.ToString(), httpRequestMessage.Method.ToString());
-            Assert.AreEqual(baseUrl + request.Path, httpRequestMessage.RequestUri.ToString());
+            Assert.AreEqual(request.Path, httpRequestMessage.RequestUri.ToString());
             Assert.IsFalse(httpRequestMessage.Headers.Any());
             Assert.IsNull(httpRequestMessage.Content);
         }
