@@ -4,8 +4,6 @@ using ComPact.Tests.Shared;
 using ComPact.Verifier;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;

@@ -53,9 +53,9 @@ namespace ComPact.Verifier
 
             if (pact.Interactions != null)
             {
-                if (_config.ProviderBaseUrl == null && _config.ProviderHttpClient == null)
+                if (_config.ProviderBaseUrl == null && _config.ProviderHttpClient?.BaseAddress == null)
                 {
-                    throw new PactException("Could not verify pacts. Please configure a ProviderBaseUrl or a pre-configured ProviderHttpClient.");
+                    throw new PactException("Could not verify pacts. Please configure a ProviderBaseUrl or a pre-configured ProviderHttpClient with at least a BaseAddress.");
                 }
 
                 var client = _config.ProviderHttpClient ?? new HttpClient {BaseAddress = new Uri(_config.ProviderBaseUrl) };
