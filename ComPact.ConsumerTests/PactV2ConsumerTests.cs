@@ -76,7 +76,7 @@ namespace ComPact.ConsumerTests
         [ExpectedException(typeof(PactException))]
         public async Task ShouldNotBuildWhenNotAllInteractionsHaveBeenMatched()
         {
-            var url = "http://localhost:9393";
+            var url = "http://localhost:9394";
 
             var builder = new PactBuilder("test-consumer", "test-provider", url);
 
@@ -112,7 +112,7 @@ namespace ComPact.ConsumerTests
         [ExpectedException(typeof(PactException))]
         public async Task ShouldNotBuildWhenNoInteractionsHaveBeenSetUp()
         {
-            var url = "http://localhost:9393";
+            var url = "http://localhost:9395";
 
             var builder = new PactBuilder("test-consumer", "test-provider", url);
 

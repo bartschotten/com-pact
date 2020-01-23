@@ -20,7 +20,7 @@ namespace ComPact.ConsumerTests
         [TestMethod]
         public async Task ShouldMatchRequest()
         {
-            var url = "http://localhost:9393";
+            var url = "http://localhost:9396";
 
             var fakePactBrokerMessageHandler = new FakePactBrokerMessageHandler();
             var publisher = new PactPublisher(new HttpClient(fakePactBrokerMessageHandler) { BaseAddress = new Uri("http://localhost:9292") }, "1.0", "local");
@@ -75,7 +75,7 @@ namespace ComPact.ConsumerTests
         [ExpectedException(typeof(PactException))]
         public async Task ShouldNotBuildWhenNotAllInteractionsHaveBeenMatched()
         {
-            var url = "http://localhost:9393";
+            var url = "http://localhost:9397";
 
             var builder = new PactBuilder("test-consumer", "test-provider", url);
 
@@ -104,7 +104,7 @@ namespace ComPact.ConsumerTests
         [TestMethod]
         public async Task ShouldReturnLastResponseWhenMultipleRequestsMatch()
         {
-            var url = "http://localhost:9393";
+            var url = "http://localhost:9398";
 
             var builder = new PactBuilder("test-consumer", "test-provider", url);
 
@@ -143,7 +143,7 @@ namespace ComPact.ConsumerTests
         [ExpectedException(typeof(PactException))]
         public async Task ShouldNotBuildWhenNoInteractionsHaveBeenSetUp()
         {
-            var url = "http://localhost:9393";
+            var url = "http://localhost:9399";
 
             var builder = new PactBuilder("test-consumer", "test-provider", url);
 
@@ -161,7 +161,7 @@ namespace ComPact.ConsumerTests
         [TestMethod]
         public async Task ShouldWorkWithEmptyResponse()
         {
-            var url = "http://localhost:9393";
+            var url = "http://localhost:9400";
 
             var builder = new PactBuilder("V3-consumer", "V3-provider", url);
 
