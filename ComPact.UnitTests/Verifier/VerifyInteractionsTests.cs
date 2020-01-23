@@ -51,7 +51,7 @@ namespace ComPact.UnitTests.Verifier
         [TestMethod]
         public async Task ShouldReturnSuccessfulTest()
         {
-            var tests = await PactVerifier.VerifyInteractions(_interactions, "http://base", (req) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)), (p) => { });
+            var tests = await PactVerifier.VerifyInteractions(_interactions, (req) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)), (p) => { });
 
             Assert.AreEqual(2, tests.Count);
             Assert.AreEqual("passed", tests.First().Status);
@@ -61,7 +61,7 @@ namespace ComPact.UnitTests.Verifier
         [TestMethod]
         public async Task ShouldReturnFailedTestWhenResponsesDoNotMatch()
         {
-            var tests = await PactVerifier.VerifyInteractions(_interactions, "http://base", (req) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound)), (p) => { });
+            var tests = await PactVerifier.VerifyInteractions(_interactions, (req) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound)), (p) => { });
 
             Assert.AreEqual(2, tests.Count);
             Assert.AreEqual("failed", tests.First().Status);
@@ -71,7 +71,7 @@ namespace ComPact.UnitTests.Verifier
         [TestMethod]
         public async Task ShouldReturnFailedTestWhenHandlerThrowsPactVerificationException()
         {
-            var tests = await PactVerifier.VerifyInteractions(_interactions, "http://base", (req) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)), 
+            var tests = await PactVerifier.VerifyInteractions(_interactions, (req) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)), 
                 (p) => throw new PactVerificationException("Unknown provider state."));
 
             Assert.AreEqual(2, tests.Count);

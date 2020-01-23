@@ -50,6 +50,42 @@ namespace ComPact.ProviderTests
         }
 
         [TestMethod]
+        public async Task ShouldVerifyPact_ProviderHttpClient()
+        {
+            var baseUrl = "http://localhost:9494";
+
+            var recipeRepository = new FakeRecipeRepository();
+            var providerStateHandler = new ProviderStateHandler(recipeRepository);
+            var cts = new CancellationTokenSource();
+            Task hostTask;
+
+            using (var client = new HttpClient {BaseAddress = new Uri(baseUrl)})
+            {
+                var pactVerifier = new PactVerifier(new PactVerifierConfig
+                    {ProviderHttpClient = client, ProviderStateHandler = providerStateHandler.Handle});
+
+                hostTask = WebHost.CreateDefaultBuilder()
+                    .UseKestrel()
+                    .UseUrls(baseUrl)
+                    .ConfigureServices(services =>
+                    {
+                        services.Add(new ServiceDescriptor(typeof(IRecipeRepository), recipeRepository));
+                    })
+                    .UseStartup<TestStartup>()
+                    .Build().RunAsync(cts.Token);
+
+                var buildDirectory = AppContext.BaseDirectory;
+                var pactDir =
+                    Path.GetFullPath(
+                        $"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
+                await pactVerifier.VerifyPactAsync(pactDir + "recipe-consumer-recipe-service.json");
+            }
+
+            cts.Cancel();
+            await hostTask;
+        }
+
+        [TestMethod]
         public async Task ShouldVerifyMessagePact()
         {
             var recipeRepository = new FakeRecipeRepository();

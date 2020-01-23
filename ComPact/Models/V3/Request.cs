@@ -57,15 +57,12 @@ namespace ComPact.Models.V3
             }
         }
 
-        public HttpRequestMessage ToHttpRequestMessage(string baseUrl)
+        public HttpRequestMessage ToHttpRequestMessage()
         {
             var method = new HttpMethod(Method.ToString());
-            var uri = baseUrl + Path;
-            if (Query.Any())
-            {
-                uri += ("?" + Query.ToQueryString());
-            }
+            var uri = Query.Any() ? $"{Path}?{Query.ToQueryString()}" : Path;
             var request = new HttpRequestMessage(method, uri);
+
             foreach (var header in Headers)
             {
                 request.Headers.Add(header.Key, header.Value);
