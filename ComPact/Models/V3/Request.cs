@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -12,6 +14,8 @@ namespace ComPact.Models.V3
 {
     internal class Request
     {
+        private const string contentTypeHeader = "Content-Type";
+
         [JsonProperty("method")]
         [JsonConverter(typeof(StringEnumConverter))]
         public Method Method { get; set; }
@@ -62,17 +66,29 @@ namespace ComPact.Models.V3
             var method = new HttpMethod(Method.ToString());
             var uri = Query.Any() ? $"{Path}?{Query.ToQueryString()}" : Path;
             var request = new HttpRequestMessage(method, uri);
-
-            foreach (var header in Headers)
+             
+            foreach (var header in GetHeadersExceptContentType())
             {
                 request.Headers.Add(header.Key, header.Value);
             }
             if (Body != null)
             {
-                request.Content = new StringContent(JsonConvert.SerializeObject(Body), Encoding.UTF8, "application/json");
+                request.Content = new StringContent(JsonConvert.SerializeObject(Body), Encoding.UTF8, GetContentTypeHeader("application/json"));
             }
 
             return request;
+        }
+
+        private IEnumerable<KeyValuePair<string, string>> GetHeadersExceptContentType()
+        {
+            return Headers.Where(h => !string.Equals(h.Key, contentTypeHeader, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private string GetContentTypeHeader(string defaultValue)
+        {
+            var header=  Headers.SingleOrDefault(h =>
+                       string.Equals(h.Key, contentTypeHeader, StringComparison.OrdinalIgnoreCase));
+            return header.Value ?? defaultValue;
         }
 
         public bool Match(Request actualRequest)
