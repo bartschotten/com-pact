@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace ComPact.Models
 {
@@ -37,7 +38,18 @@ namespace ComPact.Models
             }
             catch (Exception e)
             {
-                differences.Add($"Exception thrown comparing body.\r\nExpected body:\r\n{expectedBody}\r\n\r\nActual Body:\r\n{actualBody}\r\n\r\nException:\r\n{e}");
+                var builder = new StringBuilder();
+                builder.AppendLine("Exception thrown comparing body.");
+                builder.AppendLine("Expected body:");
+                builder.AppendLine(expectedBody);
+                builder.AppendLine();
+                builder.AppendLine("Actual body:");
+                builder.AppendLine(actualBody);
+                builder.AppendLine();
+                builder.AppendLine("Exception:");
+                builder.AppendLine(e.ToString());
+
+                differences.Add(builder.ToString());
             }
 
             return differences;
