@@ -1,7 +1,10 @@
-﻿using ComPact.Models;
+﻿using System.Collections.Generic;
+using ComPact.Models;
 using ComPact.Models.V3;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 
 namespace ComPact.UnitTests.Models.V3
 {
@@ -46,6 +49,47 @@ namespace ComPact.UnitTests.Models.V3
             Assert.AreEqual(request.Path, httpRequestMessage.RequestUri.ToString());
             Assert.IsFalse(httpRequestMessage.Headers.Any());
             Assert.IsNull(httpRequestMessage.Content);
+        }
+
+        [TestMethod]
+        public void ContentTypeHeaderShouldNotBeAppliedToHttpRequest()
+        {
+            var request = new Request
+            {
+                Method = Method.POST,
+                Path = "/test",
+                Headers = new Headers( new HeaderDictionary(new Dictionary<string, StringValues>
+                {
+                    {"Content-Type", new StringValues("content-type-value") }
+                }))
+            };
+
+            var httpRequestMessage = request.ToHttpRequestMessage();
+
+            Assert.IsTrue(!httpRequestMessage.Headers.Any());
+        }
+
+        [TestMethod]
+        public void ContentTypeHeaderShouldBeAppliedToContent()
+        {
+            var contentTypeMediaType = "text/html";
+
+            var request = new Request
+            {
+                Method = Method.POST,
+                Path = "/test",
+                Body = "some test body",
+                Headers = new Headers( new HeaderDictionary(new Dictionary<string, StringValues>
+                {
+                    {"Content-Type", new StringValues(contentTypeMediaType) }
+                }))
+            };
+
+            var httpRequestMessage = request.ToHttpRequestMessage();
+
+            Assert.AreEqual(httpRequestMessage.Content.Headers.Count(), 1);
+            Assert.IsTrue(httpRequestMessage.Content.Headers.Contains("Content-Type"));
+            Assert.AreEqual(httpRequestMessage.Content.Headers.ContentType.MediaType, contentTypeMediaType);
         }
     }
 }

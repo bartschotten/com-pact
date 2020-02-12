@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,7 +13,7 @@ namespace ComPact.Models.V3
 {
     internal class Request
     {
-        private const string contentTypeHeader = "Content-Type";
+        private const string ContentTypeHeader = "Content-Type";
 
         [JsonProperty("method")]
         [JsonConverter(typeof(StringEnumConverter))]
@@ -81,13 +80,13 @@ namespace ComPact.Models.V3
 
         private IEnumerable<KeyValuePair<string, string>> GetHeadersExceptContentType()
         {
-            return Headers.Where(h => !string.Equals(h.Key, contentTypeHeader, StringComparison.OrdinalIgnoreCase));
+            return Headers.Where(h => !string.Equals(h.Key, ContentTypeHeader, StringComparison.OrdinalIgnoreCase));
         }
 
         private string GetContentTypeHeader(string defaultValue)
         {
             var header=  Headers.SingleOrDefault(h =>
-                       string.Equals(h.Key, contentTypeHeader, StringComparison.OrdinalIgnoreCase));
+                       string.Equals(h.Key, ContentTypeHeader, StringComparison.OrdinalIgnoreCase));
             return header.Value ?? defaultValue;
         }
 
