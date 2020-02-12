@@ -41,10 +41,10 @@ namespace ComPact.Models
                 var builder = new StringBuilder();
                 builder.AppendLine("Exception thrown comparing body.");
                 builder.AppendLine("Expected body:");
-                builder.AppendLine(expectedBody);
+                builder.AppendLine(expectedBody.ToString());
                 builder.AppendLine();
                 builder.AppendLine("Actual body:");
-                builder.AppendLine(actualBody);
+                builder.AppendLine(actualBody.ToString());
                 builder.AppendLine();
                 builder.AppendLine("Exception:");
                 builder.AppendLine(e.ToString());
