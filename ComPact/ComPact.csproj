@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>ComPact</RootNamespace>
-    <Version>0.2.2</Version>
+    <Version>0.2.3</Version>
     <Authors>Bart Schotten</Authors>
     <Description>An alternative Pact implementation for .NET with support for Pact Specification v3.</Description>
     <Copyright></Copyright>
