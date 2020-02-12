@@ -23,15 +23,22 @@ namespace ComPact.Models
                 return differences;
             }
 
-            JToken expectedRootToken = JToken.FromObject(expectedBody);
-            JToken actualRootToken = JToken.FromObject(actualBody);
-
-            foreach (var token in expectedRootToken.ThisTokenAndAllItsDescendants())
+            try
             {
-                differences.AddRange(ProcessToken(token, matchingRules, actualRootToken));
-            }
+                JToken expectedRootToken = JToken.FromObject(expectedBody);
+                JToken actualRootToken = JToken.FromObject(actualBody);
 
-            differences.AddRange(VerifyAdditionalActualTokensAgainstMatchingRules(expectedRootToken, actualRootToken, matchingRules));
+                foreach (var token in expectedRootToken.ThisTokenAndAllItsDescendants())
+                {
+                    differences.AddRange(ProcessToken(token, matchingRules, actualRootToken));
+                }
+
+                differences.AddRange(VerifyAdditionalActualTokensAgainstMatchingRules(expectedRootToken, actualRootToken, matchingRules));
+            }
+            catch (Exception e)
+            {
+                differences.Add($"Exception thrown comparing body.\r\nExpected body:\r\n{expectedBody}\r\n\r\nActual Body:\r\n{actualBody}\r\n\r\nException:\r\n{e}");
+            }
 
             return differences;
         }
