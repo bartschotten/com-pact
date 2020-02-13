@@ -52,7 +52,7 @@ namespace ComPact.UnitTests.Models.V3
             }
             catch (PactException e)
             {
-                Assert.AreEqual("Response body could not be deserialized to JSON. Content-Type was text/plain; charset=utf-8", e.Message);
+                Assert.AreEqual("Response body could not be deserialized from JSON. Content-Type was text/plain; charset=utf-8", e.Message);
                 throw;
             }
         }

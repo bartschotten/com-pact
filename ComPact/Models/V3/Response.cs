@@ -51,7 +51,7 @@ namespace ComPact.Models.V3
             }
             catch (JsonReaderException)
             {
-                throw new PactException($"Response body could not be deserialized to JSON. Content-Type was {response.Content.Headers.ContentType}");
+                throw new PactException($"Response body could not be deserialized from JSON. Content-Type was {response.Content.Headers.ContentType}");
             }
         }
 
