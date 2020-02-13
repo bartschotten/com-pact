@@ -5,6 +5,8 @@ using System.Linq;
 using ComPact.Models;
 using ComPact.Models.V3;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Text;
@@ -70,6 +72,15 @@ namespace ComPact.Verifier
             if (_config.PublishVerificationResults)
             {
                 await PublishVerificationResultsAsync(pact, tests, _config.ProviderVersion, _config.PactBrokerClient, publishVerificationResultsUrl);
+
+                if (_config.ProviderTags != null)
+                {
+                    var tags = _config.ProviderTags.ToList();
+                    if (tags.Any())
+                    {
+                        await PublishTags(_config.PactBrokerClient, pact.Provider.Name, _config.ProviderVersion, tags);
+                    }
+                }
             }
 
             if (tests.Any(t => t.Status == "failed"))
@@ -148,7 +159,7 @@ namespace ComPact.Verifier
             return null;
         }
 
-        internal async static Task<List<Test>> VerifyInteractions(List<Interaction> interactions, Func<HttpRequestMessage, Task<HttpResponseMessage>> providerClient, Action<ProviderState> providerStateHandler)
+        internal static async Task<List<Test>> VerifyInteractions(List<Interaction> interactions, Func<HttpRequestMessage, Task<HttpResponseMessage>> providerClient, Action<ProviderState> providerStateHandler)
         {
             var tests = new List<Test>();
 
@@ -290,7 +301,37 @@ namespace ComPact.Verifier
                 throw new PactException("Publishing verification results failed. Pact Broker returned " + response.StatusCode);
             }
         }
+
+        internal static async Task PublishTags(HttpClient pactBrokerClient, string providerName, string providerVersion, IList<string> tags)
+        {
+            if (string.IsNullOrWhiteSpace(providerName))
+            {
+                throw new PactException("ProviderName should be configured to be able to publish tags.");
+            }
+
+            if (string.IsNullOrWhiteSpace(providerVersion))
+            {
+                throw new PactException("ProviderVersion should be configured to be able to publish tags.");
+            }
+
+            if (tags == null || !tags.Any())
+            {
+                throw new PactException("At least one tag should be configured to be able to publish tags.");
+            }
+
+            foreach (var tag in tags)
+            {
+                var content = new StringContent("", Encoding.UTF8, "application/json");
+                var response = await pactBrokerClient.PutAsync($"pacticipants/{WebUtility.UrlEncode(providerName)}/versions/{WebUtility.UrlEncode(providerVersion)}/tags/{WebUtility.UrlEncode(tag)}", content);
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new PactException($"Publishing tag '{tag}' failed. Pact Broker returned " + response.StatusCode);
+                }
+            }
+        }
     }
+
+
 
     internal class PactBrokerResults
     {

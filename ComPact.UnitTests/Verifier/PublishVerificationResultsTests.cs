@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Linq;
+using System.Net;
 using ComPact.Verifier;
 using ComPact.Exceptions;
+using Shouldly;
 
 namespace ComPact.UnitTests.Verifier
 {
@@ -86,6 +88,52 @@ namespace ComPact.UnitTests.Verifier
                 Assert.AreEqual("Publishing verification results failed. Pact Broker returned NotFound", e.Message);
                 throw;
             }
+        }
+
+        [TestMethod]
+        public async Task PublishTags()
+        {
+            const string baseAddress = "http://local-pact-broker";
+            const string providerName = "test-provider";
+            const string providerVersion = "1.0.0";
+
+            var tags = new List<string> {"test", "tag"};
+            var path = $"{baseAddress}/pacticipants/{providerName}/versions/{providerVersion}/tags/";
+
+            var fakeHttpMessageHandler = new FakePactBrokerTagMessageHandler(HttpMethod.Put, path);
+
+            await PactVerifier.PublishTags(new HttpClient(fakeHttpMessageHandler) {BaseAddress = new Uri(baseAddress)}, providerName, providerVersion, tags);
+
+            foreach (var tag in tags)
+            {
+                fakeHttpMessageHandler.CalledUrls.ShouldContain($"{path}{tag}");
+            }
+        }
+
+        [TestMethod]
+        public async Task PublishTags_PactNotFound()
+        {
+            try
+            {
+                const string baseAddress = "http://local-pact-broker";
+                const string providerName = "test-provider";
+                const string providerVersion = "1.0.0";
+
+                var tags = new List<string> {"test", "tag"};
+                var path = $"{baseAddress}/pacticipants/{providerName}/versions/{providerVersion}/tags/";
+
+                var fakeHttpMessageHandler = new FakePactBrokerTagMessageHandler(HttpMethod.Put, path)
+                    {StatusCodeToReturn = HttpStatusCode.NotFound};
+
+                await PactVerifier.PublishTags(new HttpClient(fakeHttpMessageHandler) {BaseAddress = new Uri(baseAddress)}, providerName, providerVersion, tags);
+
+                Assert.Fail("Expected exception was not thrown.");
+            }
+            catch (PactException e)
+            {
+                e.Message.ShouldBe("Publishing tag 'test' failed. Pact Broker returned NotFound");
+            }
+
         }
     }
 }
