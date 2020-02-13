@@ -12,7 +12,7 @@ namespace ComPact.UnitTests.Matching.ResponseTests.BodyTests
     public class BodyMatchingTests
     {
         [TestMethod]
-        public void ShouldSuccessfullyExecuteAllTestcase()
+        public void ShouldSuccessfullyExecuteAllTestcases()
         {
             var testcasesDir = Path.GetFullPath($"{AppContext.BaseDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}.." +
                 $"{Path.DirectorySeparatorChar}Matching{Path.DirectorySeparatorChar}ResponseTests{Path.DirectorySeparatorChar}BodyTests{Path.DirectorySeparatorChar}Testcases{Path.DirectorySeparatorChar}");

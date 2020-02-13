@@ -1,4 +1,5 @@
-﻿using ComPact.Models.V3;
+﻿using ComPact.Exceptions;
+using ComPact.Models.V3;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using System.Net.Http;
@@ -36,6 +37,24 @@ namespace ComPact.UnitTests.Models.V3
             Assert.AreEqual(1, response.Headers.Count);
             Assert.IsTrue(response.Headers.Any(h => h.Key == "Some-Header" && h.Value == "some value"));
             Assert.IsNull(response.Body);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PactException))]
+        public void ShouldThrowWhenContentCannotBeDeserialized()
+        {
+            var httpResponseMessage = new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+            httpResponseMessage.Content = new StringContent("text", Encoding.UTF8, "text/plain");
+
+            try
+            {
+                var response = new Response(httpResponseMessage);
+            }
+            catch (PactException e)
+            {
+                Assert.AreEqual("Response body could not be deserialized to JSON. Content-Type was text/plain; charset=utf-8", e.Message);
+                throw;
+            }
         }
     }
 }

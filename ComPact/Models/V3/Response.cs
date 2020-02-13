@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using ComPact.Exceptions;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,7 +45,14 @@ namespace ComPact.Models.V3
 
             Status = (int)response?.StatusCode;
             Headers = new Headers(response);
-            Body = JsonConvert.DeserializeObject(response.Content?.ReadAsStringAsync().Result ?? string.Empty);
+            try
+            {
+                Body = JsonConvert.DeserializeObject(response.Content?.ReadAsStringAsync().Result ?? string.Empty);
+            }
+            catch (JsonReaderException)
+            {
+                throw new PactException($"Response body could not be deserialized to JSON. Content-Type was {response.Content.Headers.ContentType}");
+            }
         }
 
         internal List<string> Match(Response actualResponse)
