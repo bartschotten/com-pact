@@ -5,7 +5,6 @@ using System.Linq;
 using ComPact.Models;
 using ComPact.Models.V3;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -73,9 +72,10 @@ namespace ComPact.Verifier
             {
                 await PublishVerificationResultsAsync(pact, tests, _config.ProviderVersion, _config.PactBrokerClient, publishVerificationResultsUrl);
 
-                if (_config.ProviderTags != null)
+                var tags = _config.ProviderTags?.ToList();
+
+                if (tags?.FirstOrDefault() != null)
                 {
-                    var tags = _config.ProviderTags.ToList();
                     if (tags.Any())
                     {
                         await PublishTags(_config.PactBrokerClient, pact.Provider.Name, _config.ProviderVersion, tags);
@@ -304,21 +304,6 @@ namespace ComPact.Verifier
 
         internal static async Task PublishTags(HttpClient pactBrokerClient, string providerName, string providerVersion, IList<string> tags)
         {
-            if (string.IsNullOrWhiteSpace(providerName))
-            {
-                throw new PactException("ProviderName should be configured to be able to publish tags.");
-            }
-
-            if (string.IsNullOrWhiteSpace(providerVersion))
-            {
-                throw new PactException("ProviderVersion should be configured to be able to publish tags.");
-            }
-
-            if (tags == null || !tags.Any())
-            {
-                throw new PactException("At least one tag should be configured to be able to publish tags.");
-            }
-
             foreach (var tag in tags)
             {
                 var content = new StringContent("", Encoding.UTF8, "application/json");
