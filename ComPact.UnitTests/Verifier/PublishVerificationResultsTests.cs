@@ -25,6 +25,8 @@ namespace ComPact.UnitTests.Verifier
         {
             var fakeHttpMessageHandler = new FakePactBrokerMessageHandler();
 
+            fakeHttpMessageHandler.Configure(HttpMethod.Post, "http://publish/").RespondsWith(HttpStatusCode.Created);
+
             await PactVerifier.PublishVerificationResultsAsync(
                 _pact, 
                 new List<Test> { new Test { Description = "test1" } },
@@ -32,7 +34,7 @@ namespace ComPact.UnitTests.Verifier
                 new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://local-pact-broker") },
                 "http://publish");
 
-            var sentVerificationResults = JsonConvert.DeserializeObject<VerificationResults>(fakeHttpMessageHandler.SentRequestContents.First().Value);
+            var sentVerificationResults = JsonConvert.DeserializeObject<VerificationResults>(fakeHttpMessageHandler.GetStatus(HttpMethod.Post, "http://publish/").SentRequestContents.First().Value);
             Assert.IsTrue(sentVerificationResults.Success);
             Assert.AreEqual("1.0", sentVerificationResults.ProviderApplicationVersion);
             Assert.AreEqual(_pact.Provider.Name, sentVerificationResults.ProviderName);
@@ -46,6 +48,7 @@ namespace ComPact.UnitTests.Verifier
         public async Task PublishingFailedTests()
         {
             var fakeHttpMessageHandler = new FakePactBrokerMessageHandler();
+            fakeHttpMessageHandler.Configure(HttpMethod.Post, "http://publish/").RespondsWith(HttpStatusCode.Created);
 
             await PactVerifier.PublishVerificationResultsAsync(
                 _pact,
@@ -57,7 +60,7 @@ namespace ComPact.UnitTests.Verifier
                 new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://local-pact-broker") },
                 "http://publish");
 
-            var sentVerificationResults = JsonConvert.DeserializeObject<VerificationResults>(fakeHttpMessageHandler.SentRequestContents.First().Value);
+            var sentVerificationResults = JsonConvert.DeserializeObject<VerificationResults>(fakeHttpMessageHandler.GetStatus(HttpMethod.Post, "http://publish/").SentRequestContents.First().Value);
             Assert.IsFalse(sentVerificationResults.Success);
             Assert.AreEqual("1.0", sentVerificationResults.ProviderApplicationVersion);
             Assert.AreEqual(_pact.Provider.Name, sentVerificationResults.ProviderName);
@@ -72,8 +75,8 @@ namespace ComPact.UnitTests.Verifier
         [ExpectedException(typeof(PactException))]
         public async Task PactBrokerReturnsNonSuccessStatusCode()
         {
-            var fakeHttpMessageHandler = new FakePactBrokerMessageHandler { StatusCodeToReturn = System.Net.HttpStatusCode.NotFound };
-
+            var fakeHttpMessageHandler = new FakePactBrokerMessageHandler();
+            fakeHttpMessageHandler.Configure(HttpMethod.Post, "http://publish/").RespondsWith(HttpStatusCode.NotFound);
             try
             {
                 await PactVerifier.PublishVerificationResultsAsync(
@@ -100,13 +103,14 @@ namespace ComPact.UnitTests.Verifier
             var tags = new List<string> {"test", "tag"};
             var path = $"{baseAddress}/pacticipants/{providerName}/versions/{providerVersion}/tags/";
 
-            var fakeHttpMessageHandler = new FakePactBrokerTagMessageHandler(HttpMethod.Put, path);
+            var fakeHttpMessageHandler = new FakePactBrokerMessageHandler();
+            fakeHttpMessageHandler.Configure(HttpMethod.Put, path).RespondsWith(HttpStatusCode.Created);
 
             await PactVerifier.PublishTags(new HttpClient(fakeHttpMessageHandler) {BaseAddress = new Uri(baseAddress)}, providerName, providerVersion, tags);
 
             foreach (var tag in tags)
             {
-                fakeHttpMessageHandler.CalledUrls.ShouldContain($"{path}{tag}");
+                fakeHttpMessageHandler.GetStatus(HttpMethod.Put, path).CalledUrls.ShouldContain($"{path}{tag}");
             }
         }
 
@@ -122,8 +126,8 @@ namespace ComPact.UnitTests.Verifier
                 var tags = new List<string> {"test", "tag"};
                 var path = $"{baseAddress}/pacticipants/{providerName}/versions/{providerVersion}/tags/";
 
-                var fakeHttpMessageHandler = new FakePactBrokerTagMessageHandler(HttpMethod.Put, path)
-                    {StatusCodeToReturn = HttpStatusCode.NotFound};
+                var fakeHttpMessageHandler = new FakePactBrokerMessageHandler();
+                fakeHttpMessageHandler.Configure(HttpMethod.Put, path).RespondsWith(HttpStatusCode.NotFound);
 
                 await PactVerifier.PublishTags(new HttpClient(fakeHttpMessageHandler) {BaseAddress = new Uri(baseAddress)}, providerName, providerVersion, tags);
 

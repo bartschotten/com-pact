@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -21,17 +22,19 @@ namespace ComPact.UnitTests.Builders
         public async Task SuccessfulPublicationAndTagging()
         {
             var fakeHttpMessageHandler = new FakePactBrokerMessageHandler();
+            fakeHttpMessageHandler.Configure(HttpMethod.Put, "http://local-pact-broker")
+                .RespondsWith(HttpStatusCode.Created);
 
             var pactPublisher = new PactPublisher(new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://local-pact-broker") }, "1.0", "local");
 
             await pactPublisher.PublishAsync(_pact);
 
-            Assert.AreEqual("http://local-pact-broker/pacts/provider/provider/consumer/consumer/version/1.0", fakeHttpMessageHandler.SentRequestContents.First().Key);
-            var sentContract = JsonConvert.DeserializeObject<Contract>(fakeHttpMessageHandler.SentRequestContents.First().Value);
+            Assert.AreEqual("http://local-pact-broker/pacts/provider/provider/consumer/consumer/version/1.0", fakeHttpMessageHandler.GetStatus(HttpMethod.Put, "http://local-pact-broker").SentRequestContents.First().Key);
+            var sentContract = JsonConvert.DeserializeObject<Contract>(fakeHttpMessageHandler.GetStatus(HttpMethod.Put, "http://local-pact-broker").SentRequestContents.First().Value);
             Assert.IsNotNull(sentContract);
             Assert.AreEqual(_pact.Consumer.Name, sentContract.Consumer.Name);
 
-            Assert.AreEqual("http://local-pact-broker/pacticipants/consumer/versions/1.0/tags/local", fakeHttpMessageHandler.SentRequestContents.Last().Key);
+            Assert.AreEqual("http://local-pact-broker/pacticipants/consumer/versions/1.0/tags/local", fakeHttpMessageHandler.GetStatus(HttpMethod.Put, "http://local-pact-broker").SentRequestContents.Last().Key);
         }
 
         [TestMethod]
@@ -86,13 +89,15 @@ namespace ComPact.UnitTests.Builders
         public async Task TaggingIsOptional()
         {
             var fakeHttpMessageHandler = new FakePactBrokerMessageHandler();
+            fakeHttpMessageHandler.Configure(HttpMethod.Put, "http://local-pact-broker")
+                .RespondsWith(HttpStatusCode.Created);
 
             var pactPublisher = new PactPublisher(new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://local-pact-broker") }, "1.0");
 
             await pactPublisher.PublishAsync(_pact);
 
-            Assert.AreEqual("http://local-pact-broker/pacts/provider/provider/consumer/consumer/version/1.0", fakeHttpMessageHandler.SentRequestContents.First().Key);
-            var sentContract = JsonConvert.DeserializeObject<Contract>(fakeHttpMessageHandler.SentRequestContents.First().Value);
+            Assert.AreEqual("http://local-pact-broker/pacts/provider/provider/consumer/consumer/version/1.0", fakeHttpMessageHandler.GetStatus(HttpMethod.Put, "http://local-pact-broker").SentRequestContents.First().Key);
+            var sentContract = JsonConvert.DeserializeObject<Contract>(fakeHttpMessageHandler.GetStatus(HttpMethod.Put, "http://local-pact-broker").SentRequestContents.First().Value);
             Assert.IsNotNull(sentContract);
             Assert.AreEqual(_pact.Consumer.Name, sentContract.Consumer.Name);
         }
@@ -101,7 +106,9 @@ namespace ComPact.UnitTests.Builders
         [ExpectedException(typeof(PactException))]
         public async Task ShouldThrowWhenCallNotSuccessful()
         {
-            var fakeHttpMessageHandler = new FakePactBrokerMessageHandler() { StatusCodeToReturn = System.Net.HttpStatusCode.BadRequest };
+            var fakeHttpMessageHandler = new FakePactBrokerMessageHandler();
+            fakeHttpMessageHandler.Configure(HttpMethod.Put, "http://local-pact-broker")
+                .RespondsWith(HttpStatusCode.BadRequest);
 
             var pactPublisher = new PactPublisher(new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://local-pact-broker") }, "1.0");
 
@@ -120,7 +127,10 @@ namespace ComPact.UnitTests.Builders
         [ExpectedException(typeof(PactException))]
         public async Task ShouldThrowWhenClientThrowsForAnyOtherReason()
         {
-            var fakeHttpMessageHandler = new FakePactBrokerMessageHandler() { ExceptionToThrow = new HttpRequestException("Something went wrong.") };
+            var fakeHttpMessageHandler = new FakePactBrokerMessageHandler();
+            fakeHttpMessageHandler.Configure(HttpMethod.Put, "http://local-pact-broker")
+                .RespondsWith(HttpStatusCode.Created)
+                .ThowsException(new HttpRequestException("Something went wrong."));
 
             var pactPublisher = new PactPublisher(new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://local-pact-broker") }, "1.0");
 

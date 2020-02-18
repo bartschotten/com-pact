@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -159,10 +160,15 @@ namespace ComPact.ProviderTests
             var buildDirectory = AppContext.BaseDirectory;
             var pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
             var pactFileToReturn = File.ReadAllText(pactDir + "messageConsumer-messageProvider.json");
-            var fakePactBrokerMessageHandler = new FakePactBrokerMessageHandler
-            {
-                ObjectToReturn = JsonConvert.DeserializeObject(pactFileToReturn)
-            };
+            var fakePactBrokerMessageHandler = new FakePactBrokerMessageHandler();
+
+            fakePactBrokerMessageHandler
+                .Configure(HttpMethod.Get,
+                    "http://localhost:9292/pacts/provider/messageProvider/consumer/messageConsumer/latest")
+                .RespondsWith(HttpStatusCode.Created).Returns(JsonConvert.DeserializeObject(pactFileToReturn));
+            fakePactBrokerMessageHandler
+                .Configure(HttpMethod.Post, "http://localhost:9292/publish/verification/results/path")
+                .RespondsWith(HttpStatusCode.Created);
 
             var recipeRepository = new FakeRecipeRepository();
             var providerStateHandler = new ProviderStateHandler(recipeRepository);
@@ -181,7 +187,10 @@ namespace ComPact.ProviderTests
 
             await pactVerifier.VerifyPactAsync("pacts/provider/messageProvider/consumer/messageConsumer/latest");
 
-            var sentVerificationResults = JsonConvert.DeserializeObject<VerificationResults>(fakePactBrokerMessageHandler.SentRequestContents.First().Value);
+            var sentVerificationResults = JsonConvert.DeserializeObject<VerificationResults>(
+                fakePactBrokerMessageHandler.GetStatus(HttpMethod.Post,
+                        "http://localhost:9292/publish/verification/results/path")
+                    .SentRequestContents.First().Value);
             Assert.IsTrue(sentVerificationResults.Success);
             Assert.AreEqual(1, sentVerificationResults.TestResults.Summary.TestCount);
             Assert.AreEqual(0, sentVerificationResults.TestResults.Summary.FailureCount);
