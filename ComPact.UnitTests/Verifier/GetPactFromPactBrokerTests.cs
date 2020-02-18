@@ -5,6 +5,7 @@ using ComPact.Verifier;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -16,10 +17,10 @@ namespace ComPact.UnitTests.Verifier
         [TestMethod]
         public async Task ShouldGetPactFromPactBroker()
         {
-            var fakePactBrokerMessageHandler = new FakePactBrokerMessageHandler
-            {
-                ObjectToReturn = new Contract()
-            };
+            var fakePactBrokerMessageHandler = new FakePactBrokerMessageHandler();
+
+            fakePactBrokerMessageHandler.Configure(HttpMethod.Get, "http://localhost:9292/some/path")
+                .RespondsWith(HttpStatusCode.OK).Returns(new Contract());
 
             var pactBrokerResults = await PactVerifier.GetPactFromBroker(new HttpClient(fakePactBrokerMessageHandler) { BaseAddress = new Uri("http://localhost:9292") }, "some/path");
 
@@ -32,11 +33,10 @@ namespace ComPact.UnitTests.Verifier
         [ExpectedException(typeof(PactException))]
         public async Task ShouldThrowWhenResponseIsNotSuccessful()
         {
-            var fakePactBrokerMessageHandler = new FakePactBrokerMessageHandler
-            {
-                ObjectToReturn = new Contract(),
-                StatusCodeToReturn = System.Net.HttpStatusCode.BadRequest
-            };
+            var fakePactBrokerMessageHandler = new FakePactBrokerMessageHandler();
+
+            fakePactBrokerMessageHandler.Configure(HttpMethod.Get, "http://localhost:9292/some/path")
+                .RespondsWith(HttpStatusCode.BadRequest).Returns(new Contract());
 
             try
             {
@@ -53,10 +53,10 @@ namespace ComPact.UnitTests.Verifier
         [ExpectedException(typeof(PactException))]
         public async Task ShouldThrowWhenClientHasNoBaseAddress()
         {
-            var fakePactBrokerMessageHandler = new FakePactBrokerMessageHandler
-            {
-                ObjectToReturn = new Contract(),
-            };
+            var fakePactBrokerMessageHandler = new FakePactBrokerMessageHandler();
+
+            fakePactBrokerMessageHandler.Configure(HttpMethod.Put, "http://localhost:9292")
+                .RespondsWith(HttpStatusCode.Created).Returns(new Contract());
 
             try
             {
@@ -73,11 +73,10 @@ namespace ComPact.UnitTests.Verifier
         [ExpectedException(typeof(PactException))]
         public async Task ShouldThrowWhenClientThrowsForAnyOtherReason()
         {
-            var fakePactBrokerMessageHandler = new FakePactBrokerMessageHandler
-            {
-                ObjectToReturn = new Contract(),
-                ExceptionToThrow = new HttpRequestException("Something went wrong.")
-            };
+            var fakePactBrokerMessageHandler = new FakePactBrokerMessageHandler();
+            fakePactBrokerMessageHandler.Configure(HttpMethod.Get, "http://localhost:9292")
+                .RespondsWith(HttpStatusCode.Created).Returns(new Contract())
+                .ThowsException(new HttpRequestException("Something went wrong."));
 
             try
             {

@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -23,6 +24,7 @@ namespace ComPact.ConsumerTests
             var url = "http://localhost:9393";
 
             var fakePactBrokerMessageHandler = new FakePactBrokerMessageHandler();
+            fakePactBrokerMessageHandler.Configure(HttpMethod.Put, "http://localhost:9292").RespondsWith(HttpStatusCode.Created);
             var publisher = new PactPublisher(new HttpClient(fakePactBrokerMessageHandler) { BaseAddress = new Uri("http://localhost:9292") }, "1.0", "local");
 
             var builder = new PactBuilder("V2-consumer", "V2-provider", url, publisher);
@@ -61,8 +63,8 @@ namespace ComPact.ConsumerTests
             await builder.BuildAsync();
 
             // Check if pact has been published and tagged
-            Assert.AreEqual("V2-consumer", JsonConvert.DeserializeObject<Contract>(fakePactBrokerMessageHandler.SentRequestContents.First().Value).Consumer.Name);
-            Assert.IsTrue(fakePactBrokerMessageHandler.SentRequestContents.Last().Key.Contains("local"));
+            Assert.AreEqual("V2-consumer", JsonConvert.DeserializeObject<Contract>(fakePactBrokerMessageHandler.GetStatus(HttpMethod.Put, "http://localhost:9292").SentRequestContents.First().Value).Consumer.Name);
+            Assert.IsTrue(fakePactBrokerMessageHandler.GetStatus(HttpMethod.Put, "http://localhost:9292").SentRequestContents.Last().Key.Contains("local"));
 
             // Check if pact has been written to project directory.
             var buildDirectory = AppContext.BaseDirectory;

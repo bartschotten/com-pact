@@ -1,5 +1,6 @@
 ﻿using ComPact.Models;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 
 namespace ComPact.Verifier
@@ -43,5 +44,9 @@ namespace ComPact.Verifier
         /// The provider version to use when publishing verification results.
         /// </summary>
         public string ProviderVersion { get; set; }
+        /// <summary>
+        /// Tags to add to this version of the provider.
+        /// </summary>
+        public IEnumerable<string> ProviderTags { get; set; }
     }
 }
