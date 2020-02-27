@@ -24,33 +24,15 @@ namespace ComPact.Models
                 return differences;
             }
 
-            try
+            JToken expectedRootToken = JToken.FromObject(expectedBody);
+            JToken actualRootToken = JToken.FromObject(actualBody);
+
+            foreach (var token in expectedRootToken.ThisTokenAndAllItsDescendants())
             {
-                JToken expectedRootToken = JToken.FromObject(expectedBody);
-                JToken actualRootToken = JToken.FromObject(actualBody);
-
-                foreach (var token in expectedRootToken.ThisTokenAndAllItsDescendants())
-                {
-                    differences.AddRange(ProcessToken(token, matchingRules, actualRootToken));
-                }
-
-                differences.AddRange(VerifyAdditionalActualTokensAgainstMatchingRules(expectedRootToken, actualRootToken, matchingRules));
+                differences.AddRange(ProcessToken(token, matchingRules, actualRootToken));
             }
-            catch (Exception e)
-            {
-                var builder = new StringBuilder();
-                builder.AppendLine("Exception thrown comparing body.");
-                builder.AppendLine("Expected body:");
-                builder.AppendLine(expectedBody.ToString());
-                builder.AppendLine();
-                builder.AppendLine("Actual body:");
-                builder.AppendLine(actualBody.ToString());
-                builder.AppendLine();
-                builder.AppendLine("Exception:");
-                builder.AppendLine(e.ToString());
 
-                differences.Add(builder.ToString());
-            }
+            differences.AddRange(VerifyAdditionalActualTokensAgainstMatchingRules(expectedRootToken, actualRootToken, matchingRules));
 
             return differences;
         }
@@ -112,6 +94,12 @@ namespace ComPact.Models
             {
                 return new List<string> { $"Property \'{expectedToken.Path}\' was not present in the actual response." };
             }
+            
+            if (expectedToken.Type != actualToken.Type)
+            {
+                return new List<string> { $"Property \'{expectedToken.Path}\' has a different type in the actual response. Expected value: {expectedToken}, actual value: {actualToken}" };
+            }
+
             var actualValue = actualToken.Value<T>();
             if (expectedToken.Type != JTokenType.Null && actualValue == null)
             {
