@@ -1,0 +1,40 @@
+{
+  "match": false,
+  "comment": "array of objects with type matcher",
+  "expected": {
+    "headers": {},
+    "body": {
+      "myObjects": [
+        { "letter": "a" }
+      ]
+    },
+    "matchingRules": {
+      "body": {
+        "$.myObjects": {
+          "matchers": [
+            {
+              "match": "min",
+              "min":  1
+            }
+          ]
+        },
+        "$.myObjects[*].letter": {
+          "matchers": [
+            {
+              "match": "type"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "actual": {
+    "headers": {},
+    "body": {
+      "myObjects": [
+        { "letter": "a" },
+        { "letter": 2 }
+      ]
+    }
+  }
+}
