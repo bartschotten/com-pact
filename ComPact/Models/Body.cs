@@ -93,6 +93,12 @@ namespace ComPact.Models
             {
                 return new List<string> { $"Property \'{expectedToken.Path}\' was not present in the actual response." };
             }
+            
+            if (expectedToken.Type != actualToken.Type)
+            {
+                return new List<string> { $"Property \'{expectedToken.Path}\' has a different type in the actual response. Expected value: {expectedToken}, actual value: {actualToken}" };
+            }
+
             var actualValue = actualToken.Value<T>();
             if (expectedToken.Type != JTokenType.Null && actualValue == null)
             {
