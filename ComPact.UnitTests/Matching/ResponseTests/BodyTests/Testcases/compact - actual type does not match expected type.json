@@ -1,0 +1,16 @@
+{
+  "match": false,
+  "comment": "actual type does not match expected type",
+  "expected": {
+    "headers": {},
+    "body": "test"
+  },
+  "actual": {
+    "headers": {},
+    "body": {
+      "myPerson": {
+        "name": " test"
+      }
+    }    
+  }
+}
