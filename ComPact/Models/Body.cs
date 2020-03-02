@@ -49,7 +49,9 @@ namespace ComPact.Models
             var additionalActualTokens = actualRootToken.ThisTokenAndAllItsDescendants().Where(t => !pathsInExpected.Contains(t.Path) && t.Type != JTokenType.Property);
             foreach (var token in additionalActualTokens)
             {
-                foreach (var jsonPath in matchingRules.Body.Select(b => b.Key))
+                // Find each MatchingRule that applies directly to the additional token,
+                // excluding those that apply to all members in an object (*), because the specification isn't clear how to handle those
+                foreach (var jsonPath in matchingRules.Body.Select(b => b.Key).Where(p => !p.EndsWith(".*")))
                 {
                     if (actualRootToken.SelectTokens(jsonPath).Any(t => t.Path == token.Path))
                     {

@@ -1,0 +1,57 @@
+{
+  "match": true,
+  "comment": "compact - additional child element different type 2",
+  "expected": {
+    "headers": {},
+    "body": {
+      "myObjects": [
+        {
+          "letter": "a",
+          "number": 1
+        }
+      ]
+    },
+    "matchingRules": {
+      "body": {
+        "$.myObjects": {
+          "matchers": [
+            {
+              "match": "min",
+              "min": 1
+            }
+          ]
+        },
+        "$.myObjects[*].*": {
+          "matchers": [
+            {
+              "match": "type"
+            }
+          ]
+        },
+        "$.myObjects[*].letter": {
+          "matchers": [
+            {
+              "match": "type"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "actual": {
+    "headers": {},
+    "body": {
+      "myObjects": [
+        {
+          "letter": "a",
+          "number": 1
+        },
+        {
+          "letter": "a",
+          "number": 2,
+          "otherNumber": 1
+        }
+      ]
+    }
+  }
+}
