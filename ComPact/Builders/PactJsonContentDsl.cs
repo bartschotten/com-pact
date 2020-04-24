@@ -94,7 +94,10 @@ namespace ComPact.Builders
     {
         public SimpleValueName Named(string name) => new SimpleValueName(name);
         public SimpleValue Like(object example) => new SimpleValue(example, MatcherType.type);
-        public SimpleValue WithTheExactValue(object example) => new SimpleValue(example, MatcherType.equality);
+        public SimpleValue WithTheExactValue(string example) => new SimpleValue(example, MatcherType.equality);
+        public SimpleValue WithTheExactValue(bool example) => new SimpleValue(example, MatcherType.equality);
+        public SimpleValue WithTheExactValue(long example) => new SimpleValue(example, MatcherType.equality);
+        public SimpleValue WithTheExactValue(decimal example) => new SimpleValue(example, MatcherType.equality);
     }
 
     public class UnknownString
@@ -132,7 +135,10 @@ namespace ComPact.Builders
     {
         public SimpleValueName(string name) : base(name) { }
         public Member Like(object example) => new Member(Name, new SimpleValue(example, MatcherType.type));
-        public Member WithTheExactValue(object example) => new Member(Name, new SimpleValue(example, MatcherType.equality));
+        public Member WithTheExactValue(string example) => new Member(Name, new SimpleValue(example, MatcherType.equality));
+        public Member WithTheExactValue(bool example) => new Member(Name, new SimpleValue(example, MatcherType.equality));
+        public Member WithTheExactValue(long example) => new Member(Name, new SimpleValue(example, MatcherType.equality));
+        public Member WithTheExactValue(decimal example) => new Member(Name, new SimpleValue(example, MatcherType.equality));
     }
 
     public class StringName : MemberName
