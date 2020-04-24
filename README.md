@@ -123,8 +123,8 @@ builder.SetUp(
                 Some.Element.Named("name").Like("A Recipe"),
                 Some.Element.Named("instructions").Like("Mix it up"),
                 Some.Array.Named("ingredients").InWhichEveryElementIs(ingredient)
-            )));
-        .VerifyConsumer<RecipeAdded>(m => handler.Handle(m)))
+            )))
+        .VerifyConsumer<RecipeAdded>(m => handler.Handle(m)));
 ```
 Set up any number of messages and verify them. Finally, when you're done with your tests, create the pact contract:
 ```c#
