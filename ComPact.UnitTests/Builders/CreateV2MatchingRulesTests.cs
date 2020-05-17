@@ -34,7 +34,7 @@ namespace ComPact.UnitTests.Builders
 
             var matchingRules = pactJsonBody.CreateV2MatchingRules();
 
-            Assert.IsNull(matchingRules);
+            Assert.AreEqual(0, matchingRules.Count);
         }
 
         [TestMethod]

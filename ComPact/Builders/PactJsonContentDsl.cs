@@ -47,10 +47,6 @@ namespace ComPact.Builders
         {
             var matchingRules = new Dictionary<string, Matcher>();
             _rootElement.AddV2MatchingRules(matchingRules, "$.body");
-            if (!matchingRules.Any())
-            {
-                return null;
-            }
             return matchingRules;
         }
 
