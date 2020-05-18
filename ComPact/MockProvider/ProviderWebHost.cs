@@ -11,6 +11,7 @@ namespace ComPact.MockProvider
         {
             var host = WebHost.CreateDefaultBuilder()
                 .UseUrls(mockProviderServiceBaseUri)
+                .ConfigureKestrel(options => options.AllowSynchronousIO = true)
                 .Configure(app =>
                 {
                     app.Run(async context =>
