@@ -45,7 +45,7 @@ namespace ComPact.Builders
 
         internal void ClearMatchableInteractions()
         {
-            MatchableInteractions = new MatchableInteractionList();
+            MatchableInteractions.Clear();
         }
 
         internal async Task BuildAsync(IContract pact)

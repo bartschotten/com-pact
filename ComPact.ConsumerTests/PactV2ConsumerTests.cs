@@ -29,6 +29,8 @@ namespace ComPact.ConsumerTests
 
             var builder = new PactBuilder("V2-consumer", "V2-provider", url, publisher);
 
+            builder.ClearInteractions(); // This call is not necessary, but we hit it for test coverage purposes
+
             var recipeId = Guid.Parse("2860dedb-a193-425f-b73e-ef02db0aa8cf");
 
             var ingredient = Some.Object.With(

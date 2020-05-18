@@ -38,7 +38,7 @@ namespace ComPact.Builders.V2
         public void ClearInteractions()
         {
             _interactions = new List<Interaction>();
-            base.ClearMatchableInteractions();
+            ClearMatchableInteractions();
         }
 
         public async Task BuildAsync()
