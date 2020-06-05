@@ -1,7 +1,9 @@
 ﻿using ComPact.Extensions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace ComPact.Models
@@ -23,8 +25,8 @@ namespace ComPact.Models
                 return differences;
             }
 
-            JToken expectedRootToken = JToken.FromObject(expectedBody);
-            JToken actualRootToken = JToken.FromObject(actualBody);
+            JToken expectedRootToken = ToJToken(expectedBody);
+            JToken actualRootToken = ToJToken(actualBody);
 
             foreach (var token in expectedRootToken.ThisTokenAndAllItsDescendants())
             {
@@ -34,6 +36,17 @@ namespace ComPact.Models
             differences.AddRange(VerifyAdditionalActualTokensAgainstMatchingRules(expectedRootToken, actualRootToken, matchingRules));
 
             return differences;
+        }
+
+        private static JToken ToJToken(dynamic body)
+        {
+            // This is necessary because DateParseHandling.None has no effect when using JToken.Parse or JToken.FromObject directly.
+            var jsonTextReader = new JsonTextReader(new StringReader(JsonConvert.SerializeObject(body)))
+            {
+                // We don't want datetime-like strings to be converted to datetime, otherwise regex matching doesn't work.
+                DateParseHandling = DateParseHandling.None 
+            };
+            return JToken.Load(jsonTextReader);
         }
 
         private static List<string> VerifyAdditionalActualTokensAgainstMatchingRules(JToken expectedRootToken, JToken actualRootToken, MatchingRuleCollection matchingRules)
