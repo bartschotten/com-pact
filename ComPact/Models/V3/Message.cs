@@ -19,7 +19,7 @@ namespace ComPact.Models.V3
 
         internal List<string> Match(object actualMessage)
         {
-            return Body.Match(Contents, actualMessage, MatchingRules);
+            return BodyMatcher.Match(Contents, actualMessage, MatchingRules);
         }
 
         internal void SetEmptyValuesToNull()

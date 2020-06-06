@@ -24,13 +24,18 @@ namespace ComPact.UnitTests.Matching.ResponseTests.BodyTests
             foreach (var file in testcaseFiles)
             {
                 var testcase = JsonConvert.DeserializeObject<Testcase>(File.ReadAllText(file));
-                if (file.Split(Path.DirectorySeparatorChar).Last().StartsWith(""))
+                if (file.Split(Path.DirectorySeparatorChar).Last().StartsWith("pro"))
                 {
-                    List<string> differences = Body.Match(testcase.Expected.Body, testcase.Actual.Body, testcase.Expected.MatchingRules);
+                    List<string> differences = BodyMatcher.Match(testcase.Expected.Body, testcase.Actual.Body, testcase.Expected.MatchingRules);
                     if (differences.Any() == testcase.Match)
                     {
                         failedCases.Add(file.Split(Path.DirectorySeparatorChar).Last());
                         failedCases.AddRange(differences.Select(d => "- " + d));
+                    }
+                    else if (testcase.ExpectedMessage != null && !differences.Contains(testcase.ExpectedMessage))
+                    {
+                        failedCases.Add(file.Split(Path.DirectorySeparatorChar).Last());
+                        failedCases.Add($"- Expected message was not returned. Expected: {testcase.ExpectedMessage}, actual: {differences.First()}");
                     }
                 }
             }

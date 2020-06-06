@@ -1,4 +1,4 @@
-﻿using ComPact.Extensions;
+﻿using ComPact.JsonHelpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace ComPact.Models
 {
-    internal static class Body
+    internal static class BodyMatcher
     {
         internal static List<string> Match(dynamic expectedBody, dynamic actualBody, MatchingRuleCollection matchingRules)
         {
@@ -25,8 +25,8 @@ namespace ComPact.Models
                 return differences;
             }
 
-            JToken expectedRootToken = ToJToken(expectedBody);
-            JToken actualRootToken = ToJToken(actualBody);
+            JToken expectedRootToken = JTokenParser.Parse(expectedBody);
+            JToken actualRootToken = JTokenParser.Parse(actualBody);
 
             foreach (var token in expectedRootToken.ThisTokenAndAllItsDescendants())
             {
@@ -36,17 +36,6 @@ namespace ComPact.Models
             differences.AddRange(VerifyAdditionalActualTokensAgainstMatchingRules(expectedRootToken, actualRootToken, matchingRules));
 
             return differences;
-        }
-
-        private static JToken ToJToken(dynamic body)
-        {
-            // This is necessary because DateParseHandling.None has no effect when using JToken.Parse or JToken.FromObject directly.
-            var jsonTextReader = new JsonTextReader(new StringReader(JsonConvert.SerializeObject(body)))
-            {
-                // We don't want datetime-like strings to be converted to datetime, otherwise regex matching doesn't work.
-                DateParseHandling = DateParseHandling.None 
-            };
-            return JToken.Load(jsonTextReader);
         }
 
         private static List<string> VerifyAdditionalActualTokensAgainstMatchingRules(JToken expectedRootToken, JToken actualRootToken, MatchingRuleCollection matchingRules)
@@ -106,6 +95,11 @@ namespace ComPact.Models
             var actualToken = actualRootToken.SelectToken(expectedToken.Path);
             if (actualToken == null)
             {
+                var actualRootTokenWithLowerCasePropertyNames = JTokenParser.ParseToLower(actualRootToken);
+                if (actualRootTokenWithLowerCasePropertyNames.SelectToken(expectedToken.Path.ToLowerInvariant()) != null)
+                {
+                    return new List<string> { $"A property with a name like \'{expectedToken.Path}\' was present in the actual response, but the case did not match. Note that Pact is case sensitive." };
+                }
                 return new List<string> { $"Property \'{expectedToken.Path}\' was not present in the actual response." };
             }
             

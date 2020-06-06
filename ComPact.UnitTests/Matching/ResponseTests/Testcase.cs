@@ -8,6 +8,7 @@ namespace ComPact.UnitTests.Matching.ResponseTests
         public string Comment { get; set; }
         public Expected Expected { get; set; }
         public Actual Actual { get; set; }
+        public string ExpectedMessage { get; set; }
     }
 
     internal class Expected

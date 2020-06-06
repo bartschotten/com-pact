@@ -1,20 +1,21 @@
 {
   "match": false,
   "comment": "Property names on objects are case sensitive",
-  "expected" : {
-    "headers": {"Content-Type": "application/json"},
+  "expected": {
+    "headers": { "Content-Type": "application/json" },
     "body": {
-      "alligator":{
+      "alligator": {
         "FavouriteColour": "red"
       }
     }
   },
   "actual": {
-    "headers": {"Content-Type": "application/json"},
+    "headers": { "Content-Type": "application/json" },
     "body": {
-      "alligator":{
+      "alligator": {
         "favouritecolour": "red"
       }
     }
-  }
+  },
+  "expectedMessage": "A property with a name like 'alligator.FavouriteColour' was present in the actual response, but the case did not match. Note that Pact is case sensitive."
 }

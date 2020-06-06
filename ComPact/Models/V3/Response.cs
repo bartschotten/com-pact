@@ -66,7 +66,7 @@ namespace ComPact.Models.V3
 
             differences.AddRange(Headers.Match(actualResponse.Headers, MatchingRules));
 
-            differences.AddRange(Models.Body.Match(Body, actualResponse.Body, MatchingRules));
+            differences.AddRange(Models.BodyMatcher.Match(Body, actualResponse.Body, MatchingRules));
 
             return differences;
         }

@@ -1,4 +1,4 @@
-﻿using ComPact.JsonConverters;
+﻿using ComPact.JsonHelpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;

@@ -1,21 +1,22 @@
 {
   "match": false,
   "comment": "Missing key alligator name",
-  "expected" : {
-    "headers": {"Content-Type": "application/json"},
+  "expected": {
+    "headers": { "Content-Type": "application/json" },
     "body": {
-      "alligator":{
+      "alligator": {
         "name": "Mary",
         "age": 3
       }
     }
   },
   "actual": {
-    "headers": {"Content-Type": "application/json"},
+    "headers": { "Content-Type": "application/json" },
     "body": {
       "alligator": {
         "age": 3
       }
     }
-  }
+  },
+  "expectedMessage": "Property 'alligator.name' was not present in the actual response."
 }
