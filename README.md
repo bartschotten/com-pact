@@ -12,7 +12,7 @@ An alternative Pact implementation for .NET with support for Pact Specification 
 3. I think it's healthy for a standard/specification to have more independent implementations of it.
 ### Status
 ComPact is already being used by various people and organisations, and as more people experiment with different scenarios, some bugs are still being ironed out.
-I try to respond quickly to issues.
+I try to respond quickly to issues. Pull requests are welcome.
 ### What's not supported
 This implementation will not support:
 * Specification versions lower than 2.0.
@@ -148,7 +148,7 @@ This function should receive the description of the message as a parameter, and 
 ## Pact Broker integration
 It is highly recommended that you share Pact contracts using the [Pact Broker](https://github.com/pact-foundation/pact_broker). As a consumer ComPact allows you to publish the contracts you create, and as a provider ComPact allows you to publish the verification results.
 
-To publish contract to the Pact Broker, you should provide a PactPublisher to the PactBuilder. To allow you maximum flexibility how to connect to your own Pact Broker, it's up to you to provide a HttpClient that can be used by ComPact. You should also configure the version of your consumer application and optionally a tag for this version:
+To publish contracts to the Pact Broker, you should provide a PactPublisher to the PactBuilder. To allow you maximum flexibility how to connect to your own Pact Broker, it's up to you to provide a HttpClient that can be used by ComPact. You should also configure the version of your consumer application and optionally a tag for this version:
 ```c#
 var publisher = new PactPublisher(new HttpClient() { BaseAddress = new Uri("http://your-pact-broker") }, "1.0", "local");
 
@@ -169,13 +169,13 @@ await pactVerifier.VerifyPactAsync("pacts/provider/messageProvider/consumer/mess
 ```
 
 ## Pact Content DSL
-To describe the contents of a message or the body of a response, ComPact uses a domain specific language via a fluent interface. The purpose of this is to make it easy to create a correct and useful Pact contract.
+To describe the contents of a message or the body of a response, ComPact uses a domain specific language as a fluent interface. The purpose of this is to make it easy to create a correct and useful Pact contract.
 
 To define some JSON content with the accompanying matching rules, start by typing `Pact.JsonContent.With(...`
 
 Then describe which elements the content consists of. For example, if the content is just a single string (yes, this is valid JSON) it would look like this: `Some.Element.Like("Hello world!")`. By using `Like()` a *"type" matching rule* will get generated, which means that you consider any string to be a valid response, and "Hello world!" is just an example.
 
-To describe a JSON member (or name-value pair), you can use either `Some.Element.Named("greeting").Like("Hello world!")` or `Some.Element.Like("Hello world!").Named("greeting")`. This will result in the following JSON: `{ "greeting": "Hello world!" }`.
+To describe a JSON member (i.e. a name-value pair), you can use either `Some.Element.Named("greeting").Like("Hello world!")` or `Some.Element.Like("Hello world!").Named("greeting")`. This will result in the following JSON: `{ "greeting": "Hello world!" }`.
 
 `Pact.JsonContent.With()`                                                                                  | JSON                               | Matching Rules                          
 -----------------------------------------------------------------------------------------------------------|------------------------------------|----------------------------
