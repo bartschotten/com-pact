@@ -1,11 +1,18 @@
 ﻿using ComPact.Exceptions;
 using ComPact.Models;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace ComPact.Builders
 {
+    internal static class RegexConstants
+    {
+        public static string Guid => "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$";
+        public static string DateTime => "^([\\+-]?\\d{4}(?!\\d{2}\\b))((-?)((0[1-9]|1[0-2])(\\3([12]\\d|0[1-9]|3[01]))?|W([0-4]\\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\\d|[12]\\d{2}|3([0-5]\\d|6[1-6])))([T\\s]((([01]\\d|2[0-3])((:?)[0-5]\\d)?|24\\:?00)([\\.,]\\d+(?!:))?)?(\\17[0-5]\\d([\\.,]\\d+)?)?([zZ]|([\\+-])([01]\\d|2[0-3]):?([0-5]\\d)?)?)?)?$";
+    }
+
     public class PactJsonContent
     {
         internal Element _rootElement;
@@ -94,6 +101,7 @@ namespace ComPact.Builders
         public SimpleValue WithTheExactValue(bool example) => new SimpleValue(example, MatcherType.equality);
         public SimpleValue WithTheExactValue(long example) => new SimpleValue(example, MatcherType.equality);
         public SimpleValue WithTheExactValue(decimal example) => new SimpleValue(example, MatcherType.equality);
+        public SimpleValue WithTheExactValue(double example) => new SimpleValue(example, MatcherType.equality);
     }
 
     public class UnknownString
@@ -101,7 +109,10 @@ namespace ComPact.Builders
         public StringName Named(string name) => new StringName(name);
         public SimpleValue Like(string example) => new SimpleValue(example, MatcherType.type);
         public String LikeRegex(string example, string regex) => new String(example, regex);
-        public String LikeGuid(string example) => new String(example, "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$");
+        public String LikeGuid(string example) => new String(example, RegexConstants.Guid);
+        public String LikeGuid(Guid example) => LikeGuid(example.ToString());
+        public String LikeDateTime(string example) => new String(example, RegexConstants.DateTime);
+        public SimpleValue WithTheExactValue(string example) => new SimpleValue(example, MatcherType.equality);
     }
 
     public class UnknownObject
@@ -135,6 +146,7 @@ namespace ComPact.Builders
         public Member WithTheExactValue(bool example) => new Member(Name, new SimpleValue(example, MatcherType.equality));
         public Member WithTheExactValue(long example) => new Member(Name, new SimpleValue(example, MatcherType.equality));
         public Member WithTheExactValue(decimal example) => new Member(Name, new SimpleValue(example, MatcherType.equality));
+        public Member WithTheExactValue(double example) => new Member(Name, new SimpleValue(example, MatcherType.equality));
     }
 
     public class StringName : MemberName
@@ -142,7 +154,10 @@ namespace ComPact.Builders
         public StringName(string name) : base(name) { }
         public Member Like(string example) => new Member(Name, new SimpleValue(example, MatcherType.type));
         public Member LikeRegex(string example, string regex) => new Member(Name, new String(example, regex));
-        public Member LikeGuid(string example) => new Member(Name, new String(example, "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"));
+        public Member LikeGuid(string example) => new Member(Name, new String(example, RegexConstants.Guid));
+        public Member LikeGuid(Guid example) => LikeGuid(example.ToString());
+        public Member LikeDateTime(string example) => new Member(Name, new String(example, RegexConstants.DateTime));
+        public Member WithTheExactValue(string example) => new Member(Name, new SimpleValue(example, MatcherType.equality));
     }
 
     public class ObjectName : MemberName
