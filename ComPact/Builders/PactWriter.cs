@@ -13,8 +13,8 @@ namespace ComPact.Builders
             var buildDirectory = new Uri(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", ""))).LocalPath;
             var pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
 #else
-            var buildDirectory = AppContext.BaseDirectory;
-            var pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
+            string buildDirectory = AppContext.BaseDirectory;
+            string pactDir = Path.GetFullPath($"{buildDirectory}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}pacts{Path.DirectorySeparatorChar}");
 #endif
             Write(pact, pactDir);
         }
@@ -23,15 +23,15 @@ namespace ComPact.Builders
         {
             pact.SetEmptyValuesToNull();
 
-            var settings = new JsonSerializerSettings
+            JsonSerializerSettings settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore,
                 Formatting = Formatting.Indented
             };
-            var serializedPact = JsonConvert.SerializeObject(pact, settings);
+            string serializedPact = JsonConvert.SerializeObject(pact, settings);
 
             Directory.CreateDirectory(pactDir);
-            File.WriteAllText($"{pactDir}{pact.Consumer.Name}-{pact.Provider.Name}.json", serializedPact);
+            File.WriteAllText($"{pactDir}{Path.DirectorySeparatorChar}{pact.Consumer.Name}-{pact.Provider.Name}.json", serializedPact);
         }
     }
 }
