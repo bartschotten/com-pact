@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -101,8 +102,8 @@ namespace ComPact.Models.V3
             var pathsMatch = Path == actualRequest.Path;
             var headersMatch = Headers.Match(actualRequest.Headers);
             var queriesMatch = Query.Match(actualRequest.Query);
-            var bodiesMatch = Body == actualRequest.Body;
-
+            var bodiesMatch = MatchBody(actualRequest);
+            
             return methodsMatch && pathsMatch && headersMatch && queriesMatch && bodiesMatch;
         }
 
@@ -111,5 +112,22 @@ namespace ComPact.Models.V3
             Headers = Headers.Any() ? Headers : null;
             Query = Query.Any() ? Query : null;
         }
+
+        internal bool MatchBody(Request actualRequest)
+        {
+            bool bodiesMatch = false;
+
+            if (Body is JObject && actualRequest.Body is JObject)
+            {
+                bodiesMatch = JToken.DeepEquals(Body, actualRequest.Body);
+            }
+            else
+            {
+                bodiesMatch = Body == actualRequest.Body;
+            }
+
+            return bodiesMatch;
+        }
+
     }
 }
