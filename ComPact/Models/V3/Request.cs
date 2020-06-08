@@ -102,7 +102,7 @@ namespace ComPact.Models.V3
             var pathsMatch = Path == actualRequest.Path;
             var headersMatch = Headers.Match(actualRequest.Headers);
             var queriesMatch = Query.Match(actualRequest.Query);
-            dynamic bodiesMatch = MatchBody(actualRequest);
+            var bodiesMatch = MatchBody(actualRequest);
 
             return methodsMatch && pathsMatch && headersMatch && queriesMatch && bodiesMatch;
         }
