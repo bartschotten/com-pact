@@ -305,5 +305,43 @@ namespace ComPact.ConsumerTests
             Assert.AreEqual("V3-consumer", JsonConvert.DeserializeObject<Contract>(pactFile).Consumer.Name);
             File.Delete(pactDir + "V3-consumer-V3-provider.json");
         }
+
+        [TestMethod]
+        public async Task ShouldNotMatchPostRequest()
+        {
+            var url = "http://localhost:9396";
+
+            var fakePactBrokerMessageHandler = new FakePactBrokerMessageHandler();
+            fakePactBrokerMessageHandler.Configure(HttpMethod.Put, "http://localhost:9292").RespondsWith(HttpStatusCode.Created);
+            var publisher = new PactPublisher(new HttpClient(fakePactBrokerMessageHandler) { BaseAddress = new Uri("http://localhost:9292") }, "1.0", "local");
+
+            var builder = new PactBuilder("V3-consumer", "V3-provider", url, publisher);
+
+            var receiptObject = new JObject();
+            receiptObject.Add("name", "Salt");
+
+            builder.SetUp(Pact.Interaction
+                .UponReceiving("A request to create new recipe")
+                .With(Pact.Request
+                    .WithHeader("Accept", "application/json")
+                    .WithMethod(Method.POST)
+                    .WithPath($"/api/recipes")
+                    .WithBody(receiptObject))
+                .WillRespondWith(Pact.Response
+                    .WithStatus(200)
+                    ));
+
+            using (var client = new HttpClient { BaseAddress = new Uri(url) })
+            {
+                var receiptObjectNew = new JObject();
+                receiptObjectNew.Add("name", "Salt");
+                receiptObjectNew.Add("unit", "gram");
+
+                StringContent httpContent = new StringContent(receiptObjectNew.ToString(), Encoding.UTF8, "application/json");
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+                var response = await client.PostAsync($"api/recipes", httpContent);
+                Assert.IsTrue(response.StatusCode == HttpStatusCode.BadRequest);
+            }
+        }
     }
 }
