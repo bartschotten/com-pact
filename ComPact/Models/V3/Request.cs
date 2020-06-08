@@ -102,9 +102,18 @@ namespace ComPact.Models.V3
             var pathsMatch = Path == actualRequest.Path;
             var headersMatch = Headers.Match(actualRequest.Headers);
             var queriesMatch = Query.Match(actualRequest.Query);
-            var bodiesMatch = MatchBody(actualRequest);
-            
+            dynamic bodiesMatch = MatchBody(actualRequest);
+
             return methodsMatch && pathsMatch && headersMatch && queriesMatch && bodiesMatch;
+        }
+
+        private dynamic MatchBody(Request actualRequest)
+        {
+            if (Body != null && actualRequest.Body != null)
+            {
+                return JObject.DeepEquals(JToken.FromObject(Body), JToken.FromObject(actualRequest.Body));
+            }
+            return Body == actualRequest.Body;
         }
 
         internal void SetEmptyValuesToNull()
@@ -112,22 +121,5 @@ namespace ComPact.Models.V3
             Headers = Headers.Any() ? Headers : null;
             Query = Query.Any() ? Query : null;
         }
-
-        internal bool MatchBody(Request actualRequest)
-        {
-            bool bodiesMatch = false;
-
-            if (Body is JObject && actualRequest.Body is JObject)
-            {
-                bodiesMatch = JToken.DeepEquals(Body, actualRequest.Body);
-            }
-            else
-            {
-                bodiesMatch = Body == actualRequest.Body;
-            }
-
-            return bodiesMatch;
-        }
-
     }
 }
