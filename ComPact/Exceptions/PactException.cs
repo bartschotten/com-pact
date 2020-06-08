@@ -7,5 +7,8 @@ namespace ComPact.Exceptions
         public PactException(string message): base(message)
         {
         }
+        public PactException(string message, Exception exception) : base(message,exception)
+        {
+        }
     }
 }
