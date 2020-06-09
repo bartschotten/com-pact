@@ -58,7 +58,7 @@ namespace ComPact.Builders.V3
         /// <returns></returns>
         public MessageBuilder VerifyConsumer<T>(Action<T> messageHandler)
         {
-            CheckMessageHandler(messageHandler);
+            CheckMessageHandler<T>(messageHandler);
 
             try
             {
@@ -83,7 +83,7 @@ namespace ComPact.Builders.V3
         /// <returns></returns>
         public async Task<MessageBuilder> VerifyConsumerAsync<T>(Func<T,Task> messageHandler)
         {
-            CheckMessageHandler(messageHandler);
+            CheckMessageHandler<T>(messageHandler);
 
             try
             {
@@ -105,7 +105,7 @@ namespace ComPact.Builders.V3
         /// <returns></returns>
         public async Task<MessageBuilder> VerifyConsumerAsync(Func<string,Task> messageHandler)
         {
-            CheckMessageHandler(messageHandler);
+            CheckMessageHandler<string>(messageHandler);
 
             var serializedContent = JsonConvert.SerializeObject(_message.Contents);
             await InvokeMessageHandlerAsync(messageHandler, serializedContent);
@@ -120,7 +120,7 @@ namespace ComPact.Builders.V3
         /// <returns></returns>
         public MessageBuilder VerifyConsumer(Action<string> messageHandler)
         {
-            CheckMessageHandler(messageHandler);
+            CheckMessageHandler<string>(messageHandler);
 
             var serializedContent = JsonConvert.SerializeObject(_message.Contents);
             InvokeMessageHandler(messageHandler, serializedContent);
@@ -144,7 +144,7 @@ namespace ComPact.Builders.V3
             return JsonConvert.DeserializeObject<T>(serializedContent);
         }
 
-        private void CheckMessageHandler<T>(Action<T> messageHandler)
+        private void CheckMessageHandler<T>(object messageHandler)
         {
             if (messageHandler is null)
             {
@@ -153,7 +153,7 @@ namespace ComPact.Builders.V3
             CheckMessageContents();
             _isVerified = false;
         }
-
+        /*
         private void CheckMessageHandler<T>(Func<T,Task> messageHandler)
         {
             if (messageHandler is null)
@@ -163,6 +163,7 @@ namespace ComPact.Builders.V3
             CheckMessageContents();
             _isVerified = false;
         }
+        */
 
         private void CheckMessageContents()
         {
