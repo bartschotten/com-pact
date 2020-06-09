@@ -65,9 +65,9 @@ namespace ComPact.Builders.V3
                 var content = DeserializeContent<T>(_message.Contents);
                 InvokeMessageHandler(messageHandler, content);
             }
-            catch
+            catch(Exception exception)
             {
-                throw new PactException($"Could not deserialize the specified message content to {typeof(T)}.");
+                throw new PactException($"Could not deserialize the specified message content to {typeof(T)}.", exception);
             }
             
             
@@ -90,9 +90,9 @@ namespace ComPact.Builders.V3
                 var content = DeserializeContent<T>(_message.Contents);
                 await InvokeMessageHandlerAsync(messageHandler, content);
             }
-            catch
+            catch(Exception exception)
             {
-                throw new PactException($"Could not deserialize the specified message content to {typeof(T)}.");
+                throw new PactException($"Could not deserialize the specified message content to {typeof(T)}.",exception);
             }
             
             return this;
@@ -153,18 +153,7 @@ namespace ComPact.Builders.V3
             CheckMessageContents();
             _isVerified = false;
         }
-        /*
-        private void CheckMessageHandler<T>(Func<T,Task> messageHandler)
-        {
-            if (messageHandler is null)
-            {
-                throw new ArgumentNullException(nameof(messageHandler));
-            }
-            CheckMessageContents();
-            _isVerified = false;
-        }
-        */
-
+        
         private void CheckMessageContents()
         {
             if (_message.Contents == null)
@@ -191,9 +180,9 @@ namespace ComPact.Builders.V3
             {
                 messageHandler.Invoke(content);
             }
-            catch
+            catch(Exception exception)
             {
-                throw new PactException("Message handler threw an exception");
+                throw new PactException("Message handler threw an exception",exception);
             }
             _isVerified = true;
         }
