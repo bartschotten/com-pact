@@ -58,19 +58,17 @@ namespace ComPact.Builders.V3
         /// <returns></returns>
         public MessageBuilder VerifyConsumer<T>(Action<T> messageHandler)
         {
-            CheckMessageHandler<T>(messageHandler);
+            CheckMessageHandler(messageHandler);
 
             try
             {
-                var content = DeserializeContent<T>(_message.Contents);
+                var content = ReserializeContent<T>(_message.Contents);
                 InvokeMessageHandler(messageHandler, content);
             }
             catch(Exception exception)
             {
                 throw new PactException($"Could not deserialize the specified message content to {typeof(T)}.", exception);
             }
-            
-            
 
             return this;
         }
@@ -83,16 +81,16 @@ namespace ComPact.Builders.V3
         /// <returns></returns>
         public async Task<MessageBuilder> VerifyConsumerAsync<T>(Func<T,Task> messageHandler)
         {
-            CheckMessageHandler<T>(messageHandler);
+            CheckMessageHandler(messageHandler);
 
             try
             {
-                var content = DeserializeContent<T>(_message.Contents);
+                var content = ReserializeContent<T>(_message.Contents);
                 await InvokeMessageHandlerAsync(messageHandler, content);
             }
             catch(Exception exception)
             {
-                throw new PactException($"Could not deserialize the specified message content to {typeof(T)}.",exception);
+                throw new PactException($"Could not deserialize the specified message content to {typeof(T)}.", exception);
             }
             
             return this;
@@ -105,7 +103,7 @@ namespace ComPact.Builders.V3
         /// <returns></returns>
         public async Task<MessageBuilder> VerifyConsumerAsync(Func<string,Task> messageHandler)
         {
-            CheckMessageHandler<string>(messageHandler);
+            CheckMessageHandler(messageHandler);
 
             var serializedContent = JsonConvert.SerializeObject(_message.Contents);
             await InvokeMessageHandlerAsync(messageHandler, serializedContent);
@@ -120,7 +118,7 @@ namespace ComPact.Builders.V3
         /// <returns></returns>
         public MessageBuilder VerifyConsumer(Action<string> messageHandler)
         {
-            CheckMessageHandler<string>(messageHandler);
+            CheckMessageHandler(messageHandler);
 
             var serializedContent = JsonConvert.SerializeObject(_message.Contents);
             InvokeMessageHandler(messageHandler, serializedContent);
@@ -138,29 +136,25 @@ namespace ComPact.Builders.V3
             return _message;
         }
 
-        private T DeserializeContent<T>(object content)
+        private T ReserializeContent<T>(object content)
         {
-            var serializedContent = JsonConvert.SerializeObject(_message.Contents);
+            var serializedContent = JsonConvert.SerializeObject(content);
             return JsonConvert.DeserializeObject<T>(serializedContent);
         }
 
-        private void CheckMessageHandler<T>(object messageHandler)
+        private void CheckMessageHandler(object messageHandler)
         {
             if (messageHandler is null)
             {
                 throw new ArgumentNullException(nameof(messageHandler));
             }
-            CheckMessageContents();
-            _isVerified = false;
-        }
-        
-        private void CheckMessageContents()
-        {
             if (_message.Contents == null)
             {
                 throw new PactException("Message content has not been set. Please provide using the With method.");
             }
+            _isVerified = false;
         }
+
         private async Task InvokeMessageHandlerAsync<T>(Func<T,Task> messageHandler, T content)
         {
             try
@@ -169,7 +163,7 @@ namespace ComPact.Builders.V3
             }
             catch(Exception exception)
             {
-                throw new PactException("Message handler threw an exception",exception);
+                throw new PactException("Message handler threw an exception", exception);
             }
             _isVerified = true;
         }
@@ -182,7 +176,7 @@ namespace ComPact.Builders.V3
             }
             catch(Exception exception)
             {
-                throw new PactException("Message handler threw an exception",exception);
+                throw new PactException("Message handler threw an exception", exception);
             }
             _isVerified = true;
         }
