@@ -79,6 +79,27 @@ namespace ComPact.ConsumerTests
         }
 
         [TestMethod]
+        public async Task ShouldCreateMessagePactAfterVerifyingConsumerAsynchronously()
+        {
+            var handler = new RecipeAddedHandler();
+
+            var fakePactBrokerMessageHandler = new FakePactBrokerMessageHandler();
+            fakePactBrokerMessageHandler.Configure(HttpMethod.Put, "http://localhost:9292").RespondsWith(HttpStatusCode.Created);
+            var publisher = new PactPublisher(new HttpClient(fakePactBrokerMessageHandler) { BaseAddress = new Uri("http://localhost:9292") }, "1.0", "local");
+
+            var builder = new MessagePactBuilder("messageConsumer", "messageProvider", publisher);
+            var messsageBuilder = await _messageBuilder
+                .VerifyConsumerAsync<RecipeAdded>(m => handler.HandleAsync(m));
+
+            await builder.SetUp(messsageBuilder)
+                .BuildAsync();
+
+            // Check if handler has been called
+            Assert.IsNotNull(handler.ReceivedRecipes.FirstOrDefault());
+            Assert.AreEqual("A Recipe", handler.ReceivedRecipes.First().Name);
+        }
+
+        [TestMethod]
         public void ShouldBeAbleToGetSerializedMessage()
         {
             string receivedMessage = null;

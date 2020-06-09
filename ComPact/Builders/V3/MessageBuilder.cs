@@ -4,6 +4,7 @@ using ComPact.Models.V3;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ComPact.Builders.V3
 {
@@ -57,20 +58,57 @@ namespace ComPact.Builders.V3
         /// <returns></returns>
         public MessageBuilder VerifyConsumer<T>(Action<T> messageHandler)
         {
-            CheckMessageHandler(messageHandler);
+            CheckMessageHandler<T>(messageHandler);
 
             try
             {
-                var serializedContent = JsonConvert.SerializeObject(_message.Contents);
-                var content = JsonConvert.DeserializeObject<T>(serializedContent);
+                var content = DeserializeContent<T>(_message.Contents);
                 InvokeMessageHandler(messageHandler, content);
             }
-            catch
+            catch(Exception exception)
             {
-                throw new PactException($"Could not deserialize the specified message content to {typeof(T)}.");
+                throw new PactException($"Could not deserialize the specified message content to {typeof(T)}.", exception);
             }
             
             
+
+            return this;
+        }
+
+        /// <summary>
+        /// Invokes the provided message handler and checks that no exceptions are thrown.
+        /// </summary>
+        /// <typeparam name="T">Type to deserialize the defined message to.</typeparam>
+        /// <param name="messageHandler">Actual handling code of your message consumer.</param>
+        /// <returns></returns>
+        public async Task<MessageBuilder> VerifyConsumerAsync<T>(Func<T,Task> messageHandler)
+        {
+            CheckMessageHandler<T>(messageHandler);
+
+            try
+            {
+                var content = DeserializeContent<T>(_message.Contents);
+                await InvokeMessageHandlerAsync(messageHandler, content);
+            }
+            catch(Exception exception)
+            {
+                throw new PactException($"Could not deserialize the specified message content to {typeof(T)}.",exception);
+            }
+            
+            return this;
+        }
+
+         /// <summary>
+        /// Invokes the provided message handler with the serialized message and checks that no exceptions are thrown.
+        /// </summary>
+        /// <param name="messageHandler">Actual handling code of your message consumer.</param>
+        /// <returns></returns>
+        public async Task<MessageBuilder> VerifyConsumerAsync(Func<string,Task> messageHandler)
+        {
+            CheckMessageHandler<string>(messageHandler);
+
+            var serializedContent = JsonConvert.SerializeObject(_message.Contents);
+            await InvokeMessageHandlerAsync(messageHandler, serializedContent);
 
             return this;
         }
@@ -82,7 +120,7 @@ namespace ComPact.Builders.V3
         /// <returns></returns>
         public MessageBuilder VerifyConsumer(Action<string> messageHandler)
         {
-            CheckMessageHandler(messageHandler);
+            CheckMessageHandler<string>(messageHandler);
 
             var serializedContent = JsonConvert.SerializeObject(_message.Contents);
             InvokeMessageHandler(messageHandler, serializedContent);
@@ -100,17 +138,40 @@ namespace ComPact.Builders.V3
             return _message;
         }
 
-        private void CheckMessageHandler<T>(Action<T> messageHandler)
+        private T DeserializeContent<T>(object content)
+        {
+            var serializedContent = JsonConvert.SerializeObject(_message.Contents);
+            return JsonConvert.DeserializeObject<T>(serializedContent);
+        }
+
+        private void CheckMessageHandler<T>(object messageHandler)
         {
             if (messageHandler is null)
             {
                 throw new ArgumentNullException(nameof(messageHandler));
             }
+            CheckMessageContents();
+            _isVerified = false;
+        }
+        
+        private void CheckMessageContents()
+        {
             if (_message.Contents == null)
             {
                 throw new PactException("Message content has not been set. Please provide using the With method.");
             }
-            _isVerified = false;
+        }
+        private async Task InvokeMessageHandlerAsync<T>(Func<T,Task> messageHandler, T content)
+        {
+            try
+            {
+                await messageHandler.Invoke(content);
+            }
+            catch(Exception exception)
+            {
+                throw new PactException("Message handler threw an exception",exception);
+            }
+            _isVerified = true;
         }
 
         private void InvokeMessageHandler<T>(Action<T> messageHandler, T content)
@@ -119,9 +180,9 @@ namespace ComPact.Builders.V3
             {
                 messageHandler.Invoke(content);
             }
-            catch
+            catch(Exception exception)
             {
-                throw new PactException("Message handler threw an exception");
+                throw new PactException("Message handler threw an exception",exception);
             }
             _isVerified = true;
         }
