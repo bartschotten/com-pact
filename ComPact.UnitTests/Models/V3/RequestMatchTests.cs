@@ -2,6 +2,7 @@
 using ComPact.Models.V3;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 
 namespace ComPact.UnitTests.Models.V3
 {
@@ -115,7 +116,7 @@ namespace ComPact.UnitTests.Models.V3
 
         [TestMethod]
         public void ShouldNotMatchWhenBodyDoesNotMatch()
-        {
+        {            
             var actual = new Request
             {
                 Method = Method.GET,
@@ -134,5 +135,69 @@ namespace ComPact.UnitTests.Models.V3
         {
             new Request().Match(null);
         }
+
+        [TestMethod]
+        public void ShouldMatchWhenBodyIsAnObject()
+        {
+            var expected = new Request
+            {
+                Method = Method.POST,
+                Path = "/test",
+                Headers = new Headers { { "Accept", "application/json" } },
+                Body = new
+                {
+                    Text = "test",
+                    Number = 120,
+                    Collection = new Dictionary<string, string>() { { "key", "value" } }
+                }
+            };
+
+            var actual = new Request
+            {
+                Method = Method.POST,
+                Path = "/test",
+                Headers = new Headers { { "Accept", "application/json" } },
+                Body = new
+                {
+                    Text = "test",
+                    Number = 120,
+                    Collection = new Dictionary<string, string>() { { "key", "value" } }
+                }
+            };
+
+            Assert.IsTrue(expected.Match(actual));
+        }
+
+        [TestMethod]
+        public void ShouldNotMatchWhenBodyObjectIsDifferent()
+        {
+            var expected = new Request
+            {
+                Method = Method.POST,
+                Path = "/test",
+                Headers = new Headers { { "Accept", "application/json" } },
+                Body = new
+                {
+                    Text = "test",
+                    Number = 120,
+                    Collection = new Dictionary<string, string>() { { "key", "otherValue" } }
+                }
+            };
+
+            var actual = new Request
+            {
+                Method = Method.POST,
+                Path = "/test",
+                Headers = new Headers { { "Accept", "application/json" } },
+                Body = new
+                {
+                    Text = "test",
+                    Number = 120,
+                    Collection = new Dictionary<string, string>() { { "key", "value" } }
+                }
+            };
+
+            Assert.IsFalse(expected.Match(actual));
+        }        
     }
 }

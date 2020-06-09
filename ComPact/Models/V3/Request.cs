@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -101,9 +102,18 @@ namespace ComPact.Models.V3
             var pathsMatch = Path == actualRequest.Path;
             var headersMatch = Headers.Match(actualRequest.Headers);
             var queriesMatch = Query.Match(actualRequest.Query);
-            var bodiesMatch = Body == actualRequest.Body;
+            var bodiesMatch = MatchBody(actualRequest);
 
             return methodsMatch && pathsMatch && headersMatch && queriesMatch && bodiesMatch;
+        }
+
+        private dynamic MatchBody(Request actualRequest)
+        {
+            if (Body != null && actualRequest.Body != null)
+            {
+                return JObject.DeepEquals(JToken.FromObject(Body), JToken.FromObject(actualRequest.Body));
+            }
+            return Body == actualRequest.Body;
         }
 
         internal void SetEmptyValuesToNull()
