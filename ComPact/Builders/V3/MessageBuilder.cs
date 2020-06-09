@@ -62,8 +62,7 @@ namespace ComPact.Builders.V3
 
             try
             {
-                var serializedContent = JsonConvert.SerializeObject(_message.Contents);
-                var content = JsonConvert.DeserializeObject<T>(serializedContent);
+                var content = DeserializeContent<T>(_message.Contents);
                 InvokeMessageHandler(messageHandler, content);
             }
             catch
@@ -88,8 +87,7 @@ namespace ComPact.Builders.V3
 
             try
             {
-                var serializedContent = JsonConvert.SerializeObject(_message.Contents);
-                var content = JsonConvert.DeserializeObject<T>(serializedContent);
+                var content = DeserializeContent<T>(_message.Contents);
                 await InvokeMessageHandlerAsync(messageHandler, content);
             }
             catch
@@ -138,6 +136,12 @@ namespace ComPact.Builders.V3
             }
 
             return _message;
+        }
+
+        private T DeserializeContent<T>(object content)
+        {
+            var serializedContent = JsonConvert.SerializeObject(_message.Contents);
+            return JsonConvert.DeserializeObject<T>(serializedContent);
         }
 
         private void CheckMessageHandler<T>(Action<T> messageHandler)
