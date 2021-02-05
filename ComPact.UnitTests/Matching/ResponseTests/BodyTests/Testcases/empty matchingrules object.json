@@ -1,0 +1,22 @@
+{
+  "match": true,
+  "comment": "empty matchingrules object",
+  "expected": {
+    "headers": {},
+    "body": {
+      "myPerson": {
+        "name": "name"
+      }
+    },
+    "matchingRules": {
+    }
+  },
+  "actual": {
+    "headers": {},
+    "body": {
+      "myPerson": {
+        "name": "name"
+      }
+    }
+  }
+} 

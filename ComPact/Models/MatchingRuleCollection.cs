@@ -8,9 +8,9 @@ namespace ComPact.Models
     internal class MatchingRuleCollection
     {
         [JsonProperty("header")]
-        internal Dictionary<string, MatcherList> Header { get; set; }
+        internal Dictionary<string, MatcherList> Header { get; set; } = new Dictionary<string, MatcherList>();
         [JsonProperty("body")]
-        internal Dictionary<string, MatcherList> Body { get; set; }
+        internal Dictionary<string, MatcherList> Body { get; set; } = new Dictionary<string, MatcherList>();
 
         internal MatchingRuleCollection() { }
 
@@ -21,13 +21,11 @@ namespace ComPact.Models
                 throw new System.ArgumentNullException(nameof(matchingRules));
             }
 
-            Body = new Dictionary<string, MatcherList>();
             foreach (var rule in matchingRules.Where(m => m.Key.StartsWith("$.body")))
             {
                 Body.Add(rule.Key.Replace(".body", ""), new MatcherList { Matchers = new List<Matcher> { rule.Value } });
             }
 
-            Header = new Dictionary<string, MatcherList>();
             foreach (var rule in matchingRules.Where(m => m.Key.StartsWith("$.headers")))
             {
                 Header.Add(rule.Key.Replace("$.headers.", ""), new MatcherList { Matchers = new List<Matcher> { rule.Value } });

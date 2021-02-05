@@ -24,7 +24,7 @@ namespace ComPact.UnitTests.Matching.ResponseTests.BodyTests
             foreach (var file in testcaseFiles)
             {
                 var testcase = JsonConvert.DeserializeObject<Testcase>(File.ReadAllText(file));
-                if (file.Split(Path.DirectorySeparatorChar).Last().StartsWith("pro"))
+                if (file.Split(Path.DirectorySeparatorChar).Last().StartsWith(""))
                 {
                     List<string> differences = BodyMatcher.Match(testcase.Expected.Body, testcase.Actual.Body, testcase.Expected.MatchingRules);
                     if (differences.Any() == testcase.Match)
