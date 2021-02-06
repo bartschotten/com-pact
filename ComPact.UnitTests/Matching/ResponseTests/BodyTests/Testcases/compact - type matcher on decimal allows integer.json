@@ -1,0 +1,42 @@
+{
+  "match": true,
+  "comment": "type matcher on integer allows decimal",
+  "expected": {
+    "headers": { "Content-Type": "application/json" },
+    "matchingRules": {
+      "body": {
+        "$.alligator.name": {
+          "matchers": [
+            {
+              "match": "type"
+            }
+          ]
+        },
+        "$.alligator.length": {
+          "matchers": [
+            {
+              "match": "type"
+            }
+          ]
+        }
+      }
+    },
+    "body": {
+      "alligator": {
+        "name": "Mary",
+        "length": 4.2,
+        "favouriteColours": [ "red", "blue" ]
+      }
+    }
+  },
+  "actual": {
+    "headers": { "Content-Type": "application/json" },
+    "body": {
+      "alligator": {
+        "length": 5,
+        "name": "Harry the very long alligator",
+        "favouriteColours": [ "red", "blue" ]
+      }
+    }
+  }
+}

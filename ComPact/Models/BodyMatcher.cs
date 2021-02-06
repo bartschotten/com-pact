@@ -102,8 +102,8 @@ namespace ComPact.Models
                 }
                 return new List<string> { $"Property \'{expectedToken.Path}\' was not present in the actual response." };
             }
-            
-            if (expectedToken.Type != actualToken.Type)
+
+            if (!expectedToken.IsSameJsonTypeAs(actualToken))
             {
                 return new List<string> { $"Property \'{expectedToken.Path}\' has a different type in the actual response. Expected value: {expectedToken}, actual value: {actualToken}" };
             }
@@ -116,10 +116,6 @@ namespace ComPact.Models
             if (matchingRules != null && matchingRules.TryGetApplicableMatcherListForToken(expectedToken, out var matcherList))
             {
                 return matcherList.Match(expectedToken, actualToken);
-            }
-            else if (expectedToken.Type != actualToken.Type)
-            {
-                return new List<string> { $"Expected value of type {expectedToken.Type} (like: \'{expectedToken.ToString()}\') at \'{expectedToken.Path}\', but was value of type {actualToken.Type}." };
             }
             else if (!actualValue.Equals(expectedValue))
             {

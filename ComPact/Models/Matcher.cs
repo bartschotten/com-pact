@@ -24,9 +24,9 @@ namespace ComPact.Models
         {
             var differences = new List<string>();
 
-            if (MatcherType == MatcherType.type && expectedToken.Type != actualToken.Type)
+            if (MatcherType == MatcherType.type && !expectedToken.IsSameJsonTypeAs(actualToken))
             {
-                differences.Add($"Expected value of type {expectedToken.Type} (like: \'{expectedToken.ToString()}\') at {expectedToken.Path}, but was value of type {actualToken.Type}.");
+                differences.Add($"Expected value of type {expectedToken.Type} (like: \'{expectedToken}\') at {expectedToken.Path}, but was value of type {actualToken.Type}.");
             }
             if (Regex != null && System.Text.RegularExpressions.Regex.Match(actualToken.Value<string>(), Regex).Value != actualToken.Value<string>())
             {
@@ -46,7 +46,7 @@ namespace ComPact.Models
             }
             if (MatcherType == MatcherType.@null && actualToken.Type != JTokenType.Null)
             {
-                differences.Add($"Expected null at {expectedToken.Path}, but was {actualToken.ToString()}.");
+                differences.Add($"Expected null at {expectedToken.Path}, but was {actualToken}.");
             }
 
             if (expectedToken.Type == JTokenType.Array)
